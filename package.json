@@ -1,0 +1,52 @@
+{
+  "name": "spago-viz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "spago build",
+    "test": "spago -x test.dhall test",
+    "esbuild-renderer": "esbuild renderer.mjs --bundle --outfile=renderer.js",
+    "esbuild-main": "esbuild main.mjs --bundle --platform=node --target=node16.15 --external:electron --outfile=main.js",
+    "esbuild": "npm run esbuild-renderer && npm run esbuild-main",
+    "just-start": "electron .",
+    "prestart": "npm run build && npm run esbuild",
+    "start": "npm run just-start",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@emotion/core": "^11.0.0",
+    "@emotion/react": "^11.9.0",
+    "@hpcc-js/wasm": "^1.14.1",
+    "@petamoriken/float16": "^2.0.0",
+    "@storybook/builder-webpack5": "^6.5.8",
+    "@storybook/manager-webpack5": "^6.5.8",
+    "big-integer": "^1.6.51",
+    "framer-motion": "^6.3.10",
+    "nearley": "^2.20.1",
+    "node-fetch": "^2.6.7",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "sjcl": "github:athanclark/sjcl#e6ca43fbcc85689f9e6b212cc88b85a53295a459"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@storybook/addon-actions": "^6.5.8",
+    "@storybook/addon-essentials": "^6.5.8",
+    "@storybook/addon-interactions": "^6.5.8",
+    "@storybook/addon-links": "^6.5.8",
+    "@storybook/builder-webpack4": "^6.5.8",
+    "@storybook/manager-webpack4": "^6.5.8",
+    "@storybook/react": "^6.5.8",
+    "@storybook/testing-library": "^0.0.12",
+    "babel-loader": "^8.2.5",
+    "electron": "^19.0.1",
+    "esbuild": "^0.14.41"
+  }
+}

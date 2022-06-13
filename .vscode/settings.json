@@ -1,0 +1,25 @@
+{
+  "purescript.buildCommand": "spago -x stories.dhall build --purs-args --json-errors",
+  "purescript.formatter": "purs-tidy",
+  "editor.formatOnSave": true,
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#08213b",
+    "activityBar.activeBorder": "#a8175e",
+    "activityBar.background": "#08213b",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#a8175e",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "sash.hoverBorder": "#08213b",
+    "statusBar.background": "#02080e",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#08213b",
+    "statusBarItem.remoteBackground": "#02080e",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#02080e",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#02080e99",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#02080e",
+}
