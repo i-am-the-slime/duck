@@ -1,0 +1,16 @@
+{
+  "name": "spago-viz",
+  "projects": [
+    {
+      "type": "spago-app",
+      "definition": {
+        "root": ".",
+        "entrypoints": [
+          {
+            "spago_file": "spago.dhall"
+          }
+        ]
+      }
+    }
+  ]
+}

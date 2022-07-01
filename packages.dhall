@@ -230,7 +230,7 @@ in  upstream
       , "web-html"
       ]
     , repo = "https://github.com/murmuras-tech/plumage.git"
-    , version = "891a5ec02778f347b0c6ea9432cee5397e186169"
+    , version = "69a62e74389e8f343d94f8f17560c7bf7325dc55"
     }
   with web-router =
     { dependencies =
@@ -675,7 +675,7 @@ in  upstream
     }
   with ry-blocks =
     { repo = "https://github.com/rowtype-yoga/ry-blocks.git"
-    , version = "1afaa05bf1160b2d009dbfa87b8f7e5b205cf5dc"
+    , version = "6ea837a554666463c1e073eca9912de6160e2768"
     , dependencies =
       [ "aff"
       , "aff-promise"
@@ -833,7 +833,7 @@ in  upstream
       , "typelevel-prelude"
       , "unsafe-coerce"
       ]
-    , version = "main"
+    , version = "654be2533b0ea950511f26e29ba9ab574f7abc03"
     }
   with dhall-purescript =
     { dependencies =
@@ -860,4 +860,4 @@ in  upstream
       ]
     , version = "main"
     }
-  with yoga-json.version = "v1.0.1"
+  with yoga-json.version = "353f5aa5aaebe59779d4521e8f2967191254de6d"

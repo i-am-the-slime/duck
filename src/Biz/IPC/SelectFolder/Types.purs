@@ -10,12 +10,14 @@ import Foreign (MultipleErrors, renderForeignError)
 import Type.Proxy (Proxy(..))
 import Type.Row (type (+))
 
-selectFolderChannel :: Channel
+-- [TODO] Delete
+selectFolderChannel ∷ Channel
 selectFolderChannel = Channel "select-folder"
 
 type SelectFolderData = {}
 
-selectedFolderChannel :: Channel
+-- [TODO] Delete
+selectedFolderChannel ∷ Channel
 selectedFolderChannel = Channel "selected-folder"
 
 type SelectedFolderData = Variant
@@ -26,38 +28,38 @@ type SelectedFolderData = Variant
   )
 
 -- | nothingSelected
-nothingSelected :: forall r. Variant (NothingSelected r)
+nothingSelected ∷ ∀ r. Variant (NothingSelected r)
 nothingSelected = inj nothingSelectedKey {}
 
-nothingSelectedKey :: Proxy "nothingSelected"
+nothingSelectedKey ∷ Proxy "nothingSelected"
 nothingSelectedKey = Proxy
 
-type NothingSelected others = (nothingSelected :: {} | others)
+type NothingSelected others = (nothingSelected ∷ {} | others)
 
 -- | noSpagoDhall
-noSpagoDhall :: forall r. Variant (NoSpagoDhall r)
+noSpagoDhall ∷ ∀ r. Variant (NoSpagoDhall r)
 noSpagoDhall = inj noSpagoDhallKey {}
 
-noSpagoDhallKey :: Proxy "noSpagoDhall"
+noSpagoDhallKey ∷ Proxy "noSpagoDhall"
 noSpagoDhallKey = Proxy
 
-type NoSpagoDhall others = (noSpagoDhall :: {} | others)
+type NoSpagoDhall others = (noSpagoDhall ∷ {} | others)
 
 -- | invalidSpagoDhall
-invalidSpagoDhall :: forall r. MultipleErrors -> Variant (InvalidSpagoDhall r)
+invalidSpagoDhall ∷ ∀ r. MultipleErrors → Variant (InvalidSpagoDhall r)
 invalidSpagoDhall errs = inj invalidSpagoDhallKey
   (intercalate "\n" (renderForeignError <$> errs))
 
-invalidSpagoDhallKey :: Proxy "invalidSpagoDhall"
+invalidSpagoDhallKey ∷ Proxy "invalidSpagoDhall"
 invalidSpagoDhallKey = Proxy
 
-type InvalidSpagoDhall others = (invalidSpagoDhall :: String | others)
+type InvalidSpagoDhall others = (invalidSpagoDhall ∷ String | others)
 
 -- | validSpagoDhall
-validSpagoDhall :: forall r. ProjectConfig -> Variant (ValidSpagoDhall r)
+validSpagoDhall ∷ ∀ r. ProjectConfig → Variant (ValidSpagoDhall r)
 validSpagoDhall = inj validSpagoDhallKey
 
-validSpagoDhallKey :: Proxy "validSpagoDhall"
+validSpagoDhallKey ∷ Proxy "validSpagoDhall"
 validSpagoDhallKey = Proxy
 
-type ValidSpagoDhall others = (validSpagoDhall :: ProjectConfig | others)
+type ValidSpagoDhall others = (validSpagoDhall ∷ ProjectConfig | others)

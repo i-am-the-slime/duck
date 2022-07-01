@@ -1,0 +1,14 @@
+* TODO:
+
+** Steps to create a purescript library project
+ 1. Create repository
+ 2. Clone repository
+ 3. `spago init`
+ 4. fix project name in spago.dhall
+ 5. create test.dhall remove test lib from spago.dhall
+ 6. Add to registry
+ 7. `spago bump-version --no-dry-run`
+ 8. `pulp publish` (twice)
+ 9. Add to package set
+
+** Steps to update a purescript library

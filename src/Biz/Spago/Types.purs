@@ -7,17 +7,17 @@ import Foreign.Object (Object)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 
 type ProjectConfig =
-  { name :: ProjectName
-  , repository :: Maybe Repository
-  , dependencies :: Array ProjectName
-  , sources :: Array SourceGlob
-  , packages :: Object Package
+  { name ∷ ProjectName
+  , repository ∷ Maybe Repository
+  , dependencies ∷ Array ProjectName
+  , sources ∷ Array SourceGlob
+  , packages ∷ Object Package
   }
 
 type Package =
-  { repo :: Repository
-  , version :: Version
-  , dependencies :: Array ProjectName
+  { repo ∷ Repository
+  , version ∷ Version
+  , dependencies ∷ Array ProjectName
   }
 
 newtype ProjectName = ProjectName String

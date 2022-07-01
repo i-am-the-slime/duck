@@ -2,9 +2,12 @@ module Backend.IPC.SendMessage where
 
 import Prelude
 
-import Biz.IPC.Message.Types (MessageToRenderer, messageToRendererChannel)
-import Electron (sendToWebContents)
+import Biz.IPC.Message.Types (MessageToRenderer, mainToRendererChannelName, messageToRendererToChannel)
+import Effect (Effect)
+import Electron (BrowserWindow, sendToWebContents)
 
-send (m :: MessageToRenderer) =
-  sendToWebContents
-    (messageToRendererChannel m)
+send ∷ MessageToRenderer → BrowserWindow → Effect Unit
+send (message ∷ MessageToRenderer) window =
+  sendToWebContents message
+    (mainToRendererChannelName $ messageToRendererToChannel message)
+    window

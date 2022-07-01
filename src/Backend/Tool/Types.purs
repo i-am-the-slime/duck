@@ -2,31 +2,32 @@ module Backend.Tool.Types where
 
 import Prelude
 
-import Backend.OperatingSystem.Types (OperatingSystem)
 import Data.Bounded.Generic (genericBottom, genericTop)
 import Data.Enum (class BoundedEnum, class Enum)
 import Data.Enum.Generic (genericCardinality, genericFromEnum, genericPred, genericSucc, genericToEnum)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Tuple.Nested (type (/\))
+import Yoga.JSON (class ReadForeign, class WriteForeign)
+import Yoga.JSON.Generics (genericReadForeignEnum, genericWriteForeignEnum)
 
 type ToolWithPath = Tool /\ Maybe ToolPath
 
 data Tool = NPM | Spago | Purs | DhallToJSON
 
-toCommand :: OperatingSystem -> Tool -> String
-toCommand = case _, _ of
-  _, NPM -> "npm"
-  _, DhallToJSON -> "dhall-to-json"
-  _, Spago -> "spago"
-  _, Purs -> "purs"
+toCommand ∷ Tool → String
+toCommand = case _ of
+  NPM → "npm"
+  DhallToJSON → "dhall-to-json"
+  Spago → "spago"
+  Purs → "purs"
 
-toName :: Tool -> String
+toName ∷ Tool → String
 toName = case _ of
-  NPM -> "Node Package Manager"
-  DhallToJSON -> "Dhall to JSON"
-  Spago -> "Spago"
-  Purs -> "PureScript Compiler"
+  NPM → "Node Package Manager"
+  DhallToJSON → "Dhall to JSON"
+  Spago → "Spago"
+  Purs → "PureScript Compiler"
 
 derive instance Generic Tool _
 derive instance Eq Tool
@@ -45,4 +46,15 @@ instance BoundedEnum Tool where
   toEnum = genericToEnum
   fromEnum = genericFromEnum
 
+instance WriteForeign Tool where
+  writeImpl = genericWriteForeignEnum
+
+instance ReadForeign Tool where
+  readImpl = genericReadForeignEnum
+
 newtype ToolPath = ToolPath String
+
+derive instance Eq ToolPath
+derive instance Ord ToolPath
+derive newtype instance ReadForeign ToolPath
+derive newtype instance WriteForeign ToolPath

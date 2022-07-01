@@ -2,35 +2,37 @@ module UI.Component where
 
 import Prelude
 
+import Biz.IPC.Message.Types (MainToRendererChannel, RendererToMainChannel)
 import Control.Monad.Reader.Trans (ask)
 import Effect (Effect)
 import Effect.Class (liftEffect)
-import Electron.Types (Channel)
 import ElectronAPI (ElectronListener)
 import Foreign (Foreign)
 import React.Basic (JSX)
 import React.Basic.Hooks as Hooks
 import React.Basic.Hooks as React
 import Uncurried.ReaderT (ReaderT, runReaderT)
+import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre)
+import Yoga.Fetch.Impl (FetchImpl)
 
 type Ctx =
-  { registerListener :: Channel -> ElectronListener -> Effect Unit
-  , removeListener :: Channel -> ElectronListener -> Effect Unit
-  , postMessage :: Channel -> Foreign -> Effect Unit
+  { registerListener ∷ MainToRendererChannel → ElectronListener → Effect Unit
+  , removeListener ∷ MainToRendererChannel → ElectronListener → Effect Unit
+  , postMessage ∷ RendererToMainChannel → Foreign → Effect Unit
+  , notificationCentre ∷ NotificationCentre
+  , fetchImpl ∷ FetchImpl
   }
 
 type ComponentM = ReaderT Ctx Effect
-type Component props = ReaderT Ctx Effect (props -> JSX)
+type Component props = ReaderT Ctx Effect (props → JSX)
 
-runComponent :: forall a. Ctx -> ComponentM a -> Effect a
+runComponent ∷ ∀ a. Ctx → ComponentM a → Effect a
 runComponent = runReaderT
 
-component
-  :: forall hooks props
-   . String
-  -> (Ctx -> props -> Hooks.Render Unit hooks JSX)
-  -> Component props
-component name render = do
-  ctx <- ask
-  liftEffect $
-    React.component name (render ctx)
+component ∷
+  ∀ hooks props.
+  String →
+  (Ctx → props → Hooks.Render Unit hooks JSX) →
+  Component props
+component name render =
+  ask >>= render >>> React.component name >>> liftEffect

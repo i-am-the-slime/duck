@@ -6,9 +6,9 @@ import Data.Foldable (for_)
 import Data.Maybe (Maybe)
 import Effect (Effect)
 import React.Basic (JSX)
-import React.Basic.DOM (hydrate)
+import React.Basic.DOM (render)
 import UI.Component (runComponent)
-import UI.Ctx.Electron (electronCtx)
+import UI.Ctx.Electron (mkElectronCtx)
 import UI.Start as Start
 import Web.DOM (Element)
 import Web.DOM.NonElementParentNode (getElementById)
@@ -16,18 +16,20 @@ import Web.HTML (window)
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.Window (document)
 
-main :: Effect Unit
+main ∷ Effect Unit
 main = do
-  contentDivʔ <- getContentDiv
-  entryView <- mkEntryView
+  contentDivʔ ← getContentDiv
+  entryView ← mkEntryView
   for_ contentDivʔ do
-    hydrate entryView
+    render entryView
 
-mkEntryView :: Effect JSX
-mkEntryView = runComponent electronCtx
-  (Start.mkView <@> unit)
+mkEntryView ∷ Effect JSX
+mkEntryView = do
+  electronCtx ← mkElectronCtx
+  runComponent electronCtx
+    (Start.mkView <@> unit)
 
-getContentDiv :: Effect (Maybe Element)
+getContentDiv ∷ Effect (Maybe Element)
 getContentDiv =
   window
     >>= document
