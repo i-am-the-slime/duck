@@ -2,9 +2,9 @@ module UI.Preferences where
 
 import Yoga.Prelude.View hiding (Component)
 
-import Biz.IPC.Message.Types (MainToRendererChannel(..), MessageToRenderer(..), RendererToMainChannel(..))
+import Biz.IPC.Message.Types (MainToRendererChannel(..), MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..))
 import Biz.PureScriptSolutionDefinition.Types (PureScriptSolutionDefinition)
-import Fahrtwind (background', border, borderCol', divideX, divideY, height, linearGradientString, mT, pL, pR, pXY, roundedDefault, roundedXl, shadowLg, shadowMd, text2xl, text3xl, textCol', width, widthAndHeight)
+import Fahrtwind (background', border, borderCol', divideY, mT, pL, pR, roundedXl, shadowMd, text2xl, textCol', widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicons
 import Fahrtwind.Style.Divide (divideCol')
 import Network.RemoteData as RD
@@ -15,7 +15,6 @@ import React.Basic.Hooks as React
 import UI.Component (Component, Ctx, component)
 import UI.FilePath (renderFilePath)
 import UI.Hook.UseIPCMessage (useIPCMessage)
-import UI.Tooltip (withTextTooltip)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col, colour)
@@ -29,7 +28,7 @@ mkView = do
         GetPureScriptSolutionDefinitionsResponseChannel
 
     useEffectOnce do
-      getPreferences {}
+      getPreferences GetPureScriptSolutionDefinitions
       mempty
 
     let title = R.h1' </* { css: text2xl } /> [ R.text "Solutions" ]

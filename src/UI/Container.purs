@@ -19,6 +19,12 @@ popOverId = "popOver"
 tooltipId ∷ String
 tooltipId = "tooltip"
 
+modalContainerId ∷ String
+modalContainerId = "modal"
+
+modalClickawayId ∷ String
+modalClickawayId = "modal-clickaway"
+
 notificationsId ∷ String
 notificationsId = "notifications"
 
@@ -35,6 +41,8 @@ mkContainer notificationCentre = do
     , notificationCentreView
     , scrollableFullScreenLayerDiv popOverId 10
     , scrollableFullScreenLayerDiv tooltipId 20
+    , fixedFullScreenLayerDiv modalClickawayId 30
+    , fixedFullScreenLayerDiv modalContainerId 40
     , fixedFullScreenLayerDiv notificationsId 300
     ]
   where

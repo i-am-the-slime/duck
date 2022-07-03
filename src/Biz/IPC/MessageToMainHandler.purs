@@ -3,10 +3,11 @@ module Biz.IPC.MessageToMainHandler where
 import Prelude
 
 import Backend.CheckTools (getToolsWithPaths)
+import Backend.Github.API as GithubGraphQL
 import Backend.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (MessageToRenderer(..), RendererToMainChannel(..), mainToRendererChannelName, messageToRendererToChannel)
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..), mainToRendererChannelName, messageToRendererToChannel)
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, invalidSpagoDhall, noSpagoDhall, nothingSelected, validSpagoDhall)
 import Biz.Preferences (readAppPreferences)
 import Data.Array.NonEmpty as NEA
@@ -28,13 +29,16 @@ import Sunde (spawn)
 import Yoga.JSON (readJSON)
 
 handleMessageToMain ∷
-  BrowserWindow → RendererToMainChannel → Aff Unit
-handleMessageToMain window incomingChannel = do
-  responseʔ ← case incomingChannel of
+  BrowserWindow → RendererToMainChannel → (MessageToMain → Aff Unit)
+handleMessageToMain window incomingChannel = \message → do
+  responseʔ ∷ Maybe MessageToRenderer ← case incomingChannel of
     ShowFolderSelectorChannel → Just <$> showFolderSelector window
     ShowOpenDialogChannel → Just <$> showOpenDialog window
     GetInstalledToolsChannel → Just <$> getInstalledTools
-    GetPureScriptSolutionDefinitionsChannel → Just <$> getProjectDefinitions
+    GetPureScriptSolutionDefinitionsChannel →
+      Just <$> getProjectDefinitions
+    QueryGithubGraphQLChannel → queryGithubGraphQL message
+
   liftEffect $ for_ responseʔ \(response ∷ MessageToRenderer) →
     window # sendToWebContents response
       ((messageToRendererToChannel >>> mainToRendererChannelName) response)
@@ -87,3 +91,9 @@ getProjectDefinitions = do
   prefs ← readAppPreferences
   projects ← for prefs.solutions \fp → (fp /\ _) <$> readSolutionDefinition fp
   pure $ GetPureScriptSolutionDefinitionsResponse projects
+
+queryGithubGraphQL ∷ MessageToMain → Aff (Maybe MessageToRenderer)
+queryGithubGraphQL = case _ of
+  QueryGithubGraphQL { token, query } →
+    GithubGraphQL.sendRequest token query <#> Just <<< GithubGraphQLResult
+  _ → pure Nothing

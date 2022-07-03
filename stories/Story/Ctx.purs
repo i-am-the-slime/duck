@@ -2,13 +2,17 @@ module Story.Ctx where
 
 import Prelude
 
+import Biz.Github.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
 import Biz.IPC.Message.Types (MainToRendererChannel, RendererToMainChannel)
+import Biz.OAuth.Types (AccessToken(..), GithubAccessToken, ScopeList(..), TokenType(..))
 import Data.Array (singleton)
 import Data.Array as Array
 import Data.Foldable (for_, traverse_)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
+import Data.Time.Duration (Seconds(..))
 import Data.Tuple.Nested (type (/\), (/\))
+import Dhall.Printer (TokenType)
 import Effect (Effect)
 import Effect.Aff.Compat (EffectFn2, runEffectFn2)
 import Effect.Ref as Ref
@@ -18,14 +22,19 @@ import React.Basic (JSX)
 import React.Basic.DOM (text)
 import Story.Util.NotificationCentre (storyNotificationCentre)
 import UI.Component (Ctx)
+import UI.GithubLogin.Repository (PollAccessToken, GetDeviceCode, getDeviceCode, pollAccessToken)
 import Unsafe.Coerce (unsafeCoerce)
 import Unsafe.Reference (unsafeRefEq)
-import Yoga.Fetch.Impl.Node (nodeFetch)
+import Yoga.Fetch as F
+import Yoga.Fetch.Impl.Window (windowFetch)
 
 type OnMessage =
   RendererToMainChannel →
   Foreign →
   Effect (Maybe (MainToRendererChannel /\ Foreign))
+
+emptyOnMessage ∷ OnMessage
+emptyOnMessage _ _ = pure Nothing
 
 mkStoryCtx ∷ OnMessage → Effect Ctx
 mkStoryCtx onMessage = do
@@ -65,8 +74,37 @@ mkStoryCtx onMessage = do
     , removeListener
     , postMessage
     , notificationCentre: storyNotificationCentre
-    , fetchImpl: nodeFetch
+    , githubAuth:
+        { getDeviceCode: alwaysSucceedGetDeviceCode
+        , pollAccessToken: getAccessTokenImmediately
+        }
     }
+
+alwaysSucceedGetDeviceCode ∷ GetDeviceCode
+alwaysSucceedGetDeviceCode = pure
+  ( pure
+      ( DeviceCodeResponse
+          { device_code: DeviceCode "123"
+          , expires_in: Seconds 900.0
+          , interval: Seconds 10.0
+          , user_code: UserCode "12c4-540O"
+          , verification_uri: VerificationURI "https://purescript.org"
+          }
+      )
+  )
+
+getAccessTokenImmediately ∷ PollAccessToken
+-- DeviceCode →
+-- Aff (Either String (Either DeviceTokenError GithubAccessToken))
+getAccessTokenImmediately _ = pure
+  ( pure
+      ( pure
+          { access_token: AccessToken "123"
+          , token_type: TokenType "fake"
+          , scope: ScopeList "user,repo"
+          }
+      )
+  )
 
 class ToJSX jsx where
   toJSX ∷ jsx → Array JSX

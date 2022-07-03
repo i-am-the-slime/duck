@@ -2,9 +2,11 @@ module Biz.IPC.Message.Types where
 
 import Prelude
 
+import Backend.Github.API.Types (GithubGraphQLQuery(..), GithubGraphQLResponse)
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult)
 import Biz.IPC.Message.OpenDialog.Types as OpenDialog
 import Biz.IPC.SelectFolder.Types (SelectedFolderData)
+import Biz.OAuth.Types (GithubAccessToken)
 import Biz.PureScriptSolutionDefinition.Types (PureScriptSolutionDefinition)
 import Data.Bounded.Generic (genericBottom, genericTop)
 import Data.Enum (class BoundedEnum, class Enum)
@@ -22,6 +24,7 @@ data MessageToMain
   | ShowOpenDialog OpenDialog.Args
   | GetInstalledTools
   | GetPureScriptSolutionDefinitions
+  | QueryGithubGraphQL { token ∷ GithubAccessToken, query ∷ GithubGraphQLQuery }
 
 data MessageToRenderer
   = ShowFolderSelectorResponse SelectedFolderData
@@ -29,6 +32,7 @@ data MessageToRenderer
   | GetInstalledToolsResponse GetInstalledToolsResult
   | GetPureScriptSolutionDefinitionsResponse
       (Array (Tuple FilePath PureScriptSolutionDefinition))
+  | GithubGraphQLResult GithubGraphQLResponse
 
 rendererToMainChannelName ∷ RendererToMainChannel → Channel
 rendererToMainChannelName = Channel <<< case _ of
@@ -36,6 +40,7 @@ rendererToMainChannelName = Channel <<< case _ of
   ShowOpenDialogChannel → "ask-user-to-select-folder"
   GetInstalledToolsChannel → "get-installed-tools"
   GetPureScriptSolutionDefinitionsChannel → "get-app-settings"
+  QueryGithubGraphQLChannel → "query-github-graphql"
 
 mainToRendererChannelName ∷ MainToRendererChannel → Channel
 mainToRendererChannelName = Channel <<< case _ of
@@ -43,6 +48,7 @@ mainToRendererChannelName = Channel <<< case _ of
   ShowOpenDialogResponseChannel → "ask-user-to-select-folder-response"
   GetInstalledToolsResponseChannel → "get-installed-tools-response"
   GetPureScriptSolutionDefinitionsResponseChannel → "get-app-settings-response"
+  GithubGraphQLResultChannel → "query-github-graphql-response"
 
 messageToRendererToChannel ∷ MessageToRenderer → MainToRendererChannel
 messageToRendererToChannel = case _ of
@@ -50,18 +56,21 @@ messageToRendererToChannel = case _ of
   UserSelectedFile _ → ShowOpenDialogResponseChannel
   GetInstalledToolsResponse _ → GetInstalledToolsResponseChannel
   GetPureScriptSolutionDefinitionsResponse _ → GetInstalledToolsResponseChannel
+  GithubGraphQLResult _ → GithubGraphQLResultChannel
 
 data RendererToMainChannel
   = ShowFolderSelectorChannel
   | ShowOpenDialogChannel
   | GetInstalledToolsChannel
   | GetPureScriptSolutionDefinitionsChannel
+  | QueryGithubGraphQLChannel
 
 data MainToRendererChannel
   = ShowFolderSelectorResponseChannel
   | ShowOpenDialogResponseChannel
   | GetInstalledToolsResponseChannel
   | GetPureScriptSolutionDefinitionsResponseChannel
+  | GithubGraphQLResultChannel
 
 derive instance Generic MessageToMain _
 derive instance Eq MessageToMain
@@ -69,6 +78,9 @@ derive instance Ord MessageToMain
 
 instance WriteForeign MessageToMain where
   writeImpl = genericWriteForeignTaggedSum defaultOptions
+
+instance ReadForeign MessageToMain where
+  readImpl = genericReadForeignTaggedSum defaultOptions
 
 instance WriteForeign MessageToRenderer where
   writeImpl = genericWriteForeignTaggedSum defaultOptions

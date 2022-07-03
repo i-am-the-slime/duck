@@ -2,18 +2,19 @@ module Electron where
 
 import Prelude
 
-import Biz.OAuth.Types (CallbackURL(..), RedirectURL(..))
 import Control.Promise (Promise, toAffE)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Effect.Uncurried (EffectFn2, runEffectFn2)
-import Electron.Types (Channel, Protocol(..))
+import Effect.Uncurried (EffectFn2, EffectFn3, runEffectFn2, runEffectFn3)
+import Electron.Types (Channel, Protocol)
 import Foreign (Foreign)
+import Node.Buffer (Buffer)
 import Node.Path (FilePath)
 import Unsafe.Coerce (unsafeCoerce)
 import Untagged.Castable (class Castable, cast)
 import Untagged.Union (UndefinedOr)
-import Web.Event.Event (EventType)
+import Web.Event.Event (Event, EventType)
 import Web.Event.EventTarget (EventListener, EventTarget)
 import Yoga.JSON (class WriteForeign, write)
 
@@ -55,7 +56,7 @@ sendIPCRendererMessage msg = runEffectFn2 sendIPCRendererMessageImpl
   (write msg)
 
 foreign import onIPCMainMessage ∷
-  EventListener → Channel → Effect Unit
+  (EffectFn2 Event Foreign Unit) → Channel → Effect Unit
 
 foreign import onIPCRendererMessage ∷
   EventListener → Channel → Effect Unit
@@ -125,3 +126,15 @@ foreign import setAsDefaultProtocolClient ∷ Protocol → Effect Boolean
 foreign import close ∷ BrowserWindow → Effect Unit
 
 foreign import setWindowOpenHandlerToExternal ∷ BrowserWindow → Effect Unit
+
+foreign import encryptStringImpl ∷
+  ∀ a. EffectFn3 (a → Maybe a) (Maybe a) String (Maybe Buffer)
+
+encryptString ∷ String → Effect (Maybe Buffer)
+encryptString = runEffectFn3 encryptStringImpl Just Nothing
+
+foreign import decryptStringImpl ∷
+  ∀ a. EffectFn3 (a → Maybe a) (Maybe a) Buffer (Maybe String)
+
+decryptString ∷ Buffer → Effect (Maybe String)
+decryptString = runEffectFn3 decryptStringImpl Just Nothing

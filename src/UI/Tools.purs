@@ -5,8 +5,7 @@ import Yoga.Prelude.View
 import Backend.Tool.Types (Tool, ToolPath(..), ToolWithPath)
 import Backend.Tool.Types as Tool
 import Data.Time.Duration (Milliseconds(..))
-import Effect.Class.Console as Console
-import Fahrtwind (background, background', border, borderCol, borderCol', flexCol, green, mB, pX, pY, roundedDefault, roundedFull, roundedMd, shadowMd, textCol', textLg, textSm, widthAndHeight, yellow)
+import Fahrtwind (background, background', border, borderCol, borderCol', flexCol, green, mB, pX, pY, roundedFull, roundedMd, shadowMd, textCol', textLg, textSm, widthAndHeight, yellow)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Plumage.Util.HTML as H
 import React.Basic.DOM as R
@@ -22,7 +21,7 @@ import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre(..))
 
 mkView ∷ UI.Component (Array ToolWithPath)
 mkView = do
-  UI.component "Project" \{ notificationCentre } tools → React.do
+  UI.component "Tools" \{ notificationCentre } tools → React.do
     pure $ Block.stack { space: E.px 8 }
       (tools <#> renderTool notificationCentre)
 

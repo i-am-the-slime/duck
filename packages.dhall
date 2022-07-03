@@ -230,7 +230,7 @@ in  upstream
       , "web-html"
       ]
     , repo = "https://github.com/murmuras-tech/plumage.git"
-    , version = "69a62e74389e8f343d94f8f17560c7bf7325dc55"
+    , version = "613f97e6b8d0de44427dca6ca61278434047254c"
     }
   with web-router =
     { dependencies =
@@ -861,3 +861,11 @@ in  upstream
     , version = "main"
     }
   with yoga-json.version = "353f5aa5aaebe59779d4521e8f2967191254de6d"
+  with react-virtuoso =
+    { dependencies =
+        ( https://raw.githubusercontent.com/rowtype-yoga/purescript-react-virtuoso/main/spago.dhall
+            sha256:9c7c1ced896538360ba325dcefe912fed8c0207bc828f68ebadf5f3b83ee5012
+        ).dependencies
+    , repo = "https://github.com/rowtype-yoga/purescript-react-virtuoso.git"
+    , version = "5be142c5a651509e9e9a68582ed1807c029ba1b5"
+    }

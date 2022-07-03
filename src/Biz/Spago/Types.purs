@@ -3,6 +3,7 @@ module Biz.Spago.Types where
 import Prelude
 
 import Data.Maybe (Maybe)
+import Data.Newtype (class Newtype)
 import Foreign.Object (Object)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 
@@ -22,6 +23,7 @@ type Package =
 
 newtype ProjectName = ProjectName String
 
+derive instance Newtype ProjectName _
 derive newtype instance Show ProjectName
 derive newtype instance Eq ProjectName
 derive newtype instance Ord ProjectName
@@ -38,6 +40,7 @@ derive newtype instance ReadForeign SourceGlob
 
 newtype Repository = Repository String
 
+derive instance Newtype Repository _
 derive newtype instance Show Repository
 derive newtype instance Eq Repository
 derive newtype instance Ord Repository

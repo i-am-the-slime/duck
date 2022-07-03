@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer, dialog, shell } from "electron"
+import { app, BrowserWindow, ipcMain, ipcRenderer, dialog, shell, safeStorage } from "electron"
 
 export const whenReadyImpl = () => app.whenReady()
 export const newBrowserWindow = (config) => () => new BrowserWindow(config)
@@ -60,4 +60,26 @@ export const setWindowOpenHandlerToExternal = win => () => {
     }
     return { action: 'deny' };
 });
+}
+
+export const isEncryptionAvailable = () => {
+  return safeStorage.isEncryptionAvailable()
+}
+
+export const encryptStringImpl = (just, nothing, plainText) => {
+  try {
+    const res = safeStorage.encryptString(plainText)
+    return just(res)
+  } catch {
+    return nothing;
+  }
+}
+
+export const decryptStringImpl = (just, nothing, buffer) => {
+  try {
+    const res = safeStorage.decryptString(buffer)
+    return just(res)
+  } catch {
+    return nothing;
+  }
 }

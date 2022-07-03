@@ -11,16 +11,19 @@ import Foreign (Foreign)
 import React.Basic (JSX)
 import React.Basic.Hooks as Hooks
 import React.Basic.Hooks as React
+import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Uncurried.ReaderT (ReaderT, runReaderT)
 import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre)
-import Yoga.Fetch.Impl (FetchImpl)
 
 type Ctx =
   { registerListener ∷ MainToRendererChannel → ElectronListener → Effect Unit
   , removeListener ∷ MainToRendererChannel → ElectronListener → Effect Unit
   , postMessage ∷ RendererToMainChannel → Foreign → Effect Unit
   , notificationCentre ∷ NotificationCentre
-  , fetchImpl ∷ FetchImpl
+  , githubAuth ∷
+      { getDeviceCode ∷ GetDeviceCode
+      , pollAccessToken ∷ PollAccessToken
+      }
   }
 
 type ComponentM = ReaderT Ctx Effect

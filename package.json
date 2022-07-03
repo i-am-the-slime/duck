@@ -36,10 +36,12 @@
     "node-fetch": "^2.6.7",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-virtuoso": "^2.16.1",
     "sjcl": "github:athanclark/sjcl#e6ca43fbcc85689f9e6b212cc88b85a53295a459"
   },
   "devDependencies": {
     "@babel/core": "^7.18.2",
+    "@react-aria/overlays": "^3.9.1",
     "@storybook/addon-actions": "^6.5.9",
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-interactions": "^6.5.9",

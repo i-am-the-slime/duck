@@ -2,8 +2,7 @@ module UI.OpenProject where
 
 import Yoga.Prelude.View hiding (Component)
 
-import Biz.IPC.Message.Types (MainToRendererChannel(..), RendererToMainChannel(..))
-import Biz.IPC.SelectFolder.Types (SelectedFolderData)
+import Biz.IPC.Message.Types (MainToRendererChannel(..), MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..))
 import Data.Variant (match)
 import Network.RemoteData (RemoteData(..))
 import React.Basic.DOM as R
@@ -18,7 +17,7 @@ mkView ∷ Component Unit
 mkView = do
   projectView ← Project.mkView
   component "OpenProject" \(ctx ∷ Ctx) _ → React.do
-    openFolder /\ (projectConfigRD ∷ _ SelectedFolderData) ←
+    openFolder /\ projectConfigRD ←
       useIPCMessage ctx ShowFolderSelectorChannel
         ShowFolderSelectorResponseChannel
 
@@ -26,7 +25,7 @@ mkView = do
       selectButton disabled = Block.centre_
         [ Block.button
             { onClick: handler preventDefault \_ → do
-                openFolder {}
+                openFolder ShowFolderSelector
             , buttonType: Primary
             , disabled
             }
@@ -40,7 +39,7 @@ mkView = do
           Loading → selectButton true
           Failure e → fragment
             [ selectButton false, R.text $ "Failed! " <> show e ]
-          Success success →
+          Success (ShowFolderSelectorResponse success) →
             success # match
               { noSpagoDhall:
                   \_ → Block.stack_
@@ -55,5 +54,7 @@ mkView = do
               , nothingSelected: \_ → selectButton false
               , validSpagoDhall: projectView
               }
+          Success other → fragment
+            [ selectButton false, R.text $ "Unexpected message" ]
 
       ]
