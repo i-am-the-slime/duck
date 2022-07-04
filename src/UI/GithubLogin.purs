@@ -18,6 +18,7 @@ import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
 import Plumage.Util.HTML as P
+import Prim.Row (class Lacks, class Nub)
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
@@ -31,6 +32,7 @@ import UI.Modal (mkModalView)
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (sendNotification)
 import Yoga.Block as Block
+import Yoga.Block.Atom.Button as Button
 import Yoga.Block.Container.Style (col)
 
 type Props =
@@ -244,18 +246,29 @@ renderCode user_code = Block.box_
     <#> toCodePointArray
     >>> (map (pure >>> String.fromCodePointArray))
 
-githubButton props = Block.button $ props `disjointUnion`
-  { css: background gray._800 <> textCol gray._100 <> shadowSm
-      <> width 170
-      <>
-        E.css
-          { "&:disabled, &:disabled:active":
-              E.nested $ E.css
-                { color: E.color gray._400
-                , boxShadow: E.none
-                , background: E.color gray._700
-                , transform: E.str "none"
-                }
-          }
-  , ripple: cssStringRGBA gray._600
-  }
+githubButton ∷
+  ∀ propsIn rest propsOut.
+  Union propsOut rest Button.PropsNoChildren ⇒
+  Lacks "children" propsOut ⇒
+  Union propsIn (css ∷ E.Style, ripple ∷ String) propsOut ⇒
+  Nub propsOut propsOut ⇒
+  Record propsIn →
+  Array JSX →
+  JSX
+githubButton props = Block.button
+  ( props `disjointUnion`
+      { css:
+          background gray._800 <> textCol gray._100 <> shadowSm
+            <> width 170
+            <> E.css
+              { "&:disabled, &:disabled:active":
+                  E.nested $ E.css
+                    { color: E.color gray._400
+                    , boxShadow: E.none
+                    , background: E.color gray._700
+                    , transform: E.str "none"
+                    }
+              }
+      , ripple: cssStringRGBA gray._600
+      }
+  )

@@ -13,7 +13,8 @@ import Yoga.JSON (class ReadForeign, class WriteForeign, writeJSON)
 
 newtype GithubGraphQLQuery = GithubGraphQLQuery String
 
-githubGraphQLQuery ∷ ∀ q. WriteForeign q ⇒ GraphQLQuery q → GithubGraphQLQuery
+githubGraphQLQuery ∷
+  ∀ q. WriteForeign { | q } ⇒ GraphQLQuery { | q } → GithubGraphQLQuery
 githubGraphQLQuery = GithubGraphQLQuery <<< writeJSON
 
 unGithubGraphQLQuery ∷ GithubGraphQLQuery → String

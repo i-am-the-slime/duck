@@ -2,7 +2,7 @@ module UI.OpenProject where
 
 import Yoga.Prelude.View hiding (Component)
 
-import Biz.IPC.Message.Types (MainToRendererChannel(..), MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Data.Variant (match)
 import Network.RemoteData (RemoteData(..))
 import React.Basic.DOM as R
@@ -17,9 +17,7 @@ mkView ∷ Component Unit
 mkView = do
   projectView ← Project.mkView
   component "OpenProject" \(ctx ∷ Ctx) _ → React.do
-    openFolder /\ projectConfigRD ←
-      useIPCMessage ctx ShowFolderSelectorChannel
-        ShowFolderSelectorResponseChannel
+    openFolder /\ projectConfigRD ← useIPCMessage ctx
 
     let
       selectButton disabled = Block.centre_
@@ -54,7 +52,7 @@ mkView = do
               , nothingSelected: \_ → selectButton false
               , validSpagoDhall: projectView
               }
-          Success other → fragment
+          Success _ → fragment
             [ selectButton false, R.text $ "Unexpected message" ]
 
       ]

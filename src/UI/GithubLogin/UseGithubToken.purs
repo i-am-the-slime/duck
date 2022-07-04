@@ -28,9 +28,9 @@ useGithubToken ∷
     ((Maybe GithubAccessToken) /\ (Maybe GithubAccessToken → Effect Unit))
 useGithubToken = coerceHook React.do
   accessTokenʔ /\ setAccessToken ← React.useState' Nothing
-  useEffectOnce do
+  useEffectAlways do
     storedʔ ← storedToken.read
-    when (storedʔ /= accessTokenʔ) do
+    when (storedʔ /= accessTokenʔ && (storedʔ # isJust)) do
       setAccessToken storedʔ
     mempty
   -- Sync with local storage

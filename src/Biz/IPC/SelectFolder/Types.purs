@@ -5,20 +5,11 @@ import Prelude
 import Biz.Spago.Types (ProjectConfig)
 import Data.List (intercalate)
 import Data.Variant (Variant, inj)
-import Electron.Types (Channel(..))
 import Foreign (MultipleErrors, renderForeignError)
 import Type.Proxy (Proxy(..))
 import Type.Row (type (+))
 
--- [TODO] Delete
-selectFolderChannel ∷ Channel
-selectFolderChannel = Channel "select-folder"
-
 type SelectFolderData = {}
-
--- [TODO] Delete
-selectedFolderChannel ∷ Channel
-selectedFolderChannel = Channel "selected-folder"
 
 type SelectedFolderData = Variant
   ( NothingSelected

@@ -5,7 +5,7 @@ import Prelude
 import Biz.Spago.Types (Repository(..), Version(..))
 import Biz.Spago.Types as Spago
 import Data.Maybe (Maybe(..))
-import Fahrtwind (background', borderBottom, borderCol', divideY, flexRow, gap, hover, itemsCenter, mL, mT, mXY, pX, pXY, pY, pY', roundedDefault, roundedLg, textCol', textSm, textXl, transition, underline, userSelectNone, widthAndHeight)
+import Fahrtwind (background', borderBottom, borderCol', divideY, hover, mL, mT, mXY, pXY, pY', roundedDefault, roundedLg, textCol', textSm, textXl, transition, underline, widthAndHeight)
 import Fahrtwind as F
 import Fahrtwind.Icon.Heroicons as Heroicons
 import Foreign.Object (Object)
@@ -23,6 +23,7 @@ import React.Basic.Events (handler_)
 import React.Basic.Hooks as React
 import UI.Component as UI
 import UI.Container (popOverId)
+import UI.Style (popOverMenuEntryStyle)
 import Yoga.Block as Block
 import Yoga.Block.Container.Style (col)
 import Yoga.Prelude.View (foldMap, guard, null, pure, (#), ($), (/>), (<#>), (</), (</*), (<>))
@@ -89,19 +90,13 @@ mkProjectName =
       }
     let
       dotsMenuHoverStyle =
-        background' col.backgroundBright3
+        background' col.backgroundBright4
           <> textCol' col.textPaler1
       dotsMenuActiveStyle =
         dotsMenuHoverStyle
     let
       menuEntry text icon = H.div_
-        ( flexRow <> itemsCenter <> gap 16 <> pX 8 <> pY 6 <> mXY 4
-            <> textSm
-            <> transition "background 240ms ease-out"
-            <> hover (background' col.backgroundBright3)
-            <> userSelectNone
-            <> roundedDefault
-        )
+        popOverMenuEntryStyle
         [ H.div_ (widthAndHeight 16) [ icon ]
         , R.text text
         ]
@@ -111,8 +106,13 @@ mkProjectName =
       , align: "flex-end"
       , space: "var(--s-1)"
       }
-      [ R.h2' </* { css: F.text4xl <> F.fontBold <> textCol' col.textPaler1 } />
-          [ R.text name ]
+      [ R.h2'
+          </*
+            { css: F.text4xl <> F.fontBold
+                <> textCol' col.textPaler1
+            }
+          />
+            [ R.text name ]
       , R.div'
           </*
             { css:

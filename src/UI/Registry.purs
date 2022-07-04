@@ -2,9 +2,7 @@ module UI.Registry where
 
 import Yoga.Prelude.View
 
-import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..), githubGraphQLQuery)
-import Biz.GraphQL (GraphQL(..), graphQLQuery)
-import Biz.IPC.Message.Types (MainToRendererChannel(..), MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..))
+import Biz.GraphQL (GraphQL(..))
 import Biz.Spago.Types (ProjectName(..), Repository(..))
 import Data.Function.Uncurried (mkFn2)
 import Data.Map (Map)
@@ -12,40 +10,40 @@ import Data.Map as Map
 import Data.Newtype (un)
 import Data.Tuple (Tuple)
 import Fahrtwind (fontFamilyOrMono, height, textXl)
-import Network.RemoteData (RemoteData(..), isNotAsked)
+import Foreign (MultipleErrors)
+import Network.RemoteData (RemoteData(..))
+import Network.RemoteData as RD
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import React.Virtuoso (virtuosoWithData)
 import UI.Component as UI
-import UI.GithubLogin.UseGithubToken (useGithubToken)
-import UI.Hook.UseIPCMessage (useIPCMessage)
+import UI.GithubLogin.UseGithubGraphQL (useGithubGraphQL)
 import Yoga.Block as Block
-import Yoga.JSON (readJSON_)
+import Yoga.JSON (class ReadForeign)
+import Yoga.JSON as JSON
 
 mkView ∷ UI.Component Unit
 mkView = do
   UI.component "Registry" \ctx _ → React.do
-    accessTokenʔ /\ _ ← useGithubToken
-    sendMessage /\ queryResultRD ← useIPCMessage ctx QueryGithubGraphQLChannel
-      GithubGraphQLResultChannel
-    useEffect accessTokenʔ do
-      when (queryResultRD # isNotAsked) do
-        for_ accessTokenʔ \token → sendMessage
-          (QueryGithubGraphQL { token, query })
+    result /\ sendQuery ← useGithubGraphQL ctx getFileInRepoQuery
+    useEffectOnce do
+      sendQuery bowerPackagesInput
       mempty
-    pure case accessTokenʔ of
-      Nothing → R.text "You must login to Github to use this feature"
-      Just _ → case queryResultRD of
+    pure
+      case
+        result >>= (parseJSONFile >>> RD.fromEither)
+        of
         NotAsked → R.text "Now, you see me..."
         Loading → R.text "Loading..."
-        Failure _ → R.text "Failed to load"
-        Success (GithubGraphQLResult (GithubGraphQLResponse res)) →
-          foldMap listRepos do
-            fileInRepo ∷ FileInRepoResponse ← readJSON_ res
-            readJSON_ fileInRepo.data.repository.object.text
-        Success _ → R.text "Wrong message.."
+        Failure f → R.text $ "Failed to load  " <> show f
+        Success (repos ∷ Map ProjectName Repository) →
+          listRepos repos
+
+parseJSONFile ∷
+  ∀ o. ReadForeign o ⇒ FileInRepoResponse → Either MultipleErrors o
+parseJSONFile x = JSON.readJSON x.data.repository.object.text
 
 listRepos ∷ Map ProjectName Repository → JSX
 listRepos repos = P.div_ (height 400) $ pure do
@@ -68,9 +66,7 @@ listRepos repos = P.div_ (height 400) $ pure do
         ]
     ]
 
-query ∷ GithubGraphQLQuery
-query = githubGraphQLQuery $ graphQLQuery
-  getFileInRepoQuery
+bowerPackagesInput =
   { owner: "purescript"
   , name: "registry"
   , branch_and_file: "HEAD:bower-packages.json"

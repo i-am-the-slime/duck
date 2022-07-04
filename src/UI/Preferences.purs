@@ -2,7 +2,7 @@ module UI.Preferences where
 
 import Yoga.Prelude.View hiding (Component)
 
-import Biz.IPC.Message.Types (MainToRendererChannel(..), MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.PureScriptSolutionDefinition.Types (PureScriptSolutionDefinition)
 import Fahrtwind (background', border, borderCol', divideY, mT, pL, pR, roundedXl, shadowMd, text2xl, textCol', widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicons
@@ -23,9 +23,7 @@ mkView ∷ Component Unit
 mkView = do
   component "Preferences" \(ctx ∷ Ctx) _ → React.do
     getPreferences /\
-      (solutionsRD ∷ _ MessageToRenderer) ←
-      useIPCMessage ctx GetPureScriptSolutionDefinitionsChannel
-        GetPureScriptSolutionDefinitionsResponseChannel
+      (solutionsRD ∷ _ MessageToRenderer) ← useIPCMessage ctx
 
     useEffectOnce do
       getPreferences GetPureScriptSolutionDefinitions

@@ -7,7 +7,7 @@ import Data.String (Pattern(..), Replacement(..), replaceAll)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 
 graphQLQuery ∷
-  ∀ v. WriteForeign { | v } ⇒ GraphQL → { | v } → GraphQLQuery { | v }
+  ∀ v. GraphQL → { | v } → GraphQLQuery { | v }
 graphQLQuery query variables = GraphQLQuery $
   { variables: variables
   , query:

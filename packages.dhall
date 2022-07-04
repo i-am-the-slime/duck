@@ -531,8 +531,8 @@ in  upstream
       , "web-file"
       , "web-html"
       ]
-    , repo = "https://github.com/lumihq/purescript-react-basic-dom.git"
-    , version = "v4.2.0"
+    , repo = "https://github.com/i-am-the-slime/purescript-react-basic-dom.git"
+    , version = "patch-3"
     }
   with react-basic-emotion =
     { dependencies =
@@ -593,10 +593,6 @@ in  upstream
        =
       "https://github.com/working-group-purescript-es/purescript-react-basic.git"
   with react-basic.version = "es-modules"
-  with react-basic-dom.repo
-       =
-      "https://github.com/working-group-purescript-es/purescript-react-basic-dom.git"
-  with react-basic-dom.version = "es-modules"
   with react-basic-emotion.repo
        =
       "https://github.com/working-group-purescript-es/purescript-react-basic-emotion.git"
@@ -675,7 +671,7 @@ in  upstream
     }
   with ry-blocks =
     { repo = "https://github.com/rowtype-yoga/ry-blocks.git"
-    , version = "6ea837a554666463c1e073eca9912de6160e2768"
+    , version = "4a00ac00fe09855db04b62208e019a2d5e456e88"
     , dependencies =
       [ "aff"
       , "aff-promise"

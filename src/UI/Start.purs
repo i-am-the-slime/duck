@@ -3,24 +3,31 @@ module UI.Start where
 import Yoga.Prelude.View
 
 import Control.Monad.Reader.Class (ask)
-import React.Basic.Hooks as React
+import Fahrtwind (heightFull)
+import React.Basic.Emotion as E
 import UI.Component as UI
 import UI.Container (mkContainer)
-import UI.GithubLogin (mkGithubLogin)
-import UI.GithubLogin.UseGithubToken (useGithubToken)
-import UI.OpenProject as OpenProject
-import UI.Registry as Registry
+import UI.MainPane.View as MainPane
+import UI.Navigation.HeaderBar as HeaderBar
+import UI.Navigation.Router (mkRouter)
+import UI.Navigation.SideBar as SideBar
+import Yoga.Block as Block
 
 mkView ∷ UI.Component Unit
 mkView = do
   { notificationCentre } ← ask
-  openProjectView ← OpenProject.mkView
+  router ← mkRouter # liftEffect
   container ← mkContainer notificationCentre # liftEffect
-  registry ← Registry.mkView
-  githubLogin ← mkGithubLogin
-  UI.component "StartView" \_ _ → React.do
-    tokenʔ /\ setToken ← useGithubToken
-    pure $ container
-      [ githubLogin { setToken, tokenʔ }
-      , registry unit
+  headerBar ← HeaderBar.mkView
+  sideBar ← SideBar.mkView
+  mainPane ← MainPane.mkView
+  UI.component "MainWindow" \_ _ → React.do
+    pure $ router $ container
+      [ Block.sidebar
+          { space: "0", sidebar: sideBar unit }
+          [ Block.stack { css: heightFull, space: E.str "0" }
+              [ headerBar unit
+              , mainPane unit
+              ]
+          ]
       ]

@@ -2,11 +2,10 @@ module Story.Project (default, openProject, project) where
 
 import Prelude
 
-import Biz.IPC.Message.Types (MainToRendererChannel(..), RendererToMainChannel(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, validSpagoDhall)
 import Biz.Spago.Types (ProjectConfig, ProjectName(..), Repository(..), SourceGlob(..), Version(..))
 import Data.Maybe (Maybe(..))
-import Data.Tuple.Nested ((/\))
 import Effect (Effect)
 import Foreign.Object as Object
 import React.Basic (JSX)
@@ -17,7 +16,6 @@ import Storybook.Types (Story)
 import UI.Component (runComponent)
 import UI.OpenProject as OpenProject
 import UI.Project as Project
-import Yoga.JSON as JSON
 
 default ∷ Story
 default = story { title: "Select Folder", decorators: [ containerDecorator ] }
@@ -56,11 +54,10 @@ openProject = do
     )
 
 exampleOnMessage ∷ OnMessage
-exampleOnMessage channel fgn = do
-  case channel, fgn of
-    ShowFolderSelectorChannel, _ → do
-      pure <<< Just $ ShowFolderSelectorResponseChannel /\ JSON.write response
-    _, _ → pure Nothing
+exampleOnMessage = case _ of
+  ShowFolderSelector → do
+    pure <<< Just $ ShowFolderSelectorResponse response
+  _ → pure Nothing
 
   where
   response ∷ SelectedFolderData

@@ -1,5 +1,5 @@
 {
-  "purescript.buildCommand": "spago -x stories.dhall build --purs-args --json-errors",
+  "purescript.buildCommand": "spago -x stories.dhall build --purs-args \"-g sourcemaps --json-errors\"",
   "purescript.formatter": "purs-tidy",
   "editor.formatOnSave": true,
   "workbench.colorCustomizations": {
@@ -22,4 +22,5 @@
     "titleBar.inactiveForeground": "#e7e7e799"
   },
   "peacock.color": "#02080e",
+  "javascript.format.insertSpaceAfterConstructor": true,
 }

@@ -3,11 +3,11 @@ module Biz.IPC.MessageToMainHandler where
 import Prelude
 
 import Backend.CheckTools (getToolsWithPaths)
-import Backend.Github.API as GithubGraphQL
 import Backend.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), RendererToMainChannel(..), mainToRendererChannelName, messageToRendererToChannel)
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.MessageToMainHandler.Github (getGithubDeviceCode, getStoredGithubAccessToken, pollGithubAccessToken, queryGithubGraphQL)
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, invalidSpagoDhall, noSpagoDhall, nothingSelected, validSpagoDhall)
 import Biz.Preferences (readAppPreferences)
 import Data.Array.NonEmpty as NEA
@@ -20,6 +20,7 @@ import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Electron (BrowserWindow, openDirectory, sendToWebContents)
 import Electron as Electron
+import Electron.Types (Channel(..))
 import Node.ChildProcess (defaultSpawnOptions)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff (readTextFile)
@@ -29,19 +30,21 @@ import Sunde (spawn)
 import Yoga.JSON (readJSON)
 
 handleMessageToMain ∷
-  BrowserWindow → RendererToMainChannel → (MessageToMain → Aff Unit)
-handleMessageToMain window incomingChannel = \message → do
-  responseʔ ∷ Maybe MessageToRenderer ← case incomingChannel of
-    ShowFolderSelectorChannel → Just <$> showFolderSelector window
-    ShowOpenDialogChannel → Just <$> showOpenDialog window
-    GetInstalledToolsChannel → Just <$> getInstalledTools
-    GetPureScriptSolutionDefinitionsChannel →
+  BrowserWindow → (MessageToMain → Aff Unit)
+handleMessageToMain window = \message → do
+  responseʔ ∷ Maybe MessageToRenderer ← case message of
+    ShowFolderSelector → Just <$> showFolderSelector window
+    ShowOpenDialog _ → Just <$> showOpenDialog window
+    GetInstalledTools → Just <$> getInstalledTools
+    GetPureScriptSolutionDefinitions →
       Just <$> getProjectDefinitions
-    QueryGithubGraphQLChannel → queryGithubGraphQL message
+    QueryGithubGraphQL arg → Just <$> queryGithubGraphQL arg
+    GetStoredGithubAccessToken → Just <$> getStoredGithubAccessToken
+    GithubLoginGetDeviceCode → Just <$> getGithubDeviceCode
+    GithubPollAccessToken arg → Just <$> pollGithubAccessToken arg
 
   liftEffect $ for_ responseʔ \(response ∷ MessageToRenderer) →
-    window # sendToWebContents response
-      ((messageToRendererToChannel >>> mainToRendererChannelName) response)
+    window # sendToWebContents response (Channel "ipc")
 
 getInstalledTools ∷ Aff MessageToRenderer
 getInstalledTools =
@@ -91,9 +94,3 @@ getProjectDefinitions = do
   prefs ← readAppPreferences
   projects ← for prefs.solutions \fp → (fp /\ _) <$> readSolutionDefinition fp
   pure $ GetPureScriptSolutionDefinitionsResponse projects
-
-queryGithubGraphQL ∷ MessageToMain → Aff (Maybe MessageToRenderer)
-queryGithubGraphQL = case _ of
-  QueryGithubGraphQL { token, query } →
-    GithubGraphQL.sendRequest token query <#> Just <<< GithubGraphQLResult
-  _ → pure Nothing

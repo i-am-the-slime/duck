@@ -4,7 +4,7 @@ import Prelude
 
 import Biz.OAuth.Types (ClientID)
 import Data.Array (intercalate)
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, un, unwrap)
 import Data.Time.Duration (Seconds(..))
 import Yoga.JSON (class ReadForeign, class WriteForeign, readImpl, writeImpl)
 
@@ -31,6 +31,7 @@ newtype DeviceCodeResponse = DeviceCodeResponse
   }
 
 derive newtype instance Eq DeviceCodeResponse
+derive newtype instance Ord DeviceCodeResponse
 
 instance ReadForeign DeviceCodeResponse where
   readImpl fgn = ado
@@ -40,6 +41,14 @@ instance ReadForeign DeviceCodeResponse where
         { expires_in = Seconds res.expires_in
         , interval = Seconds res.interval
         }
+
+instance WriteForeign DeviceCodeResponse where
+  writeImpl (DeviceCodeResponse rec) = writeImpl
+    ( rec
+        { expires_in = un Seconds rec.expires_in
+        , interval = un Seconds rec.interval
+        }
+    )
 
 newtype DeviceCode = DeviceCode String
 

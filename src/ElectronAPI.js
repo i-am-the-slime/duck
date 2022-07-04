@@ -6,5 +6,5 @@ export const on = (channel) => (handler) => () =>
 
 export const removeListener = (channel) => (handler) => {
   window.electronAPI.removeListener(channel, handler)
-  return {}
+  return
 }

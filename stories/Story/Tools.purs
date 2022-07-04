@@ -1,9 +1,9 @@
-module Story.SelectFile (default, tools) where
+module Story.Tools (default, tools) where
 
 import Prelude
 
 import Backend.Tool.Types (Tool(..), ToolPath(..))
-import Biz.IPC.Message.Types (MainToRendererChannel(..), RendererToMainChannel(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, validSpagoDhall)
 import Biz.Spago.Types (ProjectConfig, ProjectName(..), Repository(..), SourceGlob(..), Version(..))
 import Data.Enum (enumFromTo)
@@ -18,7 +18,6 @@ import Storybook (story)
 import Storybook.Types (Story)
 import UI.Component (runComponent)
 import UI.Tools as Tools
-import Yoga.JSON as JSON
 
 default ∷ Story
 default = story { title: "Tools", decorators: [ containerDecorator ] }
@@ -50,11 +49,9 @@ exampleProject =
   }
 
 exampleOnMessage ∷ OnMessage
-exampleOnMessage channel fgn = do
-  case channel, fgn of
-    ShowFolderSelectorChannel, _ → do
-      pure <<< Just $ ShowFolderSelectorResponseChannel /\ JSON.write response
-    _, _ → pure Nothing
+exampleOnMessage = case _ of
+  ShowFolderSelector → pure $ Just $ ShowFolderSelectorResponse response
+  _ → pure Nothing
 
   where
   response ∷ SelectedFolderData

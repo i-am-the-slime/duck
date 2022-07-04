@@ -3,71 +3,63 @@ module Story.Ctx where
 import Prelude
 
 import Biz.Github.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
-import Biz.IPC.Message.Types (MainToRendererChannel, RendererToMainChannel)
-import Biz.OAuth.Types (AccessToken(..), GithubAccessToken, ScopeList(..), TokenType(..))
+import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
+import Biz.OAuth.Types (AccessToken(..), ScopeList(..), TokenType(..))
 import Data.Array (singleton)
 import Data.Array as Array
+import Data.Either (either)
 import Data.Foldable (for_, traverse_)
-import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Seconds(..))
-import Data.Tuple.Nested (type (/\), (/\))
-import Dhall.Printer (TokenType)
 import Effect (Effect)
-import Effect.Aff.Compat (EffectFn2, runEffectFn2)
 import Effect.Ref as Ref
+import Effect.Uncurried (EffectFn2, runEffectFn2)
+import Electron.Types (Channel(..))
 import ElectronAPI (ElectronListener)
 import Foreign (Foreign)
+import Partial.Unsafe (unsafeCrashWith)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
 import Story.Util.NotificationCentre (storyNotificationCentre)
 import UI.Component (Ctx)
-import UI.GithubLogin.Repository (PollAccessToken, GetDeviceCode, getDeviceCode, pollAccessToken)
+import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Unsafe.Coerce (unsafeCoerce)
 import Unsafe.Reference (unsafeRefEq)
-import Yoga.Fetch as F
-import Yoga.Fetch.Impl.Window (windowFetch)
+import Yoga.JSON as JSON
 
 type OnMessage =
-  RendererToMainChannel →
-  Foreign →
-  Effect (Maybe (MainToRendererChannel /\ Foreign))
+  MessageToMain →
+  Effect (Maybe MessageToRenderer)
 
 emptyOnMessage ∷ OnMessage
-emptyOnMessage _ _ = pure Nothing
+emptyOnMessage _ = pure Nothing
 
 mkStoryCtx ∷ OnMessage → Effect Ctx
 mkStoryCtx onMessage = do
-  listenersRef ← Ref.new
-    (Map.empty ∷ _ MainToRendererChannel (Array ElectronListener))
+  listenersRef ← Ref.new ([] ∷ (Array ElectronListener))
   let
-    registerListener channel listener = do
-      listenersRef # Ref.modify_
-        ( flip Map.alter channel case _ of
-            Just ls → Just (Array.cons listener ls)
-            Nothing → Just [ listener ]
-        )
-    removeListener channel listener = do
-      listenersRef # Ref.modify_
-        ( flip Map.alter channel case _ of
-            Just ls → Just (Array.filter (unsafeRefEq listener) ls)
-            Nothing → Nothing
-        )
+    registerListener listener = do
+      listenersRef # Ref.modify_ (Array.cons listener)
+    removeListener listener = do
+      listenersRef # Ref.modify_ (Array.filter (unsafeRefEq listener))
 
-    postMessage channel payload = do
-      responseʔ ← onMessage channel payload
-      for_ responseʔ \(responseChannel /\ responseMessage) → do
-        listenersRef # Ref.read >>= \listeners →
-          case Map.lookup responseChannel listeners of
-            Just ls → traverse_
-              ( \listener →
-                  ( ( (unsafeCoerce listener) ∷
-                        EffectFn2 Foreign Foreign Unit
-                    ) # runEffectFn2
-                  ) responseMessage responseMessage
-              )
-              ls
-            Nothing → mempty
+    postMessage ∷ MessageToMain → Effect Unit
+    postMessage payload = do
+      let
+        msg ∷ MessageToMain
+        msg = JSON.write payload # JSON.read
+          # either (show >>> unsafeCrashWith) identity
+      responseʔ ← onMessage msg
+      for_ responseʔ \(responseMessage) → do
+        listenersRef # Ref.read >>=
+          traverse_
+            ( \elecList → do
+                let
+                  listener ∷ EffectFn2 Channel Foreign Unit
+                  listener = unsafeCoerce elecList
+                runEffectFn2 listener (Channel "ipc")
+                  (JSON.write responseMessage)
+            )
 
   pure
     { registerListener
