@@ -44,6 +44,7 @@ derive instance Newtype Repository _
 derive newtype instance Show Repository
 derive newtype instance Eq Repository
 derive newtype instance Ord Repository
+derive newtype instance Semigroup Repository
 derive newtype instance WriteForeign Repository
 derive newtype instance ReadForeign Repository
 

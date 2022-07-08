@@ -23,16 +23,15 @@ exampleProject ∷ PureScriptSolutionDefinition
 exampleProject =
   { name: "some-project"
   , projects:
-      [ ( SpagoApp
-            { entrypoints:
-                [ { type: Test
-                  , build_command: Nothing
-                  , spago_file: "spago.dhall"
-                  }
-                ]
-            , root: "."
-            }
-        )
+      [ SpagoApp
+          { entrypoints:
+              [ { type: Test
+                , build_command: Nothing
+                , spago_file: "spago.dhall"
+                }
+              ]
+          , root: "."
+          }
       ]
   }
 

@@ -24,6 +24,8 @@ foreign import data BrowserWindow ∷ Type
 type BrowserWindowConfig =
   { width ∷ Int
   , height ∷ Int
+  , backgroundColor ∷ String
+  , show ∷ Boolean
   , webPreferences ∷
       { contextIsolation ∷ Boolean
       , enableRemoteModule ∷ Boolean
@@ -138,3 +140,8 @@ foreign import decryptStringImpl ∷
 
 decryptString ∷ Buffer → Effect (Maybe String)
 decryptString = runEffectFn3 decryptStringImpl Just Nothing
+
+foreign import copyToClipboard ∷ String → Effect Unit
+foreign import getClipboardText ∷ Effect String
+foreign import showWhenReadyToShow ∷ BrowserWindow → Effect Unit
+foreign import appendSwitch ∷ String → String → Effect Unit

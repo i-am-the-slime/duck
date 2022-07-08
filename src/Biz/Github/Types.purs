@@ -4,7 +4,7 @@ import Prelude
 
 import Biz.OAuth.Types (ClientID)
 import Data.Array (intercalate)
-import Data.Newtype (class Newtype, un, unwrap)
+import Data.Newtype (class Newtype, un)
 import Data.Time.Duration (Seconds(..))
 import Yoga.JSON (class ReadForeign, class WriteForeign, readImpl, writeImpl)
 

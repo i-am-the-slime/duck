@@ -5,7 +5,6 @@ import Prelude hiding ((/))
 import Data.Either (Either, fromRight)
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Debug (spy)
 import Effect (Effect)
 import Effect.Ref as Ref
 import Effect.Unsafe (unsafePerformEffect)
@@ -14,10 +13,10 @@ import React.Basic.Hooks as React
 import Routing.Duplex (RouteDuplex')
 import Routing.Duplex as R
 import Routing.Duplex.Generic as RG
-import Routing.Duplex.Generic.Syntax ((/), (?))
+import Routing.Duplex.Generic.Syntax ((/))
 import Routing.Duplex.Parser (RouteError)
-import Routing.Duplex.Printer (hash)
 import Routing.Hash (getHash)
+import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
 import Web.Router (RouterState(..))
 import Web.Router as Router
@@ -36,7 +35,7 @@ parseRoute ∷ String → Either RouteError Route
 parseRoute = R.parse appRoute
 
 printRoute ∷ Route → String
-printRoute = R.print appRoute
+printRoute route = "#" <> R.print appRoute route
 
 derive instance newtypeUseRouter ∷ Newtype (UseRouter hooks) _
 
@@ -85,4 +84,5 @@ appRoute =
         { "Home": RG.noArgs
         , "Solutions": "projects" / RG.noArgs
         , "Registry": "registry" / RG.noArgs
+        , "Preferences": "preferences" / Preferences.subRoute
         }

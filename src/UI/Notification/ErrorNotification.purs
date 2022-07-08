@@ -5,6 +5,7 @@ import Yoga.Prelude.View
 import Fahrtwind (mB, textCol', widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import React.Basic.DOM as R
+import React.Basic.Emotion as E
 import Yoga.Block as Block
 import Yoga.Block.Container.Style (col)
 import Yoga.Block.Organism.NotificationCentre.Notification.Style (defaultNotificationBodyStyle, defaultNotificationContentContainerStyle, defaultNotificationContentStyle, defaultNotificationTitleStyle)
@@ -30,8 +31,13 @@ errorNotification { title, body } =
                   , R.div' </* { css: defaultNotificationTitleStyle } />
                       [ R.text title ]
                   ]
-              , R.div' </* { css: defaultNotificationBodyStyle } />
-                  [ body ]
+              , R.div'
+                  </*
+                    { css: defaultNotificationBodyStyle <> E.css
+                        { whiteSpace: E.preWrap }
+                    }
+                  />
+                    [ body ]
               ]
           , notificationDismissButton dismiss
           ]

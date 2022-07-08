@@ -3,20 +3,22 @@ module UI.GithubLogin where
 import Yoga.Prelude.View
 
 import Biz.Github.Types (DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
-import Biz.OAuth.Types (GithubAccessToken)
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), failedOrToEither)
 import Color (cssStringRGBA)
 import Control.Monad.Rec.Class (forever)
 import Data.Array (intersperse)
 import Data.Array as Array
+import Data.Bifunctor (lmap)
 import Data.Newtype (un)
 import Data.String (toCodePointArray)
 import Data.String as String
-import Data.Time.Duration (fromDuration)
+import Data.Time.Duration (Seconds(..), fromDuration, negateDuration)
 import Effect.Aff as Aff
-import Fahrtwind (background, background', border, borderCol', cursorPointer, flexCol, flexRow, fontFamilyOrMono, gap, gray, hover, itemsCenter, justifyAround, justifyBetween, mB, mL, mT, mXAuto, pB, pX, pY, rounded3xl, roundedFull, roundedXl, screenSm, shadowMd, shadowSm, shadowXl, text3xl, text4xl, textCenter, textCol, textCol', textSm, textXl, transition, underline, width, width', widthAndHeight, widthFull)
+import Fahrtwind (background, background', border, borderCol', borderLeft, cursorPointer, flexCol, flexRow, fontFamilyOrMono, gap, gray, height, hover, itemsCenter, justifyAround, justifyBetween, mB, mL, mT, mXAuto, pB, pL, pX, pY, rounded3xl, roundedFull, roundedXl, screenSm, shadowMd, shadowSm, shadowXl, text3xl, text4xl, textCenter, textCol, textCol', textSm, textXl, transition, underline, width, width', widthAndHeight, widthFull)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
+import Partial.Unsafe (unsafePartial)
 import Plumage.Util.HTML as P
 import Prim.Row (class Lacks, class Nub)
 import React.Basic.DOM as R
@@ -27,49 +29,73 @@ import Record (disjointUnion)
 import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
 import UI.GithubLogin.GithubLogo (githubLogo)
-import UI.Hook.UseRemoteData (useRemoteData)
+import UI.Hook.UseIPCMessage (useIPCMessage)
 import UI.Modal (mkModalView)
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (sendNotification)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button as Button
+import Yoga.Block.Atom.Button.Types (ButtonType(..)) as ButtonStyle
 import Yoga.Block.Container.Style (col)
 
 type Props =
-  { setToken ∷ Maybe GithubAccessToken → Effect Unit
-  , tokenʔ ∷ Maybe GithubAccessToken
+  { onComplete ∷ Effect Unit
   }
+
+useGetDeviceCode ctx = React.do
+  response /\ send /\ reset ← useIPCMessage ctx
+  let
+    res = response # lmap (const "") >>= unsafePartial case _ of
+      GithubLoginGetDeviceCodeResult v → RD.fromEither (failedOrToEither v)
+  pure (res /\ (send GithubLoginGetDeviceCode) /\ reset)
+
+usePollAccessToken ctx = React.do
+  response /\ send /\ reset ← useIPCMessage ctx
+  let
+    res = response >>= unsafePartial case _ of
+      GithubPollAccessTokenResult v → RD.Success
+        (failedOrToEither v <#> failedOrToEither)
+
+  -- other → RD.Failure $ "Wrong response type " <> unsafeStringify other
+  pure (res /\ (send <<< GithubPollAccessToken) /\ reset)
 
 mkGithubLogin ∷ UI.Component Props
 mkGithubLogin = do
   modalView ← mkModalView { clickAwayId: modalClickawayId, modalContainerId } #
     liftEffect
+  copyToClipboardButton ← mkCopyToClipboardButton
   UI.component "GithubLoginButton" \ctx (props ∷ Props) → React.do
     let
-      { getDeviceCode, pollAccessToken } = ctx.githubAuth
       notifyError message = sendNotification ctx $
         errorNotification { title: "Error", body: R.text message }
-    code ← useRemoteData (\_ → getDeviceCode)
-    let codeʔ = RD.toMaybe code.data
+    code /\ getDeviceCode /\ resetCode ← useGetDeviceCode ctx
+    let codeʔ = RD.toMaybe code
+
+    accessToken /\ pollAccessToken /\ resetAccessToken ← usePollAccessToken ctx
 
     useAff codeʔ do
-      for_ codeʔ \(DeviceCodeResponse { expires_in }) → do
-        Aff.delay (expires_in # fromDuration)
-        code.load unit # liftEffect
+      for_ codeʔ \(DeviceCodeResponse { expires_in, device_code }) → do
+        pollAccessToken device_code # liftEffect
+        Aff.delay
+          (expires_in <> (negateDuration (10.0 # Seconds)) # fromDuration)
+        getDeviceCode # liftEffect
 
-    useAff codeʔ do
-      for_ codeʔ \(DeviceCodeResponse { interval, device_code }) → forever do
-        Aff.delay (interval # fromDuration)
-        result ← pollAccessToken device_code
-        liftEffect $ case result of
-          Left err → notifyError (show err)
-          Right (Left { error }) | error == "authorization_pending" → mempty
-          Right (Left error) → notifyError (show error)
-          Right (Right token) → do
-            props.setToken $ Just token
+    useAff accessToken do
+      for_ accessToken \_ →
+        for_ codeʔ \(DeviceCodeResponse { interval, device_code }) → forever do
+          Aff.delay (interval # fromDuration)
+          liftEffect
+            ( for_ accessToken case _ of
+                Left err → notifyError (show err)
+                Right (Left { error }) | error == "authorization_pending" →
+                  pollAccessToken device_code # liftEffect
+                Right (Left error) → notifyError (show error)
+                Right (Right token) → do
+                  resetCode
+            )
 
-    useEffect code.data do
-      case code.data of
+    useEffect code do
+      case code of
         Failure err → notifyError err
         _ → mempty
       mempty
@@ -77,29 +103,20 @@ mkGithubLogin = do
     let
       buttonGithubLogo =
         P.div_ (mL 8 <> widthAndHeight 16 <> mB 1) [ githubLogo ]
-      logoutButton =
-        githubButton
-          { onClick: handler_ (props.setToken Nothing) }
-          [ P.div_ (flexRow <> justifyBetween <> widthFull <> itemsCenter)
-              [ R.div_ [ R.text "Log out of Github" ]
-              , buttonGithubLogo
-              ]
-          ]
 
       loginButton { disabled } =
         githubButton
           { disabled
-          , onClick: handler_ (code.load unit)
+          , onClick: handler_ getDeviceCode
           }
           [ P.div_ (flexRow <> justifyBetween <> widthFull <> itemsCenter)
-              [ R.div_ [ R.text "Login to Github" ]
+              [ P.div_ (E.css { whiteSpace: E.nowrap })
+                  [ R.text "Login to Github" ]
               , buttonGithubLogo
               ]
           ]
 
-      loggedInView = logoutButton
-
-      loggedOutView = case code.data of
+      loggedOutView = case code of
         NotAsked → loginButton { disabled: false }
         Loading → loginButton { disabled: true }
         Failure _ → loginButton { disabled: false }
@@ -108,21 +125,27 @@ mkGithubLogin = do
           ]
 
     pure $ fragment
-      [ if isJust props.tokenʔ then
-          loggedInView
-        else
-          loggedOutView
+      [ loggedOutView
       , modalView
           { childʔ: codeʔ <#>
               \(DeviceCodeResponse { user_code, verification_uri }) →
-                renderInstructions user_code verification_uri
-          , hide: code.reset
+                renderInstructions
+                  (copyToClipboardButton $ un UserCode user_code)
+                  user_code
+                  verification_uri
+          , hide: resetCode *> resetAccessToken
+          , onHidden: case accessToken of
+              RD.Success _ → props.onComplete
+              _ → resetCode *> resetAccessToken
           }
       ]
 
 renderInstructions ∷
-  UserCode → VerificationURI → JSX
-renderInstructions user_code verification_uri =
+  JSX →
+  UserCode →
+  VerificationURI →
+  JSX
+renderInstructions copyToClipboardButton user_code verification_uri =
   Block.box
     { css: background' col.backgroundLayer5 <> rounded3xl
         <> E.css { width: E.str "fit-content" }
@@ -172,16 +195,24 @@ renderInstructions user_code verification_uri =
                           }
                         />
                           [ R.text $
-                              "To complete your login to Github, visit"
+                              "To complete your login to Github copy this code"
+                          ]
+                    , renderCode user_code
+                    , copyToClipboardButton
+                    , R.div'
+                        </*
+                          { css: textSm <> textCol' col.textPaler2
+                          }
+                        />
+                          [ R.text "into the form at"
+
                           ]
                     , R.a'
                         </*
                           { css: textXl
                               <> underline
                               <> cursorPointer
-                              <> roundedFull
                               -- <> shadowDefault
-                              <> background' col.backgroundBright3
                               <> transition "all 0.5s ease"
                               <> hover (underline)
                               <> textCol' col.highlight
@@ -196,16 +227,45 @@ renderInstructions user_code verification_uri =
 
                     ]
                 ]
-            , R.div'
-                </*
-                  { css: textSm <> textCol' col.textPaler2
-                  }
-                />
-                  [ R.text "and enter the following code" ]
-            , renderCode user_code
             ]
         ]
     ]
+
+mkCopyToClipboardButton ∷ UI.Component String
+mkCopyToClipboardButton = UI.component "CopyToClipboardButton" \ctx toCopy →
+  React.do
+    copied /\ copyToClipboard /\ reset ← useCopyToClipboard ctx
+    useAff copied do
+      for_ copied \_ → do
+        Aff.delay (5.0 # Seconds # fromDuration)
+        reset # liftEffect
+    pure $ Block.button
+      { buttonType: ButtonStyle.Primary
+      , css: shadowSm
+      , onClick: handler_ (copyToClipboard toCopy)
+      }
+      [ Block.cluster
+          { css: textCol' col.highlightText, space: "4px" }
+          [ R.text "Copy to Clipboard"
+          , P.div_
+              ( width 22 <> height 18 <> mL 4 <> pL 4 <> borderLeft 1
+                  <> borderCol' col.highlight
+              )
+              [ if copied # isJust then Heroicon.clipboardCheck
+                else Heroicon.clipboard
+
+              ]
+          ]
+      ]
+  where
+  useCopyToClipboard ctx = React.do
+    res /\ send /\ reset ← useIPCMessage ctx
+    let copyToClipboard text = send $ CopyToClipboard text
+    let
+      copiedToClipboard = unsafePartial case res # RD.toMaybe of
+        Nothing → mempty
+        Just (CopyToClipboardResult text) → Just text
+    pure (copiedToClipboard /\ copyToClipboard /\ reset)
 
 renderCode ∷ UserCode → JSX
 renderCode user_code = Block.box_

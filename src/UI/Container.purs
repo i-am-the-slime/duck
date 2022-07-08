@@ -2,7 +2,7 @@ module UI.Container where
 
 import Yoga.Prelude.View
 
-import Fahrtwind (background', globalStyles, heightFull, heightScreen, ignoreClicks, overflowHidden, overflowVisible, positionAbsolute, positionFixed, widthFull, widthScreen)
+import Fahrtwind (background', globalStyles, height, heightFull, heightScreen, ignoreClicks, overflowHidden, overflowVisible, positionAbsolute, positionFixed, width, widthFull, widthScreen)
 import Fahrtwind as F
 import Plumage.Prelude.Style (Style)
 import Plumage.Util.HTML as H
@@ -37,7 +37,7 @@ mkContainer notificationCentre = do
   pure \children → fragment
     [ Emotion.global </>
         { styles: globalStyles <> global <> ourGobalStyle }
-    , H.div "container" mempty children
+    , H.div "container" (heightFull <> widthFull) children
     , notificationCentreView
     , scrollableFullScreenLayerDiv popOverId 10
     , scrollableFullScreenLayerDiv tooltipId 20
@@ -69,11 +69,32 @@ mkContainer notificationCentre = do
 
 ourGobalStyle ∷ Style
 ourGobalStyle = E.css
-  { body: E.nested $ (background' col.backgroundLayer1) <> E.css
-      { "--mono-font": E.str "'Jetbrains Mono', monospace"
+  { html: E.nested $ E.css
+      { width: E.vw 100.0
+      , overflowX: E.hidden
       }
-  , a: E.nested $ E.css
-      { textDecoration: E.none
-      , fontWeight: E.str "normal"
+  , body: E.nested $ (background' col.backgroundLayer1)
+      <> E.css
+        { "--mono-font": E.str "'Jetbrains Mono', monospace"
+        , scrollbarGutter: E.str "stable"
+        }
+  , "*": E.nested $ E.css
+      { "&::-webkit-scrollbar":
+          E.nested $ width 12 <> height 6
+      , "&::-webkit-scrollbar-track": E.nested
+          $ background' col.backgroundLayer2
+      , "&::-webkit-scrollbar-thumb": E.nested $ E.css
+          { background: col.backgroundLayer5
+          -- , borderRadius: E.str "4px"
+          -- , border: E.str
+          --     ( "1px solid " <> colour.backgroundLayer1
+          --     )
+          }
+      , "&::-webkit-scrollbar-corner": E.nested
+          $ background' col.backgroundLayer2
+      , a: E.nested $ E.css
+          { textDecoration: E.none
+          , fontWeight: E.str "normal"
+          }
       }
   }

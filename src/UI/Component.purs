@@ -4,6 +4,7 @@ import Prelude
 
 import Biz.IPC.Message.Types (MessageToMain)
 import Control.Monad.Reader.Trans (ask)
+import Data.UUID (UUID)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import ElectronAPI (ElectronListener)
@@ -17,7 +18,7 @@ import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre)
 type Ctx =
   { registerListener ∷ ElectronListener → Effect Unit
   , removeListener ∷ ElectronListener → Effect Unit
-  , postMessage ∷ MessageToMain → Effect Unit
+  , postMessage ∷ UUID → MessageToMain → Effect Unit
   , notificationCentre ∷ NotificationCentre
   , githubAuth ∷
       { getDeviceCode ∷ GetDeviceCode

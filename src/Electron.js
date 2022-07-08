@@ -1,4 +1,7 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer, dialog, shell, safeStorage } from "electron"
+import { app, BrowserWindow
+  , ipcMain, ipcRenderer, dialog, shell, safeStorage
+  , clipboard
+ } from "electron"
 
 export const whenReadyImpl = () => app.whenReady()
 export const newBrowserWindow = (config) => () => new BrowserWindow(config)
@@ -83,3 +86,13 @@ export const decryptStringImpl = (just, nothing, buffer) => {
     return nothing;
   }
 }
+
+export const copyToClipboard = (text) => () => clipboard.writeText(text)
+export const getClipboardText = () => clipboard.readText()
+export const showWhenReadyToShow =
+  (win) => () => {
+    win.once("ready-to-show", () => win.show())
+  }
+
+export const appendSwitch = name => value => () =>
+  (app.commandLine.appendSwitch(name, value))

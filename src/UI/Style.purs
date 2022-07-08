@@ -41,6 +41,9 @@ popOverMenuEntryStyle =
   flexRow <> itemsCenter <> gap 16 <> pX 8 <> pY 6 <> mXY 4
     <> textSm
     <> transition "background 240ms ease-out"
-    <> hover (background' col.backgroundBright6)
     <> userSelectNone
     <> roundedDefault
+
+popOverMenuEntryHoverStyle ∷ Style
+popOverMenuEntryHoverStyle =
+  hover (background' col.backgroundBright6)

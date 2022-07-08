@@ -2,32 +2,35 @@ module UI.GithubLogin.UseGithubUserInfo where
 
 import Yoga.Prelude.View
 
-import Backend.Github.API.Types (githubGraphQLQuery)
+import Backend.Github.API.Types (GithubGraphQLResponse(..), githubGraphQLQuery)
 import Biz.GraphQL (GraphQL(..), graphQLQuery)
-import Biz.IPC.Message.Types (MessageToMain(..))
+import Biz.IPC.Message.Types (FailedOr(..), MessageToMain(..), MessageToRenderer(..), NoGithubToken(..))
 import Control.Monad.Reader (ask)
+import Data.Maybe (Maybe(..))
+import Network.RemoteData as RD
+import Partial.Unsafe (unsafePartial)
 import React.Basic.Hooks as React
-import UI.GithubLogin.UseGithubToken (useGithubToken)
 import UI.Hook.UseIPCMessage (useIPCMessage)
 
-mkUseGithubUserInfo = do
-  ctx ← ask
+useGithubUserInfo ctx = do
   pure $ coerceHook React.do
-    tokenʔ /\ _ ← useGithubToken
-    send /\ result ← useIPCMessage ctx
-    useEffect tokenʔ do
-      for_ tokenʔ \token →
-        send $ QueryGithubGraphQL
-          { token
-          , query: githubGraphQLQuery (graphQLQuery query {})
-          }
-      mempty
-    pure tokenʔ
+    res /\ send /\ _ ← useIPCMessage ctx
+    let
+      result = unsafePartial case res # RD.toMaybe of
+        Nothing → Nothing
+        Just (GithubGraphQLResult (Succeeded (GithubGraphQLResponse s))) →
+          Just s
+        Just (GithubGraphQLResult (Failed NoGithubToken)) → Nothing
+
+    let
+      get = send $ QueryGithubGraphQL
+        (githubGraphQLQuery (graphQLQuery query {}))
+    pure $ result /\ get
 
 query ∷ GraphQL
 query = GraphQL
   """
-query{
+query {
   viewer {
     login
     name

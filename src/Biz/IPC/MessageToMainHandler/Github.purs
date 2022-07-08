@@ -3,15 +3,17 @@ module Biz.IPC.MessageToMainHandler.Github where
 import Prelude
 
 import Backend.Github.API as GithubGraphQL
-import Backend.Github.API.Types (GithubGraphQLQuery)
+import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..))
 import Biz.Github.API.Auth as Auth
 import Biz.Github.Types (DeviceCode)
-import Biz.IPC.Message.Types (MessageToRenderer(..), failedOrFromEither)
+import Biz.IPC.Message.Types (FailedOr(..), MessageToRenderer(..), NoGithubToken(..), failedOrFromEither)
 import Biz.OAuth.Types (GithubAccessToken)
-import Data.Maybe (Maybe(..))
+import Data.Either (Either(..))
+import Data.Maybe (Maybe(..), isJust)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Electron (decryptString, getUserDataDirectory)
+import Effect.Class.Console as Console
+import Electron (decryptString, encryptString, getUserDataDirectory)
 import Node.FS.Aff as AFS
 import Node.FS.Sync as FS
 import Node.Path as Path
@@ -20,16 +22,24 @@ import Yoga.Fetch.Impl.Node (nodeFetch)
 import Yoga.JSON as JSON
 
 queryGithubGraphQL ∷
-  { token ∷ GithubAccessToken, query ∷ GithubGraphQLQuery } →
+  GithubGraphQLQuery →
   Aff (MessageToRenderer)
-queryGithubGraphQL { token, query } = GithubGraphQLResult <$>
-  GithubGraphQL.sendRequest token query
+queryGithubGraphQL query = GithubGraphQLResult <$> do
+  tokenʔ ← readStoredGithubAccessToken
+  case tokenʔ of
+    Just token → Succeeded <$> GithubGraphQL.sendRequest token query
+    Nothing → pure $ Failed NoGithubToken
 
 githubTokenFile ∷ String
 githubTokenFile = "github-token"
 
-getStoredGithubAccessToken ∷ Aff MessageToRenderer
-getStoredGithubAccessToken = GetStoredGithubAccessTokenResult <$> do
+getIsLoggedIntoGithub ∷ Aff MessageToRenderer
+getIsLoggedIntoGithub =
+  (GetIsLoggedIntoGithubResult <<< isJust)
+    <$> readStoredGithubAccessToken
+
+readStoredGithubAccessToken ∷ Aff (Maybe GithubAccessToken)
+readStoredGithubAccessToken = do
   dir ← getUserDataDirectory # liftEffect
   let path = Path.concat [ dir, githubTokenFile ]
   pathExists ← FS.exists path # liftEffect
@@ -39,13 +49,30 @@ getStoredGithubAccessToken = GetStoredGithubAccessTokenResult <$> do
     strʔ ← decryptString buf # liftEffect
     pure $ JSON.readJSON_ =<< strʔ
 
+storeGithubAccessToken ∷ GithubAccessToken → Aff Unit
+storeGithubAccessToken token = do
+  dir ← getUserDataDirectory # liftEffect
+  let path = Path.concat [ dir, githubTokenFile ]
+  encryptedBufʔ ← encryptString (JSON.writeJSON token) # liftEffect
+  case encryptedBufʔ of
+    Nothing → Console.error "Failed to encrypt token"
+    Just buf → AFS.writeFile path buf
+
 getGithubDeviceCode ∷ Aff MessageToRenderer
 getGithubDeviceCode =
   (GithubLoginGetDeviceCodeResult <<< failedOrFromEither) <$>
     Auth.getDeviceCode (Fetch.fetch nodeFetch)
 
 pollGithubAccessToken ∷ DeviceCode → Aff MessageToRenderer
-pollGithubAccessToken deviceCode =
-  ( GithubPollAccessTokenResult <<< failedOrFromEither <<< map
-      failedOrFromEither
-  ) <$> Auth.pollAccessToken (Fetch.fetch nodeFetch) deviceCode
+pollGithubAccessToken deviceCode = do
+  response ← Auth.pollAccessToken (Fetch.fetch nodeFetch) deviceCode
+  case response of
+    Right (Right token) → do
+      Console.info "Stored Github Access Token"
+      storeGithubAccessToken token
+    _ → pure unit
+  pure
+    <<< GithubPollAccessTokenResult
+    <<< failedOrFromEither
+    <<< map failedOrFromEither
+    $ response

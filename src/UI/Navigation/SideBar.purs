@@ -11,6 +11,7 @@ import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Component as UI
 import UI.Navigation.Router (useRouter)
+import UI.Navigation.Router.Page.Preferences as PreferencesRoute
 import UI.Navigation.Router.Types (Route(..), TopLevelRoute(..), toTopLevelRoute)
 import UI.Style (toolbarBackground, toolbarBorderCol, toolbarButtonStyle, toolbarRippleCol)
 import Yoga.Block as Block
@@ -27,6 +28,7 @@ mkPresentationalView =
   React.component "HeaderBarPresentational" \props → React.do
     pure $ Block.stack
       { space: E.str "16px"
+      , splitAfter: 3
       , css:
           toolbarBackground <> borderRight 1
             <> toolbarBorderCol
@@ -56,3 +58,5 @@ renderLinks (currentRoute /\ setRoute) =
     TopLevelHome → iconButton tlr Home Heroicon.home
     TopLevelSolutions → iconButton tlr Solutions Heroicon.code
     TopLevelRegistry → iconButton tlr Registry Heroicon.identification
+    TopLevelPreferences → iconButton tlr (Preferences PreferencesRoute.Root)
+      Heroicon.cog

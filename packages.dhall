@@ -553,8 +553,8 @@ in  upstream
     }
   with uuid =
     { dependencies = [ "effect", "maybe", "foreign-generic", "console", "spec" ]
-    , repo = "https://github.com/i-am-the-slime/purescript-uuid.git"
-    , version = "patch-2"
+    , repo = "https://github.com/megamaddu/purescript-uuid.git"
+    , version = "7bb5a90c9b11f6a33ac7610608a650e4d58aeac9"
     }
   with react-basic-hooks =
     { dependencies =
@@ -671,7 +671,7 @@ in  upstream
     }
   with ry-blocks =
     { repo = "https://github.com/rowtype-yoga/ry-blocks.git"
-    , version = "4a00ac00fe09855db04b62208e019a2d5e456e88"
+    , version = "c0d4f508800c173389e716353268556ab0108bb7"
     , dependencies =
       [ "aff"
       , "aff-promise"

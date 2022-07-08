@@ -3,6 +3,7 @@ module Biz.IPC.Message.Types where
 import Prelude
 
 import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse)
+import Backend.Tool.Spago.Types (SpagoGlobalCacheDir)
 import Biz.Github.Types (DeviceCode, DeviceCodeResponse, DeviceTokenError)
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult)
 import Biz.IPC.Message.OpenDialog.Types as OpenDialog
@@ -14,7 +15,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Tuple (Tuple)
 import Node.Path (FilePath)
-import Yoga.JSON (class ReadForeign, class WriteForeign)
+import Yoga.JSON (class ReadForeign, class WriteForeign, writeImpl)
 import Yoga.JSON.Generics (defaultOptions, genericReadForeignTaggedSum, genericWriteForeignTaggedSum)
 
 data MessageToMain
@@ -22,10 +23,13 @@ data MessageToMain
   | ShowOpenDialog OpenDialog.Args
   | GetInstalledTools
   | GetPureScriptSolutionDefinitions
-  | QueryGithubGraphQL { token ∷ GithubAccessToken, query ∷ GithubGraphQLQuery }
-  | GetStoredGithubAccessToken
+  | GetIsLoggedIntoGithub
+  | QueryGithubGraphQL GithubGraphQLQuery
   | GithubLoginGetDeviceCode
   | GithubPollAccessToken DeviceCode
+  | CopyToClipboard String
+  | GetClipboardText
+  | GetSpagoGlobalCache
 
 data MessageToRenderer
   = ShowFolderSelectorResponse SelectedFolderData
@@ -33,11 +37,14 @@ data MessageToRenderer
   | GetInstalledToolsResponse GetInstalledToolsResult
   | GetPureScriptSolutionDefinitionsResponse
       (Array (Tuple FilePath PureScriptSolutionDefinition))
-  | GetStoredGithubAccessTokenResult (Maybe GithubAccessToken)
-  | GithubGraphQLResult GithubGraphQLResponse
+  | GetIsLoggedIntoGithubResult Boolean
+  | GithubGraphQLResult (FailedOr NoGithubToken GithubGraphQLResponse)
   | GithubLoginGetDeviceCodeResult (FailedOr String DeviceCodeResponse)
   | GithubPollAccessTokenResult
       (FailedOr String (FailedOr DeviceTokenError GithubAccessToken))
+  | CopyToClipboardResult String
+  | GetClipboardTextResult String
+  | GetSpagoGlobalCacheResult (FailedOr String SpagoGlobalCacheDir)
 
 data FailedOr e a = Failed e | Succeeded a
 
@@ -79,3 +86,14 @@ derive instance Ord MessageToRenderer
 
 instance ReadForeign MessageToRenderer where
   readImpl = genericReadForeignTaggedSum defaultOptions
+
+data NoGithubToken = NoGithubToken
+
+derive instance Generic NoGithubToken _
+derive instance Eq NoGithubToken
+derive instance Ord NoGithubToken
+instance WriteForeign NoGithubToken where
+  writeImpl _ = writeImpl "no_github_token"
+
+instance ReadForeign NoGithubToken where
+  readImpl = pure $ pure NoGithubToken

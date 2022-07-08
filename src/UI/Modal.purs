@@ -3,20 +3,30 @@ module UI.Modal where
 import Yoga.Prelude.View
 
 import Data.Maybe (isNothing)
+import Debug (spy)
+import Fahrtwind.Style (pT, pY)
 import Framer.Motion as M
 import Plumage.Atom.Modal.View (mkModal)
-import Fahrtwind.Style (pT, pY)
 import React.Aria.Overlays (usePreventScroll)
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
+import Unsafe.Reference (reallyUnsafeRefEq)
 
 mkModalView ∷
   { clickAwayId ∷ String, modalContainerId ∷ String } →
-  React.Component { childʔ ∷ Maybe JSX, hide ∷ Effect Unit }
+  React.Component
+    { childʔ ∷ Maybe JSX, hide ∷ Effect Unit, onHidden ∷ Effect Unit }
 mkModalView { clickAwayId, modalContainerId } = do
   modal ← mkModal # liftEffect
   React.component "ModalView" \props → React.do
     usePreventScroll { isDisabled: props.childʔ # isNothing }
+    let
+      exit =
+        M.exit $ R.css
+          { y: "-120%"
+          , transition:
+              { type: "spring", bounce: 0.2, duration: 0.8 }
+          }
     pure $ modal
       { isVisible: props.childʔ # isJust
       , clickAwayId
@@ -39,14 +49,13 @@ mkModalView { clickAwayId, modalContainerId } = do
                             { type: "spring", bounce: 0.33, duration: 0.5 }
 
                         }
-                    , exit:
-                        M.exit $ R.css
-                          { y: "-120%"
-                          , transition:
-                              { type: "spring", bounce: 0.2, duration: 0.8 }
-                          }
+                    , exit
 
                     , onClick: handler stopPropagation mempty
+                    , onAnimationComplete: M.onAnimationComplete \fgn → do
+                        if (reallyUnsafeRefEq fgn exit) then props.onHidden
+                        else mempty
+
                     }
                   />
                     [ child ]

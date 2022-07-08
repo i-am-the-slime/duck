@@ -5,12 +5,15 @@ import Prelude
 import Biz.Github.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
 import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
 import Biz.OAuth.Types (AccessToken(..), ScopeList(..), TokenType(..))
-import Data.Array (singleton)
+import Control.Alt (alt, (<|>))
+import Data.Array (foldMap, singleton, foldl)
 import Data.Array as Array
 import Data.Either (either)
 import Data.Foldable (for_, traverse_)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Seconds(..))
+import Data.UUID (UUID)
+import Data.UUID as UUID
 import Effect (Effect)
 import Effect.Ref as Ref
 import Effect.Uncurried (EffectFn2, runEffectFn2)
@@ -20,6 +23,8 @@ import Foreign (Foreign)
 import Partial.Unsafe (unsafeCrashWith)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
+import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockRegistry, getMockSolutionDefinition)
+import Story.Ctx.Types (OnMessage)
 import Story.Util.NotificationCentre (storyNotificationCentre)
 import UI.Component (Ctx)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
@@ -27,12 +32,23 @@ import Unsafe.Coerce (unsafeCoerce)
 import Unsafe.Reference (unsafeRefEq)
 import Yoga.JSON as JSON
 
-type OnMessage =
-  MessageToMain →
-  Effect (Maybe MessageToRenderer)
-
-emptyOnMessage ∷ OnMessage
-emptyOnMessage _ = pure Nothing
+defaultOnMessage ∷ OnMessage
+defaultOnMessage msg = tryAllOf
+  [ getMockSolutionDefinition
+  , getMockInstalledTools
+  , getMockIsLoggedIntoGithub
+  , getMockGithubUserQuery
+  , getMockRegistry
+  ]
+  where
+  tryAllOf =
+    foldl
+      ( \acc fn → ado
+          res ← fn msg
+          accRes ← acc
+          in (accRes <|> res)
+      )
+      (pure Nothing)
 
 mkStoryCtx ∷ OnMessage → Effect Ctx
 mkStoryCtx onMessage = do
@@ -43,14 +59,14 @@ mkStoryCtx onMessage = do
     removeListener listener = do
       listenersRef # Ref.modify_ (Array.filter (unsafeRefEq listener))
 
-    postMessage ∷ MessageToMain → Effect Unit
-    postMessage payload = do
+    postMessage ∷ UUID → MessageToMain → Effect Unit
+    postMessage uuid payload = do
       let
         msg ∷ MessageToMain
         msg = JSON.write payload # JSON.read
           # either (show >>> unsafeCrashWith) identity
       responseʔ ← onMessage msg
-      for_ responseʔ \(responseMessage) → do
+      for_ responseʔ \responseMessage → do
         listenersRef # Ref.read >>=
           traverse_
             ( \elecList → do
@@ -58,7 +74,11 @@ mkStoryCtx onMessage = do
                   listener ∷ EffectFn2 Channel Foreign Unit
                   listener = unsafeCoerce elecList
                 runEffectFn2 listener (Channel "ipc")
-                  (JSON.write responseMessage)
+                  ( JSON.write
+                      { response_for_message_id: UUID.toString uuid
+                      , response: responseMessage
+                      }
+                  )
             )
 
   pure

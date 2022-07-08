@@ -17,7 +17,7 @@ mkView ∷ Component Unit
 mkView = do
   projectView ← Project.mkView
   component "OpenProject" \(ctx ∷ Ctx) _ → React.do
-    openFolder /\ projectConfigRD ← useIPCMessage ctx
+    projectConfigRD /\ openFolder /\ _ ← useIPCMessage ctx
 
     let
       selectButton disabled = Block.centre_
@@ -35,8 +35,8 @@ mkView = do
       , case projectConfigRD of
           NotAsked → selectButton false
           Loading → selectButton true
-          Failure e → fragment
-            [ selectButton false, R.text $ "Failed! " <> show e ]
+          Failure _ → fragment
+            [ selectButton false ]
           Success (ShowFolderSelectorResponse success) →
             success # match
               { noSpagoDhall:

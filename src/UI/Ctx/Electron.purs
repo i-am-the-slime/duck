@@ -2,6 +2,7 @@ module UI.Ctx.Electron where
 
 import Prelude
 
+import Data.UUID as UUID
 import Effect (Effect)
 import Electron.Types (Channel(..))
 import ElectronAPI as ElectronAPI
@@ -19,7 +20,8 @@ mkElectronCtx = ado
   in
     { registerListener: ElectronAPI.on (Channel "ipc")
     , removeListener: ElectronAPI.removeListener (Channel "ipc")
-    , postMessage: \d → postMessage $ JSON.write { type: "ipc", data: d }
+    , postMessage: \uuid payload → postMessage $ JSON.write
+        { type: "ipc", data: { message_id: UUID.toString uuid, payload } }
     , notificationCentre
     , githubAuth:
         { getDeviceCode: getDeviceCode (F.fetch windowFetch)

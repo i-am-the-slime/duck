@@ -5,20 +5,27 @@ import Prelude
 import Backend.CheckTools (getToolsWithPaths)
 import Backend.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
+import Backend.Tool.Types (Tool(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
-import Biz.IPC.MessageToMainHandler.Github (getGithubDeviceCode, getStoredGithubAccessToken, pollGithubAccessToken, queryGithubGraphQL)
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), failedOrFromEither)
+import Biz.IPC.MessageToMainHandler.Github (getGithubDeviceCode, getIsLoggedIntoGithub, pollGithubAccessToken, queryGithubGraphQL)
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, invalidSpagoDhall, noSpagoDhall, nothingSelected, validSpagoDhall)
 import Biz.Preferences (readAppPreferences)
+import Biz.Spago.Service (getGlobalCacheDir)
+import Control.Monad.Except (ExceptT(..), except, runExceptT)
+import Data.Array as Array
 import Data.Array.NonEmpty as NEA
-import Data.Either (either)
-import Data.Foldable (for_)
+import Data.Either (Either(..), either, note)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Traversable (for)
+import Data.Tuple (fst, snd)
 import Data.Tuple.Nested ((/\))
+import Data.UUID (UUID)
+import Data.UUID as UUID
+import Debug (spy)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Electron (BrowserWindow, openDirectory, sendToWebContents)
+import Electron (BrowserWindow, copyToClipboard, getClipboardText, openDirectory, sendToWebContents)
 import Electron as Electron
 import Electron.Types (Channel(..))
 import Node.ChildProcess (defaultSpawnOptions)
@@ -28,23 +35,34 @@ import Node.FS.Sync (exists)
 import Node.Path as Path
 import Sunde (spawn)
 import Yoga.JSON (readJSON)
+import Yoga.JSON as JSON
 
 handleMessageToMain ∷
-  BrowserWindow → (MessageToMain → Aff Unit)
-handleMessageToMain window = \message → do
-  responseʔ ∷ Maybe MessageToRenderer ← case message of
-    ShowFolderSelector → Just <$> showFolderSelector window
-    ShowOpenDialog _ → Just <$> showOpenDialog window
-    GetInstalledTools → Just <$> getInstalledTools
-    GetPureScriptSolutionDefinitions →
-      Just <$> getProjectDefinitions
-    QueryGithubGraphQL arg → Just <$> queryGithubGraphQL arg
-    GetStoredGithubAccessToken → Just <$> getStoredGithubAccessToken
-    GithubLoginGetDeviceCode → Just <$> getGithubDeviceCode
-    GithubPollAccessToken arg → Just <$> pollGithubAccessToken arg
+  BrowserWindow → (UUID → MessageToMain → Aff Unit)
+handleMessageToMain window = \message_id message → do
+  response ∷ MessageToRenderer ← case message of
+    ShowFolderSelector → showFolderSelector window
+    ShowOpenDialog _ → showOpenDialog window
+    GetInstalledTools → getInstalledTools
+    GetPureScriptSolutionDefinitions → getProjectDefinitions
+    QueryGithubGraphQL arg → queryGithubGraphQL arg
+    GetIsLoggedIntoGithub → getIsLoggedIntoGithub
+    GithubLoginGetDeviceCode → getGithubDeviceCode
+    GithubPollAccessToken arg → pollGithubAccessToken arg
+    GetClipboardText →
+      GetClipboardTextResult <$> getClipboardText # liftEffect
+    CopyToClipboard arg →
+      (CopyToClipboardResult arg) <$ copyToClipboard arg # liftEffect
+    GetSpagoGlobalCache → getSpagoGlobalCache
 
-  liftEffect $ for_ responseʔ \(response ∷ MessageToRenderer) →
-    window # sendToWebContents response (Channel "ipc")
+  liftEffect do
+    let
+      responsePayload =
+        { response_for_message_id: UUID.toString message_id
+        , response
+        }
+    let _ = spy "Responding with" (JSON.write responsePayload)
+    window # sendToWebContents responsePayload (Channel "ipc")
 
 getInstalledTools ∷ Aff MessageToRenderer
 getInstalledTools =
@@ -94,3 +112,13 @@ getProjectDefinitions = do
   prefs ← readAppPreferences
   projects ← for prefs.solutions \fp → (fp /\ _) <$> readSolutionDefinition fp
   pure $ GetPureScriptSolutionDefinitionsResponse projects
+
+getSpagoGlobalCache ∷ Aff MessageToRenderer
+getSpagoGlobalCache = GetSpagoGlobalCacheResult <<< failedOrFromEither <$>
+  runExceptT do
+    os ← operatingSystemʔ # note "Unsupported OS" # except
+    tools ← getToolsWithPaths os <#> Right # ExceptT
+    spagoPath ← (Array.find (fst >>> (_ == Spago)) tools >>= snd)
+      # note "Spago is not installed"
+      # except
+    getGlobalCacheDir spagoPath # ExceptT
