@@ -1,20 +1,15 @@
 module UI.Registry where
 
-import Prelude
-import Yoga.Prelude.View
-
-import Backend.Github.API.Types (GithubGraphQLQuery, githubGraphQLQuery)
 import Biz.GraphQL (GraphQL(..))
 import Biz.Spago.Types (ProjectName(..), Repository(..))
-import Control.Monad.ST as ST
-import Control.Monad.ST.Ref as ST
+import Control.Monad.ST (run, while) as ST
+import Control.Monad.ST.Ref (modify, new, read) as ST
 import Data.Array as Array
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NonEmptyArray
 import Data.Array.ST as STArray
 import Data.DateTime.Instant (Instant, durationMillis)
-import Data.Foldable (foldMap, traverse_)
-import Data.Function.Uncurried (mkFn2)
+import Data.Function.Uncurried (mkFn2, mkFn3)
 import Data.Int as Int
 import Data.Interpolate (i)
 import Data.JSDate (JSDate)
@@ -22,69 +17,55 @@ import Data.JSDate as JSDate
 import Data.List as List
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (fromJust)
 import Data.Newtype (un)
 import Data.String (Pattern(..), split, stripPrefix, stripSuffix)
 import Data.String as String
 import Data.Time.Duration (Days(..), toDuration)
-import Data.Traversable (traverse)
+import Data.Tuple (snd)
 import Debug (spy)
 import Effect.Aff (Milliseconds(..))
 import Effect.Aff as Aff
 import Effect.Class.Console as Console
-import Effect.Now as DateTime
 import Effect.Now as Instant
-import Effect.Ref as Ref
 import Effect.Unsafe (unsafePerformEffect)
-import Fahrtwind (acceptClicks, background, background', borderBottom, borderCol, borderCol', cursorPointer, displayNone, flexCol, flexGrow, flexRow, focusWithin, fontBold, fontLight, fontMedium, fontSemiMedium, fontThin, full, gap, height, height', heightFull, hover, lineHeight, mX, mXAuto, mXY, maxHeight', maxWidth, overflowHidden, overflowYScroll, pX, pX', pXY, pY, pY', roundedDefault, roundedFull, roundedLg, roundedMd, roundedNone, roundedXl, screenHeight, screenLg, screenMd, screenXl, shadowLg, textCol', textDefault, textLg, textXl, textXs, transform, transition, width, width', widthAndHeight, widthFull)
+import Fahrtwind (background', borderBottom, borderCol', cursorPointer, displayNone, flexCol, flexGrow, flexRow, focusWithin, fontMedium, full, height', heightFull, hover, lineHeight, mXAuto, mXY, maxHeight', maxWidth, overflowHidden, overflowYScroll, pX', pY', roundedLg, roundedMd, roundedNone, roundedXl, screenMd, screenXl, textCol', textDefault, textLg, textXs, transition, width, width', widthAndHeight, widthFull)
 import Fahrtwind.Icon.Heroicons as Heroicon
-import Foreign (Foreign, MultipleErrors)
-import Foreign.Object (mapWithKey)
+import Foreign (MultipleErrors)
 import Image (setFallbackImgSrc)
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
-import Partial.Unsafe (unsafePartial)
-import Plumage.Hooks.UsePopOver (usePopOver)
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
-import React.Basic.Emotion (ch)
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import React.Basic.Hooks.Aff (useAff)
 import React.Virtuoso (virtuosoImpl)
 import Type.Function (type ($))
-import UI.Block.Card (card, clickableCard, styledCard, styledClickableCard)
+import UI.Block.Card (styledCard, styledClickableCard)
 import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
 import UI.Ctx.Types (Ctx)
 import UI.FilePath (GithubRepo, renderFilePath, renderGithubRepo)
-import UI.GithubLogin.UseGithubGraphQL (UseGithubGraphQL, useDynamicGithubGraphQL, useGithubGraphQL)
+import UI.GithubLogin.UseGithubGraphQL (UseGithubGraphQL, useDynamicGithubGraphQL)
 import UI.Hook.UseGetFileInRepo (GetFileInRepoInput, useGetTextFileInRepo)
 import UI.MainPane.Style (mainViewHeight)
-import UI.Modal (mkModalView)
-import UI.Navigation.HeaderBar.GithubAvatar (duckImage, notFoundImage)
+import UI.Navigation.HeaderBar.GithubAvatar (notFoundImage)
 import UI.Repository.View as Repository
-import Web.DOM (Element)
-import Web.DOM.NonElementParentNode (getElementById)
-import Web.HTML (window)
-import Web.HTML.HTMLDocument (toNonElementParentNode)
-import Web.HTML.Window (document)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Input.Hook.UseTypingPlaceholders (useTypingPlaceholders)
 import Yoga.Block.Container.Style (col, colour)
-import Yoga.Block.Hook.UseDocumentSize (useDocumentSize)
 import Yoga.Block.Hook.UseMediaQuery (useMediaQuery)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
-import Yoga.Block.Internal.CSS (transparent)
-import Yoga.Block.Layout.Sidebar.Style (SidebarSide(..))
 import Yoga.Block.Molecule.Sheet as Sheet
 import Yoga.JSON as JSON
+import Yoga.Prelude.View (type (/\), Effect, Hook, JSX, Maybe(..), Unit, bind, const, discard, foldMap, foldMapWithIndex, for_, fragment, fromMaybe, getHTMLElementFromRef, guard, handler, handler_, isJust, liftEffect, map, maybe, mempty, not, note, pure, show, target, targetValue, traverse_, unit, useEffect, useEffectOnce, (#), ($), (*), (+), (/), (/=), (/>), (/\), (<), (<#>), (<$), (</*), (</*>), (</>), (<<<), (<>), (<|>), (==), (>), (>=), (>>=), (>>>), (||))
 import Yoga.Prelude.View as HTMLElement
 
 mkView ∷ UI.Component Unit
 mkView = do
   repoFilter ← mkRepositoryFilter # liftEffect
   repoView ← Repository.mkView
+  repoList ← mkRepoList # liftEffect
   now ← Instant.now # liftEffect
   UI.component "Registry" \ctx _ → React.do
     bowerPackagesRD /\ sendBowerPackagesQuery ← useGetPackagesFileInRepo ctx
@@ -107,8 +88,8 @@ mkView = do
           setRepos $ Just allRepos
           setFilteredRepos $ Just allRepos
           getRepoInfo
-            ( allRepos # Map.values # Array.fromFoldable # Array.mapMaybe
-                parseGithubRepoLink
+            ( allRepos # Map.mapMaybe parseGithubRepoLink # Map.values #
+                Array.fromFoldable
             )
         _, _ → mempty
       mempty
@@ -138,7 +119,8 @@ mkView = do
                         ( screenMd $
                             E.css
                               { ".virtualised-registry-entries": E.nested
-                                  $ width 360 <> maxWidth 360
+                                  $ width 360
+                                  <> maxWidth 360
                               }
                         )
                       <>
@@ -177,9 +159,12 @@ mkView = do
                               <<< repoView
                           )
                       ]
-                  , listRepos
-                      { now, repoInfo, selectedRepoʔ, setSelectedRepo }
-                      filteredRepos
+                  , repoList
+                      { repoInfo
+                      , selectedRepoʔ
+                      , setSelectedRepo
+                      , repos: filteredRepos
+                      }
                   ]
               , guard (not screenIsAtLeastMedium) $ Sheet.component
                   </>
@@ -248,85 +233,89 @@ mkRepositoryFilter = do
           }
       ]
 
-listRepos ∷
-  { repoInfo ∷ Map ProjectName (RemoteData String JSDate)
-  , now ∷ Instant
+type ListProps =
+  { repoInfo ∷ Map GithubRepo (RemoteData String JSDate)
   , selectedRepoʔ ∷ Maybe GithubRepo
   , setSelectedRepo ∷ Maybe GithubRepo → Effect Unit
-  } →
-  Map ProjectName Repository →
-  JSX
-listRepos { repoInfo, now, selectedRepoʔ, setSelectedRepo } repos = do
-  let
-    withDate = repos # Map.mapMaybeWithKey
-      ( \name repo →
-          Just (repo /\ (Map.lookup name repoInfo))
-      )
-  virtuosoImpl </>
-    { useWindowScroll: false
-    , overscan: 300.0
-    , className: "virtualised-registry-entries"
-    , style: R.css { height: "100%", background: colour.backgroundLayer4 }
-    , data:
-        Map.toUnfoldable withDate ∷
-          Array (ProjectName /\ Repository /\ Maybe (RemoteData String JSDate))
-    , itemContent: mkFn2 renderRepo
-    }
+  , repos ∷ Map ProjectName Repository
+  }
+
+mkRepoList ∷ React.Component ListProps
+mkRepoList = do
+  now ← Instant.now
+  React.component "RepoList" \props → React.do
+    let { repos } = props
+    itemContent ← React.useMemo repos \_ → mkFn3 renderRepo
+    pure
+      $ virtuosoImpl
+      </>
+        { useWindowScroll: false
+        , overscan: 100.0
+        , className: "virtualised-registry-entries"
+        , style: R.css { height: "100%", background: colour.backgroundLayer4 }
+        , context: { props, now }
+        , data: Map.toUnfoldable repos ∷ Array (ProjectName /\ Repository)
+        , itemContent
+        }
 
   where
   renderRepo ∷
     Int →
-    (ProjectName /\ Repository /\ Maybe (RemoteData String JSDate)) →
+    (ProjectName /\ Repository) →
+    { props ∷ ListProps, now ∷ Instant } →
     JSX
-  renderRepo _i (name /\ repo /\ lastCommitʔ) = do
-    let githubRepoʔ = parseGithubRepoLink repo
-    let
-      cardStyle = roundedNone <> borderBottom 1
-        <> borderCol' col.backgroundLayer2
-        <> hover (background' col.backgroundLayer3)
-    let
-      theCard = githubRepoʔ # maybe
-        (styledCard cardStyle)
-        ( styledClickableCard cardStyle <<< handler_ <<< setSelectedRepo <<<
-            Just
-        )
-    theCard
-      [ Block.cluster_
-          [ githubRepoʔ # foldMap \{ owner } → R.img' </*>
-              { css: roundedMd
-              , className: "gh-avatar"
-              , width: "48px"
-              , height: "48px"
-              , src: "https://github.com/" <> owner <> ".png"
-              , onError: handler target (setFallbackImgSrc notFoundImage)
-              }
-          , Block.stack { space: E.str "0" }
-              [ P.div_ (textDefault <> fontMedium <> lineHeight "1em")
-                  [ R.text
-                      ( un ProjectName name # \n →
-                          stripPrefix
-                            (Pattern "purescript-")
-                            n # fromMaybe n
-                      )
-                  ]
-              , P.span_ (textXs <> textCol' col.textPaler4)
-                  [ lastCommitʔ # R.text <<< case _ of
-                      Nothing → "(Only works for Github repos)"
-                      Just (RD.NotAsked) → "Loading"
-                      Just (RD.Loading) → "Loading"
-                      Just (RD.Failure e) → String.take 24 e
-                      Just (RD.Success s) → JSDate.toInstant s # foldMap
-                        \start →
-                          approximateHumanReadableTimeInThePast
-                            { start, end: now }
+  renderRepo _i (name /\ repo) { props: { repoInfo, setSelectedRepo }, now } =
+    do
+      let githubRepoʔ = parseGithubRepoLink repo
+      let lastCommitRD = githubRepoʔ >>= \ghr → Map.lookup ghr repoInfo
+      let
+        cardStyle = roundedNone <> borderBottom 1
+          <> borderCol' col.backgroundLayer2
+          <> hover (background' col.backgroundLayer3)
+      let
+        theCard = githubRepoʔ # maybe
+          (styledCard cardStyle)
+          ( styledClickableCard cardStyle <<< handler_ <<< setSelectedRepo
+              <<<
+                Just
+          )
+      theCard
+        [ Block.cluster_
+            [ githubRepoʔ # foldMap \{ owner } → R.img' </*>
+                { css: roundedMd
+                , className: "gh-avatar"
+                , width: "48px"
+                , height: "48px"
+                , src: "https://github.com/" <> owner <> ".png"
+                , onError: handler target (setFallbackImgSrc notFoundImage)
+                }
+            , Block.stack { space: E.str "0" }
+                [ P.div_ (textDefault <> fontMedium <> lineHeight "1em")
+                    [ R.text
+                        ( un ProjectName name # \n →
+                            stripPrefix
+                              (Pattern "purescript-")
+                              n # fromMaybe n
+                        )
+                    ]
+                , P.span_ (textXs <> textCol' col.textPaler4)
+                    [ lastCommitRD # R.text <<< case _ of
+                        Nothing → "(Only works for Github repos)"
+                        Just (RD.NotAsked) → "-"
+                        Just (RD.Loading) → "Loading last commit age"
+                        Just (RD.Failure e) → String.take 24 e
+                        Just (RD.Success s) → JSDate.toInstant s # foldMap
+                          \start →
+                            approximateHumanReadableTimeInThePast
+                              { start, end: now }
 
-                  ]
-              , case githubRepoʔ of
-                  Nothing → renderFilePath (un Repository repo)
-                  Just githubRepo → renderGithubRepo githubRepo
-              ]
-          ]
-      ]
+                    ]
+                , case githubRepoʔ of
+                    Nothing → renderFilePath (un Repository repo)
+                    Just githubRepo → renderGithubRepo githubRepo
+                ]
+            ]
+        ]
 
 parseGithubRepoLink ∷ Repository → Maybe GithubRepo
 parseGithubRepoLink (Repository repo) = case strippedPrefix of
@@ -364,7 +353,8 @@ useGetPackagesFileInRepo ctx = React.do
   pure $ (rd >>= (JSON.readJSON >>> RD.fromEither)) /\ get
 
 type Entry =
-  { name ∷ ProjectName
+  { name ∷ String
+  , owner ∷ { login ∷ String }
   , defaultBranchRef ∷
       { name ∷ String
       , target ∷
@@ -375,11 +365,12 @@ type Entry =
 
 useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
   rd /\ get ← useDynamicGithubGraphQL ctx
-  remainingChunks /\ setRemainingChunks ← React.useState []
+  remainingChunks /\ setRemainingChunks ← React.useState
+    ([] ∷ (Array (NonEmptyArray GithubRepo)))
   results /\ setResults ← React.useState
-    (Map.empty ∷ _ ProjectName (RemoteData String JSDate))
+    (Map.empty ∷ _ GithubRepo (RemoteData String JSDate))
   resultsRef ← React.useRef
-    (Map.empty ∷ _ ProjectName (RemoteData String JSDate))
+    (Map.empty ∷ _ GithubRepo (RemoteData String JSDate))
   useEffect remainingChunks do
     chunkResults ← React.readRef resultsRef
     setResults (Map.union chunkResults)
@@ -388,7 +379,7 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
       Just chunk → do
         setResults
           ( Map.union
-              ( chunk <#> (\{ repoName } → ProjectName repoName /\ Loading)
+              ( chunk <#> (\repo → repo /\ Loading)
                   # Map.fromFoldable
               )
           )
@@ -402,24 +393,24 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
         React.writeRef resultsRef Map.empty
       RD.Loading → mempty
       RD.Failure e → do
-        let _ = spy "errrrrrrrrrrrrrror" e
         Console.log (show e)
         mempty
       RD.Success (repoInfoResult ∷ { | RepoInfoResult }) → do
-        let _ = spy "succ" "succ"
         intermediate ← React.readRef resultsRef
         React.writeRef resultsRef
           ( intermediate # Map.union
               ( ( repoInfoResult.data # Map.values
                     # List.mapMaybe
-                        ( map \x → x.name /\
-                            ( x.defaultBranchRef.target.history.edges
-                                # Array.head
-                                >>= _.node.pushedDate
-                                <#> (unsafePerformEffect <<< JSDate.parse)
-                                # note "null result from API"
-                                # RD.fromEither
-                            )
+                        ( map \x@{ owner: { login: owner }, name: repoName } →
+                            { owner, repoName }
+                              /\
+                                ( x.defaultBranchRef.target.history.edges
+                                    # Array.head
+                                    >>= _.node.pushedDate
+                                    <#> (unsafePerformEffect <<< JSDate.parse)
+                                    # note "null result from API"
+                                    # RD.fromEither
+                                )
                         )
                 )
                   # Map.fromFoldable
@@ -429,16 +420,15 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
     mempty
   let
     result ∷
-      (Map ProjectName (RemoteData String JSDate)) /\
+      (Map GithubRepo (RemoteData String JSDate)) /\
         (Array GithubRepo → Effect Unit)
     result =
       results /\ \repos → do
-        let chunks = chunked 50 repos
+        let chunks = chunked 200 repos
         setResults
           ( const
               ( Map.fromFoldable
-                  ( repos <#>
-                      (\{ repoName } → (ProjectName repoName /\ NotAsked))
+                  ( repos <#> (\repo → (repo /\ NotAsked))
                   )
               )
           )
@@ -477,6 +467,7 @@ mkGetRepoInfo repos = GraphQL $
     """
     fragment repoProperties on Repository {
         name
+        owner { login }
         defaultBranchRef {
           name
           target {
@@ -497,6 +488,8 @@ mkGetRepoInfo repos = GraphQL $
   quote ∷ String → String
   quote = show
 
+approximateHumanReadableTimeInThePast ∷
+  { end ∷ Instant, start ∷ Instant } → String
 approximateHumanReadableTimeInThePast { start, end } = do
   let duration = durationMillis { start, end }
   let days = toDuration duration # un Days

@@ -20,7 +20,7 @@
 
   // node_modules/react/cjs/react.development.js
   var require_react_development = __commonJS({
-    "node_modules/react/cjs/react.development.js"(exports, module2) {
+    "node_modules/react/cjs/react.development.js"(exports, module) {
       "use strict";
       if (true) {
         (function() {
@@ -1022,7 +1022,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useCallback(callback2, deps);
           }
-          function useMemo7(create4, deps) {
+          function useMemo8(create4, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useMemo(create4, deps);
           }
@@ -1591,8 +1591,8 @@
             if (enqueueTaskImpl === null) {
               try {
                 var requireString = ("require" + Math.random()).slice(0, 7);
-                var nodeRequire = module2 && module2[requireString];
-                enqueueTaskImpl = nodeRequire.call(module2, "timers").setImmediate;
+                var nodeRequire = module && module[requireString];
+                enqueueTaskImpl = nodeRequire.call(module, "timers").setImmediate;
               } catch (_err) {
                 enqueueTaskImpl = function(callback2) {
                   {
@@ -1791,7 +1791,7 @@
           exports.useImperativeHandle = useImperativeHandle2;
           exports.useInsertionEffect = useInsertionEffect6;
           exports.useLayoutEffect = useLayoutEffect6;
-          exports.useMemo = useMemo7;
+          exports.useMemo = useMemo8;
           exports.useReducer = useReducer2;
           exports.useRef = useRef10;
           exports.useState = useState7;
@@ -1808,12 +1808,12 @@
 
   // node_modules/react/index.js
   var require_react = __commonJS({
-    "node_modules/react/index.js"(exports, module2) {
+    "node_modules/react/index.js"(exports, module) {
       "use strict";
       if (false) {
-        module2.exports = null;
+        module.exports = null;
       } else {
-        module2.exports = require_react_development();
+        module.exports = require_react_development();
       }
     }
   });
@@ -2270,12 +2270,12 @@
 
   // node_modules/scheduler/index.js
   var require_scheduler = __commonJS({
-    "node_modules/scheduler/index.js"(exports, module2) {
+    "node_modules/scheduler/index.js"(exports, module) {
       "use strict";
       if (false) {
-        module2.exports = null;
+        module.exports = null;
       } else {
-        module2.exports = require_scheduler_development();
+        module.exports = require_scheduler_development();
       }
     }
   });
@@ -22597,13 +22597,13 @@
 
   // node_modules/react-dom/index.js
   var require_react_dom = __commonJS({
-    "node_modules/react-dom/index.js"(exports, module2) {
+    "node_modules/react-dom/index.js"(exports, module) {
       "use strict";
       if (false) {
         checkDCE();
-        module2.exports = null;
+        module.exports = null;
       } else {
-        module2.exports = require_react_dom_development();
+        module.exports = require_react_dom_development();
       }
     }
   });
@@ -22795,19 +22795,19 @@
 
   // node_modules/react-is/index.js
   var require_react_is = __commonJS({
-    "node_modules/react-is/index.js"(exports, module2) {
+    "node_modules/react-is/index.js"(exports, module) {
       "use strict";
       if (false) {
-        module2.exports = null;
+        module.exports = null;
       } else {
-        module2.exports = require_react_is_development();
+        module.exports = require_react_is_development();
       }
     }
   });
 
   // node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js
   var require_hoist_non_react_statics_cjs = __commonJS({
-    "node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js"(exports, module2) {
+    "node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js"(exports, module) {
       "use strict";
       var reactIs = require_react_is();
       var REACT_STATICS = {
@@ -22889,7 +22889,7 @@
         }
         return targetComponent;
       }
-      module2.exports = hoistNonReactStatics;
+      module.exports = hoistNonReactStatics;
     }
   });
 
@@ -26622,7 +26622,7 @@
               return [workInProgressHook.memoizedState, _dispatch];
             }
           }
-          function useMemo7(nextCreate, deps) {
+          function useMemo8(nextCreate, deps) {
             currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
             workInProgressHook = createWorkInProgressHook();
             var nextDeps = deps === void 0 ? null : deps;
@@ -26696,7 +26696,7 @@
             }
           }
           function useCallback4(callback2, deps) {
-            return useMemo7(function() {
+            return useMemo8(function() {
               return callback2;
             }, deps);
           }
@@ -26736,7 +26736,7 @@
           var Dispatcher = {
             readContext: readContext$1,
             useContext: useContext19,
-            useMemo: useMemo7,
+            useMemo: useMemo8,
             useReducer: useReducer2,
             useRef: useRef10,
             useState: useState7,
@@ -31683,7 +31683,7 @@
               return [workInProgressHook.memoizedState, _dispatch];
             }
           }
-          function useMemo7(nextCreate, deps) {
+          function useMemo8(nextCreate, deps) {
             currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
             workInProgressHook = createWorkInProgressHook();
             var nextDeps = deps === void 0 ? null : deps;
@@ -31757,7 +31757,7 @@
             }
           }
           function useCallback4(callback2, deps) {
-            return useMemo7(function() {
+            return useMemo8(function() {
               return callback2;
             }, deps);
           }
@@ -31797,7 +31797,7 @@
           var Dispatcher = {
             readContext: readContext$1,
             useContext: useContext19,
-            useMemo: useMemo7,
+            useMemo: useMemo8,
             useReducer: useReducer2,
             useRef: useRef10,
             useState: useState7,
@@ -33047,7 +33047,7 @@
 
   // node_modules/tslib/tslib.js
   var require_tslib = __commonJS({
-    "node_modules/tslib/tslib.js"(exports, module2) {
+    "node_modules/tslib/tslib.js"(exports, module) {
       var __extends2;
       var __assign2;
       var __rest2;
@@ -33079,8 +33079,8 @@
           define("tslib", ["exports"], function(exports2) {
             factory(createExporter(root2, createExporter(exports2)));
           });
-        } else if (typeof module2 === "object" && typeof module2.exports === "object") {
-          factory(createExporter(root2, createExporter(module2.exports)));
+        } else if (typeof module === "object" && typeof module.exports === "object") {
+          factory(createExporter(root2, createExporter(module.exports)));
         } else {
           factory(createExporter(root2));
         }
@@ -33521,9 +33521,9 @@
 
   // node_modules/dompurify/dist/purify.js
   var require_purify = __commonJS({
-    "node_modules/dompurify/dist/purify.js"(exports, module2) {
+    "node_modules/dompurify/dist/purify.js"(exports, module) {
       (function(global5, factory) {
-        typeof exports === "object" && typeof module2 !== "undefined" ? module2.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global5 = typeof globalThis !== "undefined" ? globalThis : global5 || self, global5.DOMPurify = factory());
+        typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global5 = typeof globalThis !== "undefined" ? globalThis : global5 || self, global5.DOMPurify = factory());
       })(exports, function() {
         "use strict";
         function _typeof(obj) {
@@ -34421,7 +34421,7 @@
 
   // node_modules/highlight.js/lib/core.js
   var require_core = __commonJS({
-    "node_modules/highlight.js/lib/core.js"(exports, module2) {
+    "node_modules/highlight.js/lib/core.js"(exports, module) {
       var deepFreezeEs6 = { exports: {} };
       function deepFreeze(obj) {
         if (obj instanceof Map) {
@@ -35809,7 +35809,7 @@
         return hljs;
       };
       var highlight = HLJS({});
-      module2.exports = highlight;
+      module.exports = highlight;
       highlight.HighlightJS = highlight;
       highlight.default = highlight;
     }
@@ -36443,6 +36443,25 @@
     EQ2.value = new EQ2();
     return EQ2;
   }();
+  var eqOrdering = {
+    eq: function(v2) {
+      return function(v1) {
+        if (v2 instanceof LT && v1 instanceof LT) {
+          return true;
+        }
+        ;
+        if (v2 instanceof GT && v1 instanceof GT) {
+          return true;
+        }
+        ;
+        if (v2 instanceof EQ && v1 instanceof EQ) {
+          return true;
+        }
+        ;
+        return false;
+      };
+    }
+  };
 
   // output/Data.Ring/foreign.js
   var intSub = function(x3) {
@@ -36634,6 +36653,8 @@
   };
 
   // output/Data.Ord/index.js
+  var eqRec2 = /* @__PURE__ */ eqRec();
+  var notEq2 = /* @__PURE__ */ notEq(eqOrdering);
   var ordString = /* @__PURE__ */ function() {
     return {
       compare: ordStringImpl(LT.value)(EQ.value)(GT.value),
@@ -36642,6 +36663,18 @@
       }
     };
   }();
+  var ordRecordNil = {
+    compareRecord: function(v2) {
+      return function(v1) {
+        return function(v22) {
+          return EQ.value;
+        };
+      };
+    },
+    EqRecord0: function() {
+      return eqRowNil;
+    }
+  };
   var ordNumber = /* @__PURE__ */ function() {
     return {
       compare: ordNumberImpl(LT.value)(EQ.value)(GT.value),
@@ -36666,6 +36699,20 @@
       }
     };
   }();
+  var compareRecord = function(dict) {
+    return dict.compareRecord;
+  };
+  var ordRecord = function() {
+    return function(dictOrdRecord) {
+      var eqRec13 = eqRec2(dictOrdRecord.EqRecord0());
+      return {
+        compare: compareRecord(dictOrdRecord)($$Proxy.value),
+        Eq0: function() {
+          return eqRec13;
+        }
+      };
+    };
+  };
   var compare = function(dict) {
     return dict.compare;
   };
@@ -36760,6 +36807,39 @@
         }
         ;
         throw new Error("Failed pattern match at Data.Ord (line 172, column 3 - line 175, column 12): " + [v2.constructor.name]);
+      };
+    };
+  };
+  var ordRecordCons = function(dictOrdRecord) {
+    var compareRecord1 = compareRecord(dictOrdRecord);
+    var eqRowCons5 = eqRowCons(dictOrdRecord.EqRecord0())();
+    return function() {
+      return function(dictIsSymbol) {
+        var reflectSymbol2 = reflectSymbol(dictIsSymbol);
+        var eqRowCons1 = eqRowCons5(dictIsSymbol);
+        return function(dictOrd) {
+          var compare32 = compare(dictOrd);
+          var eqRowCons22 = eqRowCons1(dictOrd.Eq0());
+          return {
+            compareRecord: function(v2) {
+              return function(ra) {
+                return function(rb2) {
+                  var key = reflectSymbol2($$Proxy.value);
+                  var left4 = compare32(unsafeGet(key)(ra))(unsafeGet(key)(rb2));
+                  var $95 = notEq2(left4)(EQ.value);
+                  if ($95) {
+                    return left4;
+                  }
+                  ;
+                  return compareRecord1($$Proxy.value)(ra)(rb2);
+                };
+              };
+            },
+            EqRecord0: function() {
+              return eqRowCons22;
+            }
+          };
+        };
       };
     };
   };
@@ -38199,6 +38279,11 @@
   var mkFn2 = function(fn) {
     return function(a4, b4) {
       return fn(a4)(b4);
+    };
+  };
+  var mkFn3 = function(fn) {
+    return function(a4, b4, c3) {
+      return fn(a4)(b4)(c3);
     };
   };
   var runFn2 = function(fn) {
@@ -41777,6 +41862,12 @@
           };
         };
       })(empty3);
+    };
+  };
+  var mapMaybe3 = function(dictOrd) {
+    var $926 = mapMaybeWithKey(dictOrd);
+    return function($927) {
+      return $926($$const($927));
     };
   };
   var $$delete2 = function(dictOrd) {
@@ -63482,17 +63573,17 @@
   };
   var writeForeignRecord1 = /* @__PURE__ */ writeForeignRecord5(writeForeignFieldsNilRowR);
   var writeForeignFieldsCons12 = /* @__PURE__ */ writeForeignFieldsCons(dependenciesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignProjectName));
-  var eqRec2 = /* @__PURE__ */ eqRec();
+  var eqRec3 = /* @__PURE__ */ eqRec();
   var eqRowCons2 = /* @__PURE__ */ eqRowCons(eqRowNil)();
   var eqMaybe2 = /* @__PURE__ */ eqMaybe(eqString);
   var variantTagsCons2 = /* @__PURE__ */ variantTagsCons(/* @__PURE__ */ variantTagsCons(/* @__PURE__ */ variantTagsCons(/* @__PURE__ */ variantTagsCons(variantTagsNil)(validSpagoDhallIsSymbol))(nothingSelectedIsSymbol))(noSpagoDhallIsSymbol))(invalidSpagoDhallIsSymbol);
   var eqArray2 = /* @__PURE__ */ eqArray(eqProjectName);
-  var eqRec1 = /* @__PURE__ */ eqRec2(eqRowNil);
-  var eqVariantCons2 = /* @__PURE__ */ eqVariantCons(/* @__PURE__ */ eqVariantCons(/* @__PURE__ */ eqVariantCons(/* @__PURE__ */ eqVariantCons(eqVariantNil)(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(sourcesIsSymbol)(/* @__PURE__ */ eqArray(eqSourceGlob)))()(repositoryIsSymbol)(/* @__PURE__ */ eqMaybe(eqRepository)))()(packagesIsSymbol)(/* @__PURE__ */ eqObject(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(versionIsSymbol)(eqVersion))()(repoIsSymbol)(eqRepository))()(dependenciesIsSymbol)(eqArray2)))))()(nameIsSymbol)(eqProjectName))()(dependenciesIsSymbol)(eqArray2))))(eqRec1))(eqRec1))(eqString);
+  var eqRec1 = /* @__PURE__ */ eqRec3(eqRowNil);
+  var eqVariantCons2 = /* @__PURE__ */ eqVariantCons(/* @__PURE__ */ eqVariantCons(/* @__PURE__ */ eqVariantCons(/* @__PURE__ */ eqVariantCons(eqVariantNil)(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(sourcesIsSymbol)(/* @__PURE__ */ eqArray(eqSourceGlob)))()(repositoryIsSymbol)(/* @__PURE__ */ eqMaybe(eqRepository)))()(packagesIsSymbol)(/* @__PURE__ */ eqObject(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(versionIsSymbol)(eqVersion))()(repoIsSymbol)(eqRepository))()(dependenciesIsSymbol)(eqArray2)))))()(nameIsSymbol)(eqProjectName))()(dependenciesIsSymbol)(eqArray2))))(eqRec1))(eqRec1))(eqString);
   var eq5 = /* @__PURE__ */ eq(/* @__PURE__ */ eqVariant()(variantTagsCons2)(eqVariantCons2));
   var eq6 = /* @__PURE__ */ eq(eqMaybe2);
   var eq7 = /* @__PURE__ */ eq(eqGetInstalledToolsResult);
-  var eq8 = /* @__PURE__ */ eq(/* @__PURE__ */ eqArray(/* @__PURE__ */ eqTuple(eqString)(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(projectsIsSymbol)(/* @__PURE__ */ eqArray(eqPureScriptProjectDefini)))()(nameIsSymbol)(eqString)))));
+  var eq8 = /* @__PURE__ */ eq(/* @__PURE__ */ eqArray(/* @__PURE__ */ eqTuple(eqString)(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(projectsIsSymbol)(/* @__PURE__ */ eqArray(eqPureScriptProjectDefini)))()(nameIsSymbol)(eqString)))));
   var NoGithubToken = /* @__PURE__ */ function() {
     function NoGithubToken2() {
     }
@@ -64005,7 +64096,7 @@
   var eq9 = /* @__PURE__ */ eq(/* @__PURE__ */ eqFailedOr(eqNoGithubToken)(eqGithubGraphQLResponse));
   var eqFailedOr1 = /* @__PURE__ */ eqFailedOr(eqString);
   var eq10 = /* @__PURE__ */ eq(/* @__PURE__ */ eqFailedOr1(eqDeviceCodeResponse));
-  var eq11 = /* @__PURE__ */ eq(/* @__PURE__ */ eqFailedOr1(/* @__PURE__ */ eqFailedOr(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(error_uriIsSymbol)(eqString))()(error_descriptionIsSymbol)(eqString))()(errorIsSymbol)(eqString)))(/* @__PURE__ */ eqRec2(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(token_typeIsSymbol)(eqTokenType))()(scopeIsSymbol)(eqScopeList))()(access_tokenIsSymbol)(eqAccessToken)))));
+  var eq11 = /* @__PURE__ */ eq(/* @__PURE__ */ eqFailedOr1(/* @__PURE__ */ eqFailedOr(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(error_uriIsSymbol)(eqString))()(error_descriptionIsSymbol)(eqString))()(errorIsSymbol)(eqString)))(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons2(token_typeIsSymbol)(eqTokenType))()(scopeIsSymbol)(eqScopeList))()(access_tokenIsSymbol)(eqAccessToken)))));
   var eq122 = /* @__PURE__ */ eq(/* @__PURE__ */ eqFailedOr1(eqSpagoGlobalCacheDir));
   var eqMessageToRenderer = {
     eq: function(x3) {
@@ -64255,7 +64346,7 @@
         }
       };
     }();
-    function Supervisor(util2) {
+    function Supervisor(util) {
       var fibers = {};
       var fiberId = 0;
       var count = 0;
@@ -64289,9 +64380,9 @@
                 return function() {
                   delete kills[fid];
                   killCount--;
-                  if (util2.isLeft(result) && util2.fromLeft(result)) {
+                  if (util.isLeft(result) && util.fromLeft(result)) {
                     setTimeout(function() {
-                      throw util2.fromLeft(result);
+                      throw util.fromLeft(result);
                     }, 0);
                   }
                   if (killCount === 0) {
@@ -64329,7 +64420,7 @@
     var PENDING = 4;
     var RETURN = 5;
     var COMPLETED = 6;
-    function Fiber(util2, supervisor, aff) {
+    function Fiber(util, supervisor, aff) {
       var runTick = 0;
       var status = SUSPENDED;
       var step3 = aff;
@@ -64361,12 +64452,12 @@
                 }
               } catch (e) {
                 status = RETURN;
-                fail5 = util2.left(e);
+                fail5 = util.left(e);
                 step3 = null;
               }
               break;
             case STEP_RESULT:
-              if (util2.isLeft(step3)) {
+              if (util.isLeft(step3)) {
                 status = RETURN;
                 fail5 = step3;
                 step3 = null;
@@ -64374,7 +64465,7 @@
                 status = RETURN;
               } else {
                 status = STEP_BIND;
-                step3 = util2.fromRight(step3);
+                step3 = util.fromRight(step3);
               }
               break;
             case CONTINUE:
@@ -64390,7 +64481,7 @@
                 case PURE:
                   if (bhead === null) {
                     status = RETURN;
-                    step3 = util2.right(step3._1);
+                    step3 = util.right(step3._1);
                   } else {
                     status = STEP_BIND;
                     step3 = step3._1;
@@ -64398,11 +64489,11 @@
                   break;
                 case SYNC:
                   status = STEP_RESULT;
-                  step3 = runSync(util2.left, util2.right, step3._1);
+                  step3 = runSync(util.left, util.right, step3._1);
                   break;
                 case ASYNC:
                   status = PENDING;
-                  step3 = runAsync(util2.left, step3._1, function(result2) {
+                  step3 = runAsync(util.left, step3._1, function(result2) {
                     return function() {
                       if (runTick !== localRunTick) {
                         return;
@@ -64421,7 +64512,7 @@
                   return;
                 case THROW:
                   status = RETURN;
-                  fail5 = util2.left(step3._1);
+                  fail5 = util.left(step3._1);
                   step3 = null;
                   break;
                 case CATCH:
@@ -64449,18 +64540,18 @@
                   break;
                 case FORK:
                   status = STEP_RESULT;
-                  tmp = Fiber(util2, supervisor, step3._2);
+                  tmp = Fiber(util, supervisor, step3._2);
                   if (supervisor) {
                     supervisor.register(tmp);
                   }
                   if (step3._1) {
                     tmp.run();
                   }
-                  step3 = util2.right(tmp);
+                  step3 = util.right(tmp);
                   break;
                 case SEQ:
                   status = CONTINUE;
-                  step3 = sequential2(util2, supervisor, step3._1);
+                  step3 = sequential2(util, supervisor, step3._1);
                   break;
               }
               break;
@@ -64480,7 +64571,7 @@
                       status = RETURN;
                     } else if (fail5) {
                       status = CONTINUE;
-                      step3 = attempt2._2(util2.fromLeft(fail5));
+                      step3 = attempt2._2(util.fromLeft(fail5));
                       fail5 = null;
                     }
                     break;
@@ -64491,13 +64582,13 @@
                       bhead = attempt2._1;
                       btail = attempt2._2;
                       status = STEP_BIND;
-                      step3 = util2.fromRight(step3);
+                      step3 = util.fromRight(step3);
                     }
                     break;
                   case BRACKET:
                     bracketCount--;
                     if (fail5 === null) {
-                      result = util2.fromRight(step3);
+                      result = util.fromRight(step3);
                       attempts = new Aff2(CONS, new Aff2(RELEASE, attempt2._2, result), attempts, tmp);
                       if (interrupt === tmp || bracketCount > 0) {
                         status = CONTINUE;
@@ -64509,11 +64600,11 @@
                     attempts = new Aff2(CONS, new Aff2(FINALIZED, step3, fail5), attempts, interrupt);
                     status = CONTINUE;
                     if (interrupt && interrupt !== tmp && bracketCount === 0) {
-                      step3 = attempt2._1.killed(util2.fromLeft(interrupt))(attempt2._2);
+                      step3 = attempt2._1.killed(util.fromLeft(interrupt))(attempt2._2);
                     } else if (fail5) {
-                      step3 = attempt2._1.failed(util2.fromLeft(fail5))(attempt2._2);
+                      step3 = attempt2._1.failed(util.fromLeft(fail5))(attempt2._2);
                     } else {
-                      step3 = attempt2._1.completed(util2.fromRight(step3))(attempt2._2);
+                      step3 = attempt2._1.completed(util.fromRight(step3))(attempt2._2);
                     }
                     fail5 = null;
                     bracketCount++;
@@ -64543,12 +64634,12 @@
               joins = null;
               if (interrupt && fail5) {
                 setTimeout(function() {
-                  throw util2.fromLeft(fail5);
+                  throw util.fromLeft(fail5);
                 }, 0);
-              } else if (util2.isLeft(step3) && rethrow) {
+              } else if (util.isLeft(step3) && rethrow) {
                 setTimeout(function() {
                   if (rethrow) {
-                    throw util2.fromLeft(step3);
+                    throw util.fromLeft(step3);
                   }
                 }, 0);
               }
@@ -64582,26 +64673,26 @@
       function kill(error5, cb2) {
         return function() {
           if (status === COMPLETED) {
-            cb2(util2.right(void 0))();
+            cb2(util.right(void 0))();
             return function() {
             };
           }
           var canceler = onComplete({
             rethrow: false,
             handler: function() {
-              return cb2(util2.right(void 0));
+              return cb2(util.right(void 0));
             }
           })();
           switch (status) {
             case SUSPENDED:
-              interrupt = util2.left(error5);
+              interrupt = util.left(error5);
               status = COMPLETED;
               step3 = interrupt;
               run5(runTick);
               break;
             case PENDING:
               if (interrupt === null) {
-                interrupt = util2.left(error5);
+                interrupt = util.left(error5);
               }
               if (bracketCount === 0) {
                 if (status === PENDING) {
@@ -64615,7 +64706,7 @@
               break;
             default:
               if (interrupt === null) {
-                interrupt = util2.left(error5);
+                interrupt = util.left(error5);
               }
               if (bracketCount === 0) {
                 status = RETURN;
@@ -64658,7 +64749,7 @@
         }
       };
     }
-    function runPar(util2, supervisor, par, cb2) {
+    function runPar(util, supervisor, par, cb2) {
       var fiberId = 0;
       var fibers = {};
       var killId = 0;
@@ -64714,7 +64805,7 @@
             }
           }
         if (count === 0) {
-          cb3(util2.right(void 0))();
+          cb3(util.right(void 0))();
         } else {
           kid = 0;
           tmp = count;
@@ -64726,7 +64817,7 @@
       }
       function join5(result, head6, tail3) {
         var fail5, step3, lhs, rhs, tmp, kid;
-        if (util2.isLeft(result)) {
+        if (util.isLeft(result)) {
           fail5 = result;
           step3 = null;
         } else {
@@ -64752,7 +64843,7 @@
             switch (head6.tag) {
               case MAP:
                 if (fail5 === null) {
-                  head6._3 = util2.right(head6._1(util2.fromRight(step3)));
+                  head6._3 = util.right(head6._1(util.fromRight(step3)));
                   step3 = head6._3;
                 } else {
                   head6._3 = fail5;
@@ -64784,17 +64875,17 @@
                 } else if (lhs === EMPTY || rhs === EMPTY) {
                   return;
                 } else {
-                  step3 = util2.right(util2.fromRight(lhs)(util2.fromRight(rhs)));
+                  step3 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
                   head6._3 = step3;
                 }
                 break;
               case ALT:
                 lhs = head6._1._3;
                 rhs = head6._2._3;
-                if (lhs === EMPTY && util2.isLeft(rhs) || rhs === EMPTY && util2.isLeft(lhs)) {
+                if (lhs === EMPTY && util.isLeft(rhs) || rhs === EMPTY && util.isLeft(lhs)) {
                   return;
                 }
-                if (lhs !== EMPTY && util2.isLeft(lhs) && rhs !== EMPTY && util2.isLeft(rhs)) {
+                if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
                   fail5 = step3 === lhs ? rhs : lhs;
                   step3 = null;
                   head6._3 = fail5;
@@ -64877,7 +64968,7 @@
                     status = RETURN;
                     tmp = step3;
                     step3 = new Aff2(FORKED, fid, new Aff2(CONS, head6, tail3), EMPTY);
-                    tmp = Fiber(util2, supervisor, tmp);
+                    tmp = Fiber(util, supervisor, tmp);
                     tmp.onComplete({
                       rethrow: false,
                       handler: resolve(step3)
@@ -64915,7 +65006,7 @@
         }
       }
       function cancel(error5, cb3) {
-        interrupt = util2.left(error5);
+        interrupt = util.left(error5);
         var innerKills;
         for (var kid in kills) {
           if (kills.hasOwnProperty(kid)) {
@@ -64951,10 +65042,10 @@
         });
       };
     }
-    function sequential2(util2, supervisor, par) {
+    function sequential2(util, supervisor, par) {
       return new Aff2(ASYNC, function(cb2) {
         return function() {
-          return runPar(util2, supervisor, par, cb2);
+          return runPar(util, supervisor, par, cb2);
         };
       });
     }
@@ -65012,9 +65103,9 @@
     };
   }
   var makeAff = Aff.Async;
-  function _makeFiber(util2, aff) {
+  function _makeFiber(util, aff) {
     return function() {
-      return Aff.Fiber(util2, null, aff);
+      return Aff.Fiber(util, null, aff);
     };
   }
   var _delay = function() {
@@ -78058,7 +78149,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
   var button$prime2 = /* @__PURE__ */ button$prime();
   var bind16 = /* @__PURE__ */ bind2(ixBindRender);
   var discard4 = /* @__PURE__ */ discard2(ixBindRender);
-  var notEq2 = /* @__PURE__ */ notEq(eqNotificationId);
+  var notEq3 = /* @__PURE__ */ notEq(eqNotificationId);
   var pure15 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeRender(refl));
   var renderAnimatedNotifications = function(items) {
     return styled2(div7)({
@@ -78120,7 +78211,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
                 if (v42 instanceof NotificationDismissed) {
                   return v3.value1(filter(function($54) {
                     return function(v5) {
-                      return notEq2(v5)(v42.value0);
+                      return notEq3(v5)(v42.value0);
                     }(fst($54));
                   }));
                 }
@@ -80768,7 +80859,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
   var exit3 = /* @__PURE__ */ exit();
   var for_1 = /* @__PURE__ */ for_(applicativeST)(foldableMaybe);
   var mapFlipped22 = /* @__PURE__ */ mapFlipped(functorST);
-  var notEq3 = /* @__PURE__ */ notEq(eqPlacement);
+  var notEq4 = /* @__PURE__ */ notEq(eqPlacement);
   var animate5 = /* @__PURE__ */ animate3();
   var mempty22 = /* @__PURE__ */ mempty(monoidEffect3);
   var $$void6 = /* @__PURE__ */ $$void(functorEffect);
@@ -81109,7 +81200,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
                           getNewPlacement();
                           (function() {
                             while (mapFlipped22(read2(pRef))(function(v3) {
-                              return notEq3(v3)(pRef.value);
+                              return notEq4(v3)(pRef.value);
                             })()) {
                               getNewPlacement();
                             }
@@ -84728,11 +84819,11 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
   var when7 = /* @__PURE__ */ when(applicativeEffect);
   var pure46 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeRender(refl));
   var useStateEq$prime = function(dictEq) {
-    var notEq5 = notEq(dictEq);
+    var notEq6 = notEq(dictEq);
     return function(initialValue) {
       return coerceHook11(bind40(useState$prime(initialValue))(function(v2) {
         var updateEq = function(newValue) {
-          return when7(notEq5(newValue)(v2.value0))(v2.value1(newValue));
+          return when7(notEq6(newValue)(v2.value0))(v2.value1(newValue));
         };
         return pure46(new Tuple(v2.value0, updateEq));
       }));
@@ -84994,33 +85085,6 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       return instant(Milliseconds($21));
     })(toInstantImpl(Just.create)(Nothing.value));
   }();
-
-  // output/Debug/foreign.js
-  var req = typeof module === "undefined" ? void 0 : module.require;
-  var util = function() {
-    try {
-      return req === void 0 ? void 0 : req("util");
-    } catch (e) {
-      return void 0;
-    }
-  }();
-  var _spy = function(tag2, x3) {
-    if (util !== void 0) {
-      console.log(tag2 + ":", util.inspect(x3, { depth: null, colors: true }));
-    } else {
-      console.log(tag2 + ":", x3);
-    }
-    return x3;
-  };
-
-  // output/Debug/index.js
-  var spy = function() {
-    return function(tag2) {
-      return function(a4) {
-        return _spy(tag2, a4);
-      };
-    };
-  };
 
   // output/Effect.Now/foreign.js
   function now2() {
@@ -94194,7 +94258,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
   var useAff1 = /* @__PURE__ */ useAff(/* @__PURE__ */ eqMaybe(eqDeviceCodeResponse));
   var append29 = /* @__PURE__ */ append(semigroupSeconds);
   var negateDuration3 = /* @__PURE__ */ negateDuration(durationSeconds);
-  var eqRec3 = /* @__PURE__ */ eqRec();
+  var eqRec4 = /* @__PURE__ */ eqRec();
   var eqRowCons3 = /* @__PURE__ */ eqRowCons(eqRowNil)();
   var error_uriIsSymbol2 = {
     reflectSymbol: function() {
@@ -94211,7 +94275,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       return "error";
     }
   };
-  var useAff22 = /* @__PURE__ */ useAff(/* @__PURE__ */ eqRemoteData(eqVoid)(/* @__PURE__ */ eqEither(eqString)(/* @__PURE__ */ eqEither(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons3(error_uriIsSymbol2)(eqString))()(error_descriptionIsSymbol2)(eqString))()(errorIsSymbol2)(eqString)))(/* @__PURE__ */ eqRec3(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons3({
+  var useAff22 = /* @__PURE__ */ useAff(/* @__PURE__ */ eqRemoteData(eqVoid)(/* @__PURE__ */ eqEither(eqString)(/* @__PURE__ */ eqEither(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons3(error_uriIsSymbol2)(eqString))()(error_descriptionIsSymbol2)(eqString))()(errorIsSymbol2)(eqString)))(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons3({
     reflectSymbol: function() {
       return "token_type";
     }
@@ -97878,7 +97942,7 @@ ${content3}</tr>
   var when9 = /* @__PURE__ */ when(applicativeEffect);
   var eqMaybe3 = /* @__PURE__ */ eqMaybe(eqString);
   var eq110 = /* @__PURE__ */ eq(eqMaybe3);
-  var notEq4 = /* @__PURE__ */ notEq(eqMaybe3);
+  var notEq5 = /* @__PURE__ */ notEq(eqMaybe3);
   var pure310 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeRender(refl));
   var useTypingPlaceholders = function(defaultPlaceholder) {
     return function(otherPlaceholders) {
@@ -98042,7 +98106,7 @@ ${content3}</tr>
                   var mkOnInputListener = eventListener(function(v2) {
                     return function __do10() {
                       var inputValue\u0294 = getInputValue();
-                      var $49 = notEq4(inputValue\u0294)(new Just("")) && notEq4(inputValue\u0294)(Nothing.value);
+                      var $49 = notEq5(inputValue\u0294)(new Just("")) && notEq5(inputValue\u0294)(Nothing.value);
                       if ($49) {
                         return cancel("on change non-empty")();
                       }
@@ -98416,7 +98480,7 @@ ${content3}</tr>
       return "name";
     }
   };
-  var readForeignFieldsCons3 = /* @__PURE__ */ readForeignFieldsCons(nameIsSymbol2);
+  var readForeignFieldsCons3 = /* @__PURE__ */ readForeignFieldsCons(nameIsSymbol2)(readForeignString);
   var targetIsSymbol = {
     reflectSymbol: function() {
       return "target";
@@ -98442,28 +98506,35 @@ ${content3}</tr>
       return "pushedDate";
     }
   };
-  var useDynamicGithubGraphQL2 = /* @__PURE__ */ useDynamicGithubGraphQL(/* @__PURE__ */ writeForeignRecord()(writeForeignFieldsNilRowR))(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(dataIsSymbol)(/* @__PURE__ */ readForeignMapString(/* @__PURE__ */ readForeignMaybe(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(defaultBranchRefIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons3(readForeignString)(/* @__PURE__ */ readForeignFieldsCons(targetIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(historyIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(edgesIsSymbol)(/* @__PURE__ */ readForeignArray(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(nodeIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(pushedDateIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignString))(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()())))(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()())()()))(/* @__PURE__ */ readForeignFieldsCons3(readForeignProjectName)(readForeignFieldsNilRowRo)()())()()))))(readForeignFieldsNilRowRo)()()));
-  var eqRec4 = /* @__PURE__ */ eqRec();
-  var eqRowCons4 = /* @__PURE__ */ eqRowCons(eqRowNil)();
-  var eqRec12 = /* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons4({
-    reflectSymbol: function() {
-      return "repoName";
-    }
-  })(eqString))()({
+  var ownerIsSymbol = {
     reflectSymbol: function() {
       return "owner";
     }
-  })(eqString));
+  };
+  var loginIsSymbol = {
+    reflectSymbol: function() {
+      return "login";
+    }
+  };
+  var useDynamicGithubGraphQL2 = /* @__PURE__ */ useDynamicGithubGraphQL(/* @__PURE__ */ writeForeignRecord()(writeForeignFieldsNilRowR))(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(dataIsSymbol)(/* @__PURE__ */ readForeignMapString(/* @__PURE__ */ readForeignMaybe(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(defaultBranchRefIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons3(/* @__PURE__ */ readForeignFieldsCons(targetIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(historyIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(edgesIsSymbol)(/* @__PURE__ */ readForeignArray(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(nodeIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(pushedDateIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignString))(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()())))(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()())()()))(/* @__PURE__ */ readForeignFieldsCons3(/* @__PURE__ */ readForeignFieldsCons(ownerIsSymbol)(/* @__PURE__ */ readForeignRecord7(/* @__PURE__ */ readForeignFieldsCons(loginIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()()))(readForeignFieldsNilRowRo)()())()())()()))))(readForeignFieldsNilRowRo)()()));
+  var eqRec5 = /* @__PURE__ */ eqRec();
+  var eqRowCons4 = /* @__PURE__ */ eqRowCons(eqRowNil)();
+  var repoNameIsSymbol = {
+    reflectSymbol: function() {
+      return "repoName";
+    }
+  };
+  var eqRec12 = /* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons4(repoNameIsSymbol)(eqString))()(ownerIsSymbol)(eqString));
   var useEffect22 = /* @__PURE__ */ useEffect(/* @__PURE__ */ eqArray(/* @__PURE__ */ eqNonEmptyArray(eqRec12)));
-  var union3 = /* @__PURE__ */ union2(ordProjectName);
+  var ordRecord2 = /* @__PURE__ */ ordRecord()(/* @__PURE__ */ ordRecordCons(/* @__PURE__ */ ordRecordCons(ordRecordNil)()(repoNameIsSymbol)(ordString))()(ownerIsSymbol)(ordString));
+  var union3 = /* @__PURE__ */ union2(ordRecord2);
   var mempty30 = /* @__PURE__ */ mempty(monoidEffect11);
-  var fromFoldable8 = /* @__PURE__ */ fromFoldable3(ordProjectName);
+  var fromFoldable8 = /* @__PURE__ */ fromFoldable3(ordRecord2);
   var fromFoldable1 = /* @__PURE__ */ fromFoldable8(foldableNonEmptyArray);
   var mapFlipped112 = /* @__PURE__ */ mapFlipped(functorNonEmptyArray);
   var mempty116 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidEffect(monoidEffect11));
   var eqRemoteData2 = /* @__PURE__ */ eqRemoteData(/* @__PURE__ */ eqNonEmptyList(eqForeignError));
-  var useEffect1 = /* @__PURE__ */ useEffect(/* @__PURE__ */ eqRemoteData2(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons4(dataIsSymbol)(/* @__PURE__ */ eqMap(eqString)(/* @__PURE__ */ eqMaybe(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons4(nameIsSymbol2)(eqProjectName))()(defaultBranchRefIsSymbol)(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons4(targetIsSymbol)(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons4(historyIsSymbol)(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons4(edgesIsSymbol)(/* @__PURE__ */ eqArray(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons4(nodeIsSymbol)(/* @__PURE__ */ eqRec4(/* @__PURE__ */ eqRowCons4(pushedDateIsSymbol)(/* @__PURE__ */ eqMaybe(eqString))))))))))))()(nameIsSymbol2)(eqString))))))))));
-  var spy2 = /* @__PURE__ */ spy();
+  var useEffect1 = /* @__PURE__ */ useEffect(/* @__PURE__ */ eqRemoteData2(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons4(dataIsSymbol)(/* @__PURE__ */ eqMap(eqString)(/* @__PURE__ */ eqMaybe(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons4(ownerIsSymbol)(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons4(loginIsSymbol)(eqString))))()(nameIsSymbol2)(eqString))()(defaultBranchRefIsSymbol)(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons(/* @__PURE__ */ eqRowCons4(targetIsSymbol)(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons4(historyIsSymbol)(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons4(edgesIsSymbol)(/* @__PURE__ */ eqArray(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons4(nodeIsSymbol)(/* @__PURE__ */ eqRec5(/* @__PURE__ */ eqRowCons4(pushedDateIsSymbol)(/* @__PURE__ */ eqMaybe(eqString))))))))))))()(nameIsSymbol2)(eqString))))))))));
   var log5 = /* @__PURE__ */ log3(monadEffectEffect);
   var show19 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
   var fromFoldable22 = /* @__PURE__ */ fromFoldable8(foldableList);
@@ -98475,17 +98546,17 @@ ${content3}</tr>
   var un5 = /* @__PURE__ */ un();
   var toDuration2 = /* @__PURE__ */ toDuration(durationDays);
   var show25 = /* @__PURE__ */ show(showInt);
+  var lookup5 = /* @__PURE__ */ lookup(ordRecord2);
   var foldMap19 = /* @__PURE__ */ foldMap(foldableMaybe);
   var foldMap110 = /* @__PURE__ */ foldMap19(monoidJSX);
   var img$prime2 = /* @__PURE__ */ img$prime();
   var stack7 = /* @__PURE__ */ stack2()();
   var foldMap24 = /* @__PURE__ */ foldMap19(monoidString);
-  var mapMaybeWithKey2 = /* @__PURE__ */ mapMaybeWithKey(ordProjectName);
-  var lookup5 = /* @__PURE__ */ lookup(ordProjectName);
+  var eqMap2 = /* @__PURE__ */ eqMap(eqProjectName)(eqRepository);
+  var useMemo7 = /* @__PURE__ */ useMemo(eqMap2);
   var toUnfoldable3 = /* @__PURE__ */ toUnfoldable2(unfoldableArray);
   var bind54 = /* @__PURE__ */ bind(bindReaderT);
   var liftEffect15 = /* @__PURE__ */ liftEffect(/* @__PURE__ */ monadEffectReaderT(monadEffectEffect));
-  var eqMap2 = /* @__PURE__ */ eqMap(eqProjectName)(eqRepository);
   var useStateEq$prime1 = /* @__PURE__ */ useStateEq$prime(/* @__PURE__ */ eqMaybe(eqMap2));
   var useStateEq$prime22 = /* @__PURE__ */ useStateEq$prime(/* @__PURE__ */ eqMaybe(eqRec12));
   var voidRight5 = /* @__PURE__ */ voidRight(functorEffect);
@@ -98493,6 +98564,7 @@ ${content3}</tr>
   var useEffect23 = /* @__PURE__ */ useEffect(/* @__PURE__ */ eqTuple(eqRemoteData1)(eqRemoteData1));
   var append210 = /* @__PURE__ */ append(/* @__PURE__ */ semigroupMap()(ordProjectName)(semigroupRepository));
   var fromFoldable42 = /* @__PURE__ */ fromFoldable(foldableList);
+  var mapMaybe4 = /* @__PURE__ */ mapMaybe3(ordProjectName);
   var box5 = /* @__PURE__ */ box2()();
   var cluster10 = /* @__PURE__ */ cluster3()();
   var css47 = /* @__PURE__ */ css2();
@@ -98501,8 +98573,8 @@ ${content3}</tr>
   var mempty210 = /* @__PURE__ */ mempty(monoidJSX);
   var useGetPackagesFileInRepo = function(ctx) {
     return bind53(useGetTextFileInRepo(ctx))(function(v2) {
-      return pure58(new Tuple(bind121(v2.value0)(function($372) {
-        return fromEither(readJSON3($372));
+      return pure58(new Tuple(bind121(v2.value0)(function($397) {
+        return fromEither(readJSON3($397));
       }), v2.value1));
     });
   };
@@ -98512,11 +98584,11 @@ ${content3}</tr>
       return Nothing.value;
     };
     if (strippedPrefix instanceof Just) {
-      var $276 = split("/")(strippedPrefix.value0);
-      if ($276.length === 2) {
-        var repoName = fromMaybe($276[1])(stripSuffix(".git")($276[1]));
+      var $302 = split("/")(strippedPrefix.value0);
+      if ($302.length === 2) {
+        var repoName = fromMaybe($302[1])(stripSuffix(".git")($302[1]));
         return new Just({
-          owner: $276[0],
+          owner: $302[0],
           repoName
         });
       }
@@ -98553,8 +98625,8 @@ ${content3}</tr>
                 return bind212(getHTMLElementFromRef(inputRef))(traverse_3(focus))();
               })
             })([function() {
-              var $283 = v2.value0 === "";
-              if ($283) {
+              var $309 = v2.value0 === "";
+              if ($309) {
                 return search2;
               }
               ;
@@ -98574,7 +98646,7 @@ ${content3}</tr>
       };
     };
     var inputs = foldMapWithIndex2(toRepoQuery)(repos);
-    return i13("\n    fragment repoProperties on Repository {\n        name\n        defaultBranchRef {\n          name\n          target {\n            ... on Commit {\n              history(first: 1) {\n                edges {\n                  node {\n                    pushedDate\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    ")("\n{\n")(inputs)("\n}");
+    return i13("\n    fragment repoProperties on Repository {\n        name\n        owner { login }\n        defaultBranchRef {\n          name\n          target {\n            ... on Commit {\n              history(first: 1) {\n                edges {\n                  node {\n                    pushedDate\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    ")("\n{\n")(inputs)("\n}");
   };
   var chunked = function(chunkSize) {
     return function(arr) {
@@ -98621,13 +98693,13 @@ ${content3}</tr>
                 }
                 ;
                 if (v42 instanceof Just) {
-                  v3.value1(union3(fromFoldable1(mapFlipped112(v42.value0)(function(v5) {
-                    return new Tuple(v5.repoName, Loading2.value);
+                  v3.value1(union3(fromFoldable1(mapFlipped112(v42.value0)(function(repo) {
+                    return new Tuple(repo, Loading2.value);
                   }))))();
                   return v1.value1(mkGetRepoInfo(v42.value0))({})();
                 }
                 ;
-                throw new Error("Failed pattern match at UI.Registry (line 386, column 5 - line 395, column 37): " + [v42.constructor.name]);
+                throw new Error("Failed pattern match at UI.Registry (line 377, column 5 - line 386, column 37): " + [v42.constructor.name]);
               })();
               return mempty116();
             }))(function() {
@@ -98642,38 +98714,39 @@ ${content3}</tr>
                   }
                   ;
                   if (v1.value0 instanceof Failure) {
-                    var v42 = spy2("errrrrrrrrrrrrrror")(v1.value0.value0);
                     log5(show19(v1.value0.value0))();
                     return mempty30();
                   }
                   ;
                   if (v1.value0 instanceof Success2) {
-                    var v42 = spy2("succ")("succ");
                     var intermediate = readRef(resultsRef)();
-                    writeRef(resultsRef)(union3(fromFoldable22(mapMaybe2(map41(function(x3) {
-                      return new Tuple(x3.name, fromEither(note("null result from API")(mapFlipped26(bind411(head(x3.defaultBranchRef.target.history.edges))(function(v5) {
+                    writeRef(resultsRef)(union3(fromFoldable22(mapMaybe2(map41(function(v42) {
+                      return new Tuple({
+                        owner: v42.owner.login,
+                        repoName: v42.name
+                      }, fromEither(note("null result from API")(mapFlipped26(bind411(head(v42.defaultBranchRef.target.history.edges))(function(v5) {
                         return v5.node.pushedDate;
-                      }))(function($373) {
-                        return unsafePerformEffect(parse10($373));
+                      }))(function($398) {
+                        return unsafePerformEffect(parse10($398));
                       }))));
                     }))(values(v1.value0.value0.data))))(intermediate))();
                     return v22.value1(function() {
-                      var $374 = fromMaybe([]);
-                      return function($375) {
-                        return $374(tail($375));
+                      var $399 = fromMaybe([]);
+                      return function($400) {
+                        return $399(tail($400));
                       };
                     }())();
                   }
                   ;
-                  throw new Error("Failed pattern match at UI.Registry (line 400, column 5 - line 428, column 57): " + [v1.value0.constructor.name]);
+                  throw new Error("Failed pattern match at UI.Registry (line 391, column 5 - line 419, column 57): " + [v1.value0.constructor.name]);
                 })();
                 return mempty116();
               }))(function() {
                 var result = new Tuple(v3.value0, function(repos) {
-                  var chunks = chunked(50)(repos);
+                  var chunks = chunked(200)(repos);
                   return function __do10() {
-                    v3.value1($$const(fromFoldable32(mapFlipped32(repos)(function(v42) {
-                      return new Tuple(v42.repoName, NotAsked.value);
+                    v3.value1($$const(fromFoldable32(mapFlipped32(repos)(function(repo) {
+                      return new Tuple(repo, NotAsked.value);
                     }))))();
                     return v22.value1($$const(chunks))();
                   };
@@ -98701,49 +98774,49 @@ ${content3}</tr>
     var minutes = hours / 60;
     var years = days / 365;
     var months = days / 30;
-    var $310 = years > 1;
-    if ($310) {
+    var $336 = years > 1;
+    if ($336) {
       var intYears = round2(years);
-      var $311 = intYears === 1;
-      if ($311) {
+      var $337 = intYears === 1;
+      if ($337) {
         return "one year ago";
       }
       ;
       return show25(intYears) + " years ago";
     }
     ;
-    var $312 = months > 1;
-    if ($312) {
+    var $338 = months > 1;
+    if ($338) {
       var intMonths = round2(months);
-      var $313 = intMonths === 1;
-      if ($313) {
+      var $339 = intMonths === 1;
+      if ($339) {
         return "one month ago";
       }
       ;
       return show25(intMonths) + " months ago";
     }
     ;
-    var $314 = days >= 1;
-    if ($314) {
+    var $340 = days >= 1;
+    if ($340) {
       var intDays = round2(days);
-      var $315 = intDays === 1;
-      if ($315) {
+      var $341 = intDays === 1;
+      if ($341) {
         return "one day ago";
       }
       ;
       return show25(intDays) + " days ago";
     }
     ;
-    var $316 = hours >= 1;
-    if ($316) {
+    var $342 = hours >= 1;
+    if ($342) {
       var intHours = round2(hours);
-      var $317 = intHours === 0;
-      if ($317) {
+      var $343 = intHours === 0;
+      if ($343) {
         return "today";
       }
       ;
-      var $318 = intHours === 1;
-      if ($318) {
+      var $344 = intHours === 1;
+      if ($344) {
         return "yesterday";
       }
       ;
@@ -98751,28 +98824,31 @@ ${content3}</tr>
     }
     ;
     var intMinutes = round2(minutes);
-    var $319 = intMinutes === 0;
-    if ($319) {
+    var $345 = intMinutes === 0;
+    if ($345) {
       return "just now";
     }
     ;
-    var $320 = intMinutes === 1;
-    if ($320) {
+    var $346 = intMinutes === 1;
+    if ($346) {
       return "a minute ago";
     }
     ;
     return show25(intMinutes) + " minutes ago";
   };
-  var listRepos = function(v2) {
-    return function(repos) {
-      var renderRepo = function(_i) {
+  var mkRepoList = /* @__PURE__ */ function() {
+    var renderRepo = function(_i) {
+      return function(v2) {
         return function(v1) {
-          var githubRepo\u0294 = parseGithubRepoLink(v1.value1.value0);
+          var githubRepo\u0294 = parseGithubRepoLink(v2.value1);
+          var lastCommitRD = bind411(githubRepo\u0294)(function(ghr) {
+            return lookup5(ghr)(v1.props.repoInfo);
+          });
           var cardStyle = append34(roundedNone)(append34(borderBottom(1))(append34(borderCol$prime(col2.backgroundLayer2))(hover(background$prime(col2.backgroundLayer3)))));
           var theCard = maybe(styledCard(cardStyle))(function() {
-            var $376 = styledClickableCard(cardStyle);
-            return function($377) {
-              return $376(handler_(v2.setSelectedRepo(Just.create($377))));
+            var $401 = styledClickableCard(cardStyle);
+            return function($402) {
+              return $401(handler_(v1.props.setSelectedRepo(Just.create($402))));
             };
           }())(githubRepo\u0294);
           return theCard([cluster_([foldMap110(function(v22) {
@@ -98788,17 +98864,17 @@ ${content3}</tr>
             space: str("0")
           })([div_2(append34(textDefault)(append34(fontMedium)(lineHeight("1em"))))([text2(function(n2) {
             return fromMaybe(n2)(stripPrefix("purescript-")(n2));
-          }(un5(ProjectName)(v1.value0)))]), span_2(append34(textXs)(textCol$prime(col2.textPaler4)))([text2(function(v22) {
+          }(un5(ProjectName)(v2.value0)))]), span_2(append34(textXs)(textCol$prime(col2.textPaler4)))([text2(function(v22) {
             if (v22 instanceof Nothing) {
               return "(Only works for Github repos)";
             }
             ;
             if (v22 instanceof Just && v22.value0 instanceof NotAsked) {
-              return "Loading";
+              return "-";
             }
             ;
             if (v22 instanceof Just && v22.value0 instanceof Loading2) {
-              return "Loading";
+              return "Loading last commit age";
             }
             ;
             if (v22 instanceof Just && v22.value0 instanceof Failure) {
@@ -98809,116 +98885,126 @@ ${content3}</tr>
               return foldMap24(function(start2) {
                 return approximateHumanReadableTimeInThePast({
                   start: start2,
-                  end: v2.now
+                  end: v1.now
                 });
               })(toInstant(v22.value0.value0));
             }
             ;
-            throw new Error("Failed pattern match at UI.Registry (line 313, column 46 - line 321, column 48): " + [v22.constructor.name]);
-          }(v1.value1.value1))]), function() {
+            throw new Error("Failed pattern match at UI.Registry (line 302, column 49 - line 310, column 50): " + [v22.constructor.name]);
+          }(lastCommitRD))]), function() {
             if (githubRepo\u0294 instanceof Nothing) {
-              return renderFilePath(un5(Repository)(v1.value1.value0));
+              return renderFilePath(un5(Repository)(v2.value1));
             }
             ;
             if (githubRepo\u0294 instanceof Just) {
               return renderGithubRepo(githubRepo\u0294.value0);
             }
             ;
-            throw new Error("Failed pattern match at UI.Registry (line 324, column 17 - line 326, column 64): " + [githubRepo\u0294.constructor.name]);
+            throw new Error("Failed pattern match at UI.Registry (line 313, column 19 - line 315, column 66): " + [githubRepo\u0294.constructor.name]);
           }()])])]);
         };
       };
-      var withDate = mapMaybeWithKey2(function(name15) {
-        return function(repo) {
-          return new Just(new Tuple(repo, lookup5(name15)(v2.repoInfo)));
-        };
-      })(repos);
-      return leaf6(virtuosoImpl)({
-        useWindowScroll: false,
-        overscan: 300,
-        className: "virtualised-registry-entries",
-        style: css8({
-          height: "100%",
-          background: colour.backgroundLayer4
-        }),
-        data: toUnfoldable3(withDate),
-        itemContent: mkFn2(renderRepo)
-      });
     };
-  };
+    return function __do10() {
+      var now3 = now2();
+      return component("RepoList")(function(props) {
+        return bind53(useMemo7(props.repos)(function(v2) {
+          return mkFn3(renderRepo);
+        }))(function(itemContent) {
+          return pure58(leaf6(virtuosoImpl)({
+            useWindowScroll: false,
+            overscan: 100,
+            className: "virtualised-registry-entries",
+            style: css8({
+              height: "100%",
+              background: colour.backgroundLayer4
+            }),
+            context: {
+              props,
+              now: now3
+            },
+            data: toUnfoldable3(props.repos),
+            itemContent
+          }));
+        });
+      })();
+    };
+  }();
   var mkView8 = /* @__PURE__ */ bind54(/* @__PURE__ */ liftEffect15(mkRepositoryFilter))(function(repoFilter) {
     return bind54(mkView7)(function(repoView) {
-      return bind54(liftEffect15(now2))(function(now3) {
-        return component2("Registry")(function(ctx) {
-          return function(v2) {
-            return bind53(useGetPackagesFileInRepo(ctx))(function(v1) {
-              return bind53(useGetPackagesFileInRepo(ctx))(function(v22) {
-                return bind53(useStateEq$prime1(Nothing.value))(function(v3) {
-                  return bind53(useGetGithubRepoInfo(ctx))(function(v42) {
-                    return bind53(useStateEq$prime1(Nothing.value))(function(v5) {
-                      return bind53(useStateEq$prime22(Nothing.value))(function(v6) {
-                        return bind53(useMediaQuery("(min-width: 768px)"))(function(screenIsAtLeastMedium) {
-                          return discard29(useEffectOnce(voidRight5(mempty30)(function __do10() {
-                            v1.value1(bowerPackagesInput)();
-                            return v22.value1(newPackagesInput)();
-                          })))(function() {
-                            return discard29(useEffect23(new Tuple(v1.value0, v22.value0))(function __do10() {
-                              (function() {
-                                if (v1.value0 instanceof Success2 && v22.value0 instanceof Success2) {
-                                  var allRepos = append210(v1.value0.value0)(v22.value0.value0);
-                                  v3.value1(new Just(allRepos))();
-                                  v5.value1(new Just(allRepos))();
-                                  return v42.value1(mapMaybe(parseGithubRepoLink)(fromFoldable42(values(allRepos))))();
-                                }
-                                ;
-                                return mempty30();
-                              })();
-                              return mempty116();
-                            }))(function() {
-                              var filterBar = function(repos) {
-                                return box5({
-                                  css: append34(background$prime(col2.backgroundBright3))(append34(borderCol$prime(col2.backgroundBright5))(borderBottom(1)))
-                                })([cluster10({
-                                  justify: "flex-end"
-                                })([repoFilter({
-                                  repositories: repos,
-                                  onChange: function($378) {
-                                    return v5.value1(Just.create($378));
+      return bind54(liftEffect15(mkRepoList))(function(repoList) {
+        return bind54(liftEffect15(now2))(function(now3) {
+          return component2("Registry")(function(ctx) {
+            return function(v2) {
+              return bind53(useGetPackagesFileInRepo(ctx))(function(v1) {
+                return bind53(useGetPackagesFileInRepo(ctx))(function(v22) {
+                  return bind53(useStateEq$prime1(Nothing.value))(function(v3) {
+                    return bind53(useGetGithubRepoInfo(ctx))(function(v42) {
+                      return bind53(useStateEq$prime1(Nothing.value))(function(v5) {
+                        return bind53(useStateEq$prime22(Nothing.value))(function(v6) {
+                          return bind53(useMediaQuery("(min-width: 768px)"))(function(screenIsAtLeastMedium) {
+                            return discard29(useEffectOnce(voidRight5(mempty30)(function __do10() {
+                              v1.value1(bowerPackagesInput)();
+                              return v22.value1(newPackagesInput)();
+                            })))(function() {
+                              return discard29(useEffect23(new Tuple(v1.value0, v22.value0))(function __do10() {
+                                (function() {
+                                  if (v1.value0 instanceof Success2 && v22.value0 instanceof Success2) {
+                                    var allRepos = append210(v1.value0.value0)(v22.value0.value0);
+                                    v3.value1(new Just(allRepos))();
+                                    v5.value1(new Just(allRepos))();
+                                    return v42.value1(fromFoldable42(values(mapMaybe4(parseGithubRepoLink)(allRepos))))();
                                   }
-                                })])]);
-                              };
-                              var view = function() {
-                                if (v3.value0 instanceof Just && v5.value0 instanceof Just) {
-                                  return fragment([div_2(append34(flexCol)(append34(heightFull)(maxHeight$prime(full))))([filterBar(v3.value0.value0), div_2(append34(flexRow)(append34(flexGrow(999))(append34(overflowHidden)(append34(screenMd(css47({
-                                    ".virtualised-registry-entries": nested(append34(width(360))(maxWidth(360)))
-                                  })))(css47({
-                                    ".virtualised-registry-entries": nested(widthFull)
-                                  }))))))([div_2(append34(displayNone)(screenMd(append34(css47({
-                                    display: str("block")
-                                  }))(append34(overflowYScroll)(append34(heightFull)(append34(maxHeight$prime(full))(width$prime(str("calc(100% - 360px)")))))))))([foldMap110(function() {
-                                    var $379 = styledCard(append34(mXY(24))(append34(pX$prime($$var("--s2")))(append34(pY$prime($$var("--s2")))(append34(roundedLg)(screenXl(append34(width(800))(append34(mXAuto)(append34(roundedXl)(append34(pX$prime($$var("--s4")))(pY$prime($$var("--s3"))))))))))));
-                                    return function($380) {
-                                      return $379(pure211(repoView($380)));
-                                    };
-                                  }())(v6.value0)]), listRepos({
-                                    now: now3,
-                                    repoInfo: v42.value0,
-                                    selectedRepo\u0294: v6.value0,
-                                    setSelectedRepo: v6.value1
-                                  })(v5.value0.value0)]), guard1(!screenIsAtLeastMedium)(leaf6(component25)({
-                                    content: div_2(height$prime(str("66vh")))([foldMap110(repoView)(v6.value0)]),
-                                    header: div_2(textLg)([text2("README.md")]),
-                                    footer: mempty210,
-                                    isOpen: isJust(v6.value0),
-                                    onDismiss: v6.value1(Nothing.value),
-                                    containerId: modalContainerId,
-                                    clickAwayId: modalClickawayId
-                                  }))])]);
-                                }
-                                ;
-                                return mempty210;
-                              }();
-                              return pure58(div_2(append34(height$prime(mainViewHeight))(overflowHidden))([view]));
+                                  ;
+                                  return mempty30();
+                                })();
+                                return mempty116();
+                              }))(function() {
+                                var filterBar = function(repos) {
+                                  return box5({
+                                    css: append34(background$prime(col2.backgroundBright3))(append34(borderCol$prime(col2.backgroundBright5))(borderBottom(1)))
+                                  })([cluster10({
+                                    justify: "flex-end"
+                                  })([repoFilter({
+                                    repositories: repos,
+                                    onChange: function($403) {
+                                      return v5.value1(Just.create($403));
+                                    }
+                                  })])]);
+                                };
+                                var view = function() {
+                                  if (v3.value0 instanceof Just && v5.value0 instanceof Just) {
+                                    return fragment([div_2(append34(flexCol)(append34(heightFull)(maxHeight$prime(full))))([filterBar(v3.value0.value0), div_2(append34(flexRow)(append34(flexGrow(999))(append34(overflowHidden)(append34(screenMd(css47({
+                                      ".virtualised-registry-entries": nested(append34(width(360))(maxWidth(360)))
+                                    })))(css47({
+                                      ".virtualised-registry-entries": nested(widthFull)
+                                    }))))))([div_2(append34(displayNone)(screenMd(append34(css47({
+                                      display: str("block")
+                                    }))(append34(overflowYScroll)(append34(heightFull)(append34(maxHeight$prime(full))(width$prime(str("calc(100% - 360px)")))))))))([foldMap110(function() {
+                                      var $404 = styledCard(append34(mXY(24))(append34(pX$prime($$var("--s2")))(append34(pY$prime($$var("--s2")))(append34(roundedLg)(screenXl(append34(width(800))(append34(mXAuto)(append34(roundedXl)(append34(pX$prime($$var("--s4")))(pY$prime($$var("--s3"))))))))))));
+                                      return function($405) {
+                                        return $404(pure211(repoView($405)));
+                                      };
+                                    }())(v6.value0)]), repoList({
+                                      repoInfo: v42.value0,
+                                      selectedRepo\u0294: v6.value0,
+                                      setSelectedRepo: v6.value1,
+                                      repos: v5.value0.value0
+                                    })]), guard1(!screenIsAtLeastMedium)(leaf6(component25)({
+                                      content: div_2(height$prime(str("66vh")))([foldMap110(repoView)(v6.value0)]),
+                                      header: div_2(textLg)([text2("README.md")]),
+                                      footer: mempty210,
+                                      isOpen: isJust(v6.value0),
+                                      onDismiss: v6.value1(Nothing.value),
+                                      containerId: modalContainerId,
+                                      clickAwayId: modalClickawayId
+                                    }))])]);
+                                  }
+                                  ;
+                                  return mempty210;
+                                }();
+                                return pure58(div_2(append34(height$prime(mainViewHeight))(overflowHidden))([view]));
+                              });
                             });
                           });
                         });
@@ -98927,8 +99013,8 @@ ${content3}</tr>
                   });
                 });
               });
-            });
-          };
+            };
+          });
         });
       });
     });

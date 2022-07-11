@@ -1,23 +1,12 @@
 module UI.FilePath where
 
-import Prelude
 import Yoga.Prelude.View
 
-import Biz.Spago.Types (Repository(..))
-import Color (mixCubehelix)
 import Color as Color
-import Data.Int as Int
-import Data.Newtype (un)
-import Data.Ord (abs)
-import Data.Ord as Int
-import Data.String (Pattern(..), split, stripPrefix)
-import Data.String as String
-import Debug (spy)
+import Data.Int (toNumber) as Int
 import Effect.Unsafe (unsafePerformEffect)
-import Fahrtwind (TailwindColor, background, background', border, borderCol, borderCol', coolGray, fontFamilyOrMono, fontLight, fontMedium, fontSemiMedium, gray, hover, hue, pX, pY, roundedDefault, textCol, textSm, textTransformUppercase, trackingWide, withAlpha, withLightness)
+import Fahrtwind (TailwindColor, background, background', border, borderCol', fontMedium, pX, pY, roundedDefault, textCol, textSm, trackingWide, withAlpha)
 import Foreign.Object as Object
-import Plumage.Util.HTML as P
-import React.Basic (JSX)
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
@@ -62,9 +51,9 @@ tag = unsafePerformEffect $ React.component "Tag" \{ col, p } → React.do
           <> textCol col._800
           <> background (col._300 # withAlpha 0.667)
           <> E.css
-            { "&[data-dark-theme='true']": E.nested $
-                background (col._800 # withAlpha 0.8)
-                  <> textCol col._300
+            { "&[data-dark-theme='true']": E.nested
+                $ background (col._800 # withAlpha 0.8)
+                <> textCol col._300
             }
       }
     /> [ R.text p ]
