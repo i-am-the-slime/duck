@@ -29,9 +29,6 @@ mkView = do
     { route } ← useRouter
     pure $ view { route, topRight: Just (githubAvatar unit) }
 
-headerBarHeight ∷ Int
-headerBarHeight = 84
-
 mkPresentationalView ∷
   React.Component { route ∷ Route, topRight ∷ Maybe JSX }
 mkPresentationalView = do

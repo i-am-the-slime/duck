@@ -10,7 +10,7 @@ import Foreign (ForeignError(..), MultipleErrors)
 import Network.RemoteData (RemoteData)
 import Network.RemoteData as RD
 import React.Basic.Hooks as React
-import UI.Component (Ctx)
+import UI.Ctx.Types (Ctx)
 import UI.Hook.UseIPCMessage (UseIPCMessage(..), useIPCMessage)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 import Yoga.JSON as JSON
@@ -31,6 +31,36 @@ useGithubGraphQL ctx query = coerceHook React.do
   ipcResult /\ sendViaIPC /\ _ ← useIPCMessage ctx
   let
     send (input ∷ { | i }) = do
+      let
+        gqlQ ∷ GraphQLQuery { | i }
+        gqlQ = graphQLQuery query input
+      sendViaIPC $
+        QueryGithubGraphQL (githubGraphQLQuery gqlQ)
+
+    result =
+      case ipcResult of
+        RD.Success (GithubGraphQLResult (Succeeded (GithubGraphQLResponse res))) →
+          JSON.readJSON res # RD.fromEither
+        RD.Success (GithubGraphQLResult (Failed NoGithubToken)) →
+          RD.Failure $ pure $ ForeignError "no github token"
+        RD.Success _ → RD.Failure $ pure $ ForeignError "Invalid response"
+        RD.Failure _ → RD.Failure $ pure $ ForeignError "IPC Problem"
+        RD.Loading → RD.Loading
+        RD.NotAsked → RD.NotAsked
+
+  pure (result /\ send)
+
+useDynamicGithubGraphQL ∷
+  ∀ @i @o.
+  WriteForeign { | i } ⇒
+  ReadForeign { | o } ⇒
+  Ctx →
+  Hook UseGithubGraphQL
+    ((RemoteData MultipleErrors { | o }) /\ (GraphQL -> { | i } → Effect Unit))
+useDynamicGithubGraphQL ctx = coerceHook React.do
+  ipcResult /\ sendViaIPC /\ _ ← useIPCMessage ctx
+  let
+    send query (input ∷ { | i }) = do
       let
         gqlQ ∷ GraphQLQuery { | i }
         gqlQ = graphQLQuery query input

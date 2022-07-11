@@ -6,7 +6,7 @@ import Data.Foldable (for_)
 import Data.Maybe (Maybe)
 import Effect (Effect)
 import React.Basic (JSX)
-import React.Basic.DOM.Concurrent as ReactDOM
+import React.Basic.DOM.Client as ReactDOM
 import UI.Component (runComponent)
 import UI.Ctx.Electron (mkElectronCtx)
 import UI.Start as Start

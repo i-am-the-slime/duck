@@ -6,7 +6,7 @@ import Data.UUID as UUID
 import Effect (Effect)
 import Electron.Types (Channel(..))
 import ElectronAPI as ElectronAPI
-import UI.Component (Ctx)
+import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.Repository (getDeviceCode, pollAccessToken)
 import UI.PostMessage (postMessage)
 import Yoga.Block.Organism.NotificationCentre (mkNotificationCentre)
@@ -19,7 +19,6 @@ mkElectronCtx = ado
   notificationCentre ← mkNotificationCentre
   in
     { registerListener: ElectronAPI.on (Channel "ipc")
-    , removeListener: ElectronAPI.removeListener (Channel "ipc")
     , postMessage: \uuid payload → postMessage $ JSON.write
         { type: "ipc", data: { message_id: UUID.toString uuid, payload } }
     , notificationCentre

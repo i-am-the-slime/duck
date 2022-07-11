@@ -8,9 +8,10 @@ process.once("loaded", () => {
 
 contextBridge.exposeInMainWorld("electronAPI", {
   on: (channel, handler) => {
-    ipcRenderer.on(channel, handler)
+    // c.f.https://stackoverflow.com/a/68942697/4063261
+    const subscription = (event, ...args) => handler(...args);
+    ipcRenderer.on(channel, subscription)
+    return () => ipcRenderer.removeListener(channel, subscription)
   },
-  removeListener: (channel, handler) =>
-    ipcRenderer.removeListener(channel, handler),
   sendToMain: (message, channel) => ipcRenderer.send(channel, message)
 })

@@ -11,8 +11,8 @@ var __commonJS = (cb, mod3) => function __require() {
   return mod3 || (0, cb[__getOwnPropNames(cb)[0]])((mod3 = { exports: {} }).exports, mod3), mod3.exports;
 };
 var __export = (target, all5) => {
-  for (var name2 in all5)
-    __defProp(target, name2, { get: all5[name2], enumerable: true });
+  for (var name3 in all5)
+    __defProp(target, name3, { get: all5[name3], enumerable: true });
 };
 var __copyProps = (to2, from3, except3, desc) => {
   if (from3 && typeof from3 === "object" || typeof from3 === "function") {
@@ -23,6 +23,746 @@ var __copyProps = (to2, from3, except3, desc) => {
   return to2;
 };
 var __toESM = (mod3, isNodeMode, target) => (target = mod3 != null ? __create(__getProtoOf(mod3)) : {}, __copyProps(isNodeMode || !mod3 || !mod3.__esModule ? __defProp(target, "default", { value: mod3, enumerable: true }) : target, mod3));
+
+// node_modules/xhr2/lib/xhr2.js
+var require_xhr2 = __commonJS({
+  "node_modules/xhr2/lib/xhr2.js"(exports, module2) {
+    (function() {
+      var InvalidStateError, NetworkError, ProgressEvent, SecurityError, SyntaxError, XMLHttpRequest, XMLHttpRequestEventTarget, XMLHttpRequestUpload, http3, https2, os, url;
+      XMLHttpRequestEventTarget = function() {
+        class XMLHttpRequestEventTarget2 {
+          constructor() {
+            this.onloadstart = null;
+            this.onprogress = null;
+            this.onabort = null;
+            this.onerror = null;
+            this.onload = null;
+            this.ontimeout = null;
+            this.onloadend = null;
+            this._listeners = {};
+          }
+          addEventListener(eventType, listener) {
+            var base;
+            eventType = eventType.toLowerCase();
+            (base = this._listeners)[eventType] || (base[eventType] = []);
+            this._listeners[eventType].push(listener);
+            return void 0;
+          }
+          removeEventListener(eventType, listener) {
+            var index3;
+            eventType = eventType.toLowerCase();
+            if (this._listeners[eventType]) {
+              index3 = this._listeners[eventType].indexOf(listener);
+              if (index3 !== -1) {
+                this._listeners[eventType].splice(index3, 1);
+              }
+            }
+            return void 0;
+          }
+          dispatchEvent(event) {
+            var eventType, j, len, listener, listeners;
+            event.currentTarget = event.target = this;
+            eventType = event.type;
+            if (listeners = this._listeners[eventType]) {
+              for (j = 0, len = listeners.length; j < len; j++) {
+                listener = listeners[j];
+                listener.call(this, event);
+              }
+            }
+            if (listener = this[`on${eventType}`]) {
+              listener.call(this, event);
+            }
+            return void 0;
+          }
+        }
+        ;
+        XMLHttpRequestEventTarget2.prototype.onloadstart = null;
+        XMLHttpRequestEventTarget2.prototype.onprogress = null;
+        XMLHttpRequestEventTarget2.prototype.onabort = null;
+        XMLHttpRequestEventTarget2.prototype.onerror = null;
+        XMLHttpRequestEventTarget2.prototype.onload = null;
+        XMLHttpRequestEventTarget2.prototype.ontimeout = null;
+        XMLHttpRequestEventTarget2.prototype.onloadend = null;
+        return XMLHttpRequestEventTarget2;
+      }.call(this);
+      http3 = require("http");
+      https2 = require("https");
+      os = require("os");
+      url = require("url");
+      XMLHttpRequest = function() {
+        class XMLHttpRequest2 extends XMLHttpRequestEventTarget {
+          constructor(options) {
+            super();
+            this.onreadystatechange = null;
+            this._anonymous = options && options.anon;
+            this.readyState = XMLHttpRequest2.UNSENT;
+            this.response = null;
+            this.responseText = "";
+            this.responseType = "";
+            this.responseURL = "";
+            this.status = 0;
+            this.statusText = "";
+            this.timeout = 0;
+            this.upload = new XMLHttpRequestUpload(this);
+            this._method = null;
+            this._url = null;
+            this._sync = false;
+            this._headers = null;
+            this._loweredHeaders = null;
+            this._mimeOverride = null;
+            this._request = null;
+            this._response = null;
+            this._responseParts = null;
+            this._responseHeaders = null;
+            this._aborting = null;
+            this._error = null;
+            this._loadedBytes = 0;
+            this._totalBytes = 0;
+            this._lengthComputable = false;
+          }
+          open(method, url2, async, user, password) {
+            var xhrUrl;
+            method = method.toUpperCase();
+            if (method in this._restrictedMethods) {
+              throw new SecurityError(`HTTP method ${method} is not allowed in XHR`);
+            }
+            xhrUrl = this._parseUrl(url2);
+            if (async === void 0) {
+              async = true;
+            }
+            switch (this.readyState) {
+              case XMLHttpRequest2.UNSENT:
+              case XMLHttpRequest2.OPENED:
+              case XMLHttpRequest2.DONE:
+                null;
+                break;
+              case XMLHttpRequest2.HEADERS_RECEIVED:
+              case XMLHttpRequest2.LOADING:
+                null;
+            }
+            this._method = method;
+            this._url = xhrUrl;
+            this._sync = !async;
+            this._headers = {};
+            this._loweredHeaders = {};
+            this._mimeOverride = null;
+            this._setReadyState(XMLHttpRequest2.OPENED);
+            this._request = null;
+            this._response = null;
+            this.status = 0;
+            this.statusText = "";
+            this._responseParts = [];
+            this._responseHeaders = null;
+            this._loadedBytes = 0;
+            this._totalBytes = 0;
+            this._lengthComputable = false;
+            return void 0;
+          }
+          setRequestHeader(name3, value2) {
+            var loweredName;
+            if (this.readyState !== XMLHttpRequest2.OPENED) {
+              throw new InvalidStateError("XHR readyState must be OPENED");
+            }
+            loweredName = name3.toLowerCase();
+            if (this._restrictedHeaders[loweredName] || /^sec\-/.test(loweredName) || /^proxy-/.test(loweredName)) {
+              console.warn(`Refused to set unsafe header "${name3}"`);
+              return void 0;
+            }
+            value2 = value2.toString();
+            if (loweredName in this._loweredHeaders) {
+              name3 = this._loweredHeaders[loweredName];
+              this._headers[name3] = this._headers[name3] + ", " + value2;
+            } else {
+              this._loweredHeaders[loweredName] = name3;
+              this._headers[name3] = value2;
+            }
+            return void 0;
+          }
+          send(data) {
+            if (this.readyState !== XMLHttpRequest2.OPENED) {
+              throw new InvalidStateError("XHR readyState must be OPENED");
+            }
+            if (this._request) {
+              throw new InvalidStateError("send() already called");
+            }
+            switch (this._url.protocol) {
+              case "file:":
+                this._sendFile(data);
+                break;
+              case "http:":
+              case "https:":
+                this._sendHttp(data);
+                break;
+              default:
+                throw new NetworkError(`Unsupported protocol ${this._url.protocol}`);
+            }
+            return void 0;
+          }
+          abort() {
+            if (!this._request) {
+              return;
+            }
+            this._request.abort();
+            this._setError();
+            this._dispatchProgress("abort");
+            this._dispatchProgress("loadend");
+            return void 0;
+          }
+          getResponseHeader(name3) {
+            var loweredName;
+            if (!this._responseHeaders) {
+              return null;
+            }
+            loweredName = name3.toLowerCase();
+            if (loweredName in this._responseHeaders) {
+              return this._responseHeaders[loweredName];
+            } else {
+              return null;
+            }
+          }
+          getAllResponseHeaders() {
+            var lines, name3, value2;
+            if (!this._responseHeaders) {
+              return "";
+            }
+            lines = function() {
+              var ref, results;
+              ref = this._responseHeaders;
+              results = [];
+              for (name3 in ref) {
+                value2 = ref[name3];
+                results.push(`${name3}: ${value2}`);
+              }
+              return results;
+            }.call(this);
+            return lines.join("\r\n");
+          }
+          overrideMimeType(newMimeType) {
+            if (this.readyState === XMLHttpRequest2.LOADING || this.readyState === XMLHttpRequest2.DONE) {
+              throw new InvalidStateError("overrideMimeType() not allowed in LOADING or DONE");
+            }
+            this._mimeOverride = newMimeType.toLowerCase();
+            return void 0;
+          }
+          nodejsSet(options) {
+            var baseUrl, parsedUrl;
+            if ("httpAgent" in options) {
+              this.nodejsHttpAgent = options.httpAgent;
+            }
+            if ("httpsAgent" in options) {
+              this.nodejsHttpsAgent = options.httpsAgent;
+            }
+            if ("baseUrl" in options) {
+              baseUrl = options.baseUrl;
+              if (baseUrl !== null) {
+                parsedUrl = url.parse(baseUrl, false, true);
+                if (!parsedUrl.protocol) {
+                  throw new SyntaxError("baseUrl must be an absolute URL");
+                }
+              }
+              this.nodejsBaseUrl = baseUrl;
+            }
+            return void 0;
+          }
+          static nodejsSet(options) {
+            XMLHttpRequest2.prototype.nodejsSet(options);
+            return void 0;
+          }
+          _setReadyState(newReadyState) {
+            var event;
+            this.readyState = newReadyState;
+            event = new ProgressEvent("readystatechange");
+            this.dispatchEvent(event);
+            return void 0;
+          }
+          _sendFile() {
+            if (this._url.method !== "GET") {
+              throw new NetworkError("The file protocol only supports GET");
+            }
+            throw new Error("Protocol file: not implemented");
+          }
+          _sendHttp(data) {
+            if (this._sync) {
+              throw new Error("Synchronous XHR processing not implemented");
+            }
+            if (data != null && (this._method === "GET" || this._method === "HEAD")) {
+              console.warn(`Discarding entity body for ${this._method} requests`);
+              data = null;
+            } else {
+              data || (data = "");
+            }
+            this.upload._setData(data);
+            this._finalizeHeaders();
+            this._sendHxxpRequest();
+            return void 0;
+          }
+          _sendHxxpRequest() {
+            var agent, hxxp, request3;
+            if (this._url.protocol === "http:") {
+              hxxp = http3;
+              agent = this.nodejsHttpAgent;
+            } else {
+              hxxp = https2;
+              agent = this.nodejsHttpsAgent;
+            }
+            request3 = hxxp.request({
+              hostname: this._url.hostname,
+              port: this._url.port,
+              path: this._url.path,
+              auth: this._url.auth,
+              method: this._method,
+              headers: this._headers,
+              agent
+            });
+            this._request = request3;
+            if (this.timeout) {
+              request3.setTimeout(this.timeout, () => {
+                return this._onHttpTimeout(request3);
+              });
+            }
+            request3.on("response", (response) => {
+              return this._onHttpResponse(request3, response);
+            });
+            request3.on("error", (error6) => {
+              return this._onHttpRequestError(request3, error6);
+            });
+            this.upload._startUpload(request3);
+            if (this._request === request3) {
+              this._dispatchProgress("loadstart");
+            }
+            return void 0;
+          }
+          _finalizeHeaders() {
+            var base;
+            this._headers["Connection"] = "keep-alive";
+            this._headers["Host"] = this._url.host;
+            if (this._anonymous) {
+              this._headers["Referer"] = "about:blank";
+            }
+            (base = this._headers)["User-Agent"] || (base["User-Agent"] = this._userAgent);
+            this.upload._finalizeHeaders(this._headers, this._loweredHeaders);
+            return void 0;
+          }
+          _onHttpResponse(request3, response) {
+            var lengthString;
+            if (this._request !== request3) {
+              return;
+            }
+            switch (response.statusCode) {
+              case 301:
+              case 302:
+              case 303:
+              case 307:
+              case 308:
+                this._url = this._parseUrl(response.headers["location"]);
+                this._method = "GET";
+                if ("content-type" in this._loweredHeaders) {
+                  delete this._headers[this._loweredHeaders["content-type"]];
+                  delete this._loweredHeaders["content-type"];
+                }
+                if ("Content-Type" in this._headers) {
+                  delete this._headers["Content-Type"];
+                }
+                delete this._headers["Content-Length"];
+                this.upload._reset();
+                this._finalizeHeaders();
+                this._sendHxxpRequest();
+                return;
+            }
+            this._response = response;
+            this._response.on("data", (data) => {
+              return this._onHttpResponseData(response, data);
+            });
+            this._response.on("end", () => {
+              return this._onHttpResponseEnd(response);
+            });
+            this._response.on("close", () => {
+              return this._onHttpResponseClose(response);
+            });
+            this.responseURL = this._url.href.split("#")[0];
+            this.status = this._response.statusCode;
+            this.statusText = http3.STATUS_CODES[this.status];
+            this._parseResponseHeaders(response);
+            if (lengthString = this._responseHeaders["content-length"]) {
+              this._totalBytes = parseInt(lengthString);
+              this._lengthComputable = true;
+            } else {
+              this._lengthComputable = false;
+            }
+            return this._setReadyState(XMLHttpRequest2.HEADERS_RECEIVED);
+          }
+          _onHttpResponseData(response, data) {
+            if (this._response !== response) {
+              return;
+            }
+            this._responseParts.push(data);
+            this._loadedBytes += data.length;
+            if (this.readyState !== XMLHttpRequest2.LOADING) {
+              this._setReadyState(XMLHttpRequest2.LOADING);
+            }
+            return this._dispatchProgress("progress");
+          }
+          _onHttpResponseEnd(response) {
+            if (this._response !== response) {
+              return;
+            }
+            this._parseResponse();
+            this._request = null;
+            this._response = null;
+            this._setReadyState(XMLHttpRequest2.DONE);
+            this._dispatchProgress("load");
+            return this._dispatchProgress("loadend");
+          }
+          _onHttpResponseClose(response) {
+            var request3;
+            if (this._response !== response) {
+              return;
+            }
+            request3 = this._request;
+            this._setError();
+            request3.abort();
+            this._setReadyState(XMLHttpRequest2.DONE);
+            this._dispatchProgress("error");
+            return this._dispatchProgress("loadend");
+          }
+          _onHttpTimeout(request3) {
+            if (this._request !== request3) {
+              return;
+            }
+            this._setError();
+            request3.abort();
+            this._setReadyState(XMLHttpRequest2.DONE);
+            this._dispatchProgress("timeout");
+            return this._dispatchProgress("loadend");
+          }
+          _onHttpRequestError(request3, error6) {
+            if (this._request !== request3) {
+              return;
+            }
+            this._setError();
+            request3.abort();
+            this._setReadyState(XMLHttpRequest2.DONE);
+            this._dispatchProgress("error");
+            return this._dispatchProgress("loadend");
+          }
+          _dispatchProgress(eventType) {
+            var event;
+            event = new ProgressEvent(eventType);
+            event.lengthComputable = this._lengthComputable;
+            event.loaded = this._loadedBytes;
+            event.total = this._totalBytes;
+            this.dispatchEvent(event);
+            return void 0;
+          }
+          _setError() {
+            this._request = null;
+            this._response = null;
+            this._responseHeaders = null;
+            this._responseParts = null;
+            return void 0;
+          }
+          _parseUrl(urlString) {
+            var absoluteUrlString, index3, password, user, xhrUrl;
+            if (this.nodejsBaseUrl === null) {
+              absoluteUrlString = urlString;
+            } else {
+              absoluteUrlString = url.resolve(this.nodejsBaseUrl, urlString);
+            }
+            xhrUrl = url.parse(absoluteUrlString, false, true);
+            xhrUrl.hash = null;
+            if (xhrUrl.auth && (typeof user !== "undefined" && user !== null || typeof password !== "undefined" && password !== null)) {
+              index3 = xhrUrl.auth.indexOf(":");
+              if (index3 === -1) {
+                if (!user) {
+                  user = xhrUrl.auth;
+                }
+              } else {
+                if (!user) {
+                  user = xhrUrl.substring(0, index3);
+                }
+                if (!password) {
+                  password = xhrUrl.substring(index3 + 1);
+                }
+              }
+            }
+            if (user || password) {
+              xhrUrl.auth = `${user}:${password}`;
+            }
+            return xhrUrl;
+          }
+          _parseResponseHeaders(response) {
+            var loweredName, name3, ref, value2;
+            this._responseHeaders = {};
+            ref = response.headers;
+            for (name3 in ref) {
+              value2 = ref[name3];
+              loweredName = name3.toLowerCase();
+              if (this._privateHeaders[loweredName]) {
+                continue;
+              }
+              if (this._mimeOverride !== null && loweredName === "content-type") {
+                value2 = this._mimeOverride;
+              }
+              this._responseHeaders[loweredName] = value2;
+            }
+            if (this._mimeOverride !== null && !("content-type" in this._responseHeaders)) {
+              this._responseHeaders["content-type"] = this._mimeOverride;
+            }
+            return void 0;
+          }
+          _parseResponse() {
+            var arrayBuffer, buffer, i2, j, jsonError, ref, view;
+            if (Buffer.concat) {
+              buffer = Buffer.concat(this._responseParts);
+            } else {
+              buffer = this._concatBuffers(this._responseParts);
+            }
+            this._responseParts = null;
+            switch (this.responseType) {
+              case "text":
+                this._parseTextResponse(buffer);
+                break;
+              case "json":
+                this.responseText = null;
+                try {
+                  this.response = JSON.parse(buffer.toString("utf-8"));
+                } catch (error1) {
+                  jsonError = error1;
+                  this.response = null;
+                }
+                break;
+              case "buffer":
+                this.responseText = null;
+                this.response = buffer;
+                break;
+              case "arraybuffer":
+                this.responseText = null;
+                arrayBuffer = new ArrayBuffer(buffer.length);
+                view = new Uint8Array(arrayBuffer);
+                for (i2 = j = 0, ref = buffer.length; 0 <= ref ? j < ref : j > ref; i2 = 0 <= ref ? ++j : --j) {
+                  view[i2] = buffer[i2];
+                }
+                this.response = arrayBuffer;
+                break;
+              default:
+                this._parseTextResponse(buffer);
+            }
+            return void 0;
+          }
+          _parseTextResponse(buffer) {
+            var e2;
+            try {
+              this.responseText = buffer.toString(this._parseResponseEncoding());
+            } catch (error1) {
+              e2 = error1;
+              this.responseText = buffer.toString("binary");
+            }
+            this.response = this.responseText;
+            return void 0;
+          }
+          _parseResponseEncoding() {
+            var contentType, encoding, match2;
+            encoding = null;
+            if (contentType = this._responseHeaders["content-type"]) {
+              if (match2 = /\;\s*charset\=(.*)$/.exec(contentType)) {
+                return match2[1];
+              }
+            }
+            return "utf-8";
+          }
+          _concatBuffers(buffers) {
+            var buffer, j, k, len, len1, length4, target;
+            if (buffers.length === 0) {
+              return Buffer.alloc(0);
+            }
+            if (buffers.length === 1) {
+              return buffers[0];
+            }
+            length4 = 0;
+            for (j = 0, len = buffers.length; j < len; j++) {
+              buffer = buffers[j];
+              length4 += buffer.length;
+            }
+            target = Buffer.alloc(length4);
+            length4 = 0;
+            for (k = 0, len1 = buffers.length; k < len1; k++) {
+              buffer = buffers[k];
+              buffer.copy(target, length4);
+              length4 += buffer.length;
+            }
+            return target;
+          }
+        }
+        ;
+        XMLHttpRequest2.prototype.onreadystatechange = null;
+        XMLHttpRequest2.prototype.readyState = null;
+        XMLHttpRequest2.prototype.response = null;
+        XMLHttpRequest2.prototype.responseText = null;
+        XMLHttpRequest2.prototype.responseType = null;
+        XMLHttpRequest2.prototype.status = null;
+        XMLHttpRequest2.prototype.timeout = null;
+        XMLHttpRequest2.prototype.upload = null;
+        XMLHttpRequest2.prototype.UNSENT = 0;
+        XMLHttpRequest2.UNSENT = 0;
+        XMLHttpRequest2.prototype.OPENED = 1;
+        XMLHttpRequest2.OPENED = 1;
+        XMLHttpRequest2.prototype.HEADERS_RECEIVED = 2;
+        XMLHttpRequest2.HEADERS_RECEIVED = 2;
+        XMLHttpRequest2.prototype.LOADING = 3;
+        XMLHttpRequest2.LOADING = 3;
+        XMLHttpRequest2.prototype.DONE = 4;
+        XMLHttpRequest2.DONE = 4;
+        XMLHttpRequest2.prototype.nodejsHttpAgent = http3.globalAgent;
+        XMLHttpRequest2.prototype.nodejsHttpsAgent = https2.globalAgent;
+        XMLHttpRequest2.prototype.nodejsBaseUrl = null;
+        XMLHttpRequest2.prototype._restrictedMethods = {
+          CONNECT: true,
+          TRACE: true,
+          TRACK: true
+        };
+        XMLHttpRequest2.prototype._restrictedHeaders = {
+          "accept-charset": true,
+          "accept-encoding": true,
+          "access-control-request-headers": true,
+          "access-control-request-method": true,
+          connection: true,
+          "content-length": true,
+          cookie: true,
+          cookie2: true,
+          date: true,
+          dnt: true,
+          expect: true,
+          host: true,
+          "keep-alive": true,
+          origin: true,
+          referer: true,
+          te: true,
+          trailer: true,
+          "transfer-encoding": true,
+          upgrade: true,
+          via: true
+        };
+        XMLHttpRequest2.prototype._privateHeaders = {
+          "set-cookie": true,
+          "set-cookie2": true
+        };
+        XMLHttpRequest2.prototype._userAgent = `Mozilla/5.0 (${os.type()} ${os.arch()}) node.js/${process.versions.node} v8/${process.versions.v8}`;
+        return XMLHttpRequest2;
+      }.call(this);
+      module2.exports = XMLHttpRequest;
+      XMLHttpRequest.XMLHttpRequest = XMLHttpRequest;
+      SecurityError = class SecurityError extends Error {
+        constructor() {
+          super();
+        }
+      };
+      XMLHttpRequest.SecurityError = SecurityError;
+      InvalidStateError = class InvalidStateError extends Error {
+        constructor() {
+          super();
+        }
+      };
+      InvalidStateError = class InvalidStateError extends Error {
+      };
+      XMLHttpRequest.InvalidStateError = InvalidStateError;
+      NetworkError = class NetworkError extends Error {
+        constructor() {
+          super();
+        }
+      };
+      XMLHttpRequest.SyntaxError = SyntaxError;
+      SyntaxError = class SyntaxError extends Error {
+        constructor() {
+          super();
+        }
+      };
+      ProgressEvent = function() {
+        class ProgressEvent2 {
+          constructor(type) {
+            this.type = type;
+            this.target = null;
+            this.currentTarget = null;
+            this.lengthComputable = false;
+            this.loaded = 0;
+            this.total = 0;
+          }
+        }
+        ;
+        ProgressEvent2.prototype.bubbles = false;
+        ProgressEvent2.prototype.cancelable = false;
+        ProgressEvent2.prototype.target = null;
+        ProgressEvent2.prototype.loaded = null;
+        ProgressEvent2.prototype.lengthComputable = null;
+        ProgressEvent2.prototype.total = null;
+        return ProgressEvent2;
+      }.call(this);
+      XMLHttpRequest.ProgressEvent = ProgressEvent;
+      XMLHttpRequestUpload = class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+        constructor(request3) {
+          super();
+          this._request = request3;
+          this._reset();
+        }
+        _reset() {
+          this._contentType = null;
+          this._body = null;
+          return void 0;
+        }
+        _setData(data) {
+          var body, i2, j, k, offset, ref, ref1, view;
+          if (typeof data === "undefined" || data === null) {
+            return;
+          }
+          if (typeof data === "string") {
+            if (data.length !== 0) {
+              this._contentType = "text/plain;charset=UTF-8";
+            }
+            this._body = Buffer.from(data, "utf8");
+          } else if (Buffer.isBuffer(data)) {
+            this._body = data;
+          } else if (data instanceof ArrayBuffer) {
+            body = Buffer.alloc(data.byteLength);
+            view = new Uint8Array(data);
+            for (i2 = j = 0, ref = data.byteLength; 0 <= ref ? j < ref : j > ref; i2 = 0 <= ref ? ++j : --j) {
+              body[i2] = view[i2];
+            }
+            this._body = body;
+          } else if (data.buffer && data.buffer instanceof ArrayBuffer) {
+            body = Buffer.alloc(data.byteLength);
+            offset = data.byteOffset;
+            view = new Uint8Array(data.buffer);
+            for (i2 = k = 0, ref1 = data.byteLength; 0 <= ref1 ? k < ref1 : k > ref1; i2 = 0 <= ref1 ? ++k : --k) {
+              body[i2] = view[i2 + offset];
+            }
+            this._body = body;
+          } else {
+            throw new Error(`Unsupported send() data ${data}`);
+          }
+          return void 0;
+        }
+        _finalizeHeaders(headers, loweredHeaders) {
+          if (this._contentType) {
+            if (!("content-type" in loweredHeaders)) {
+              headers["Content-Type"] = this._contentType;
+            }
+          }
+          if (this._body) {
+            headers["Content-Length"] = this._body.length.toString();
+          }
+          return void 0;
+        }
+        _startUpload(request3) {
+          if (this._body) {
+            request3.write(this._body);
+          }
+          request3.end();
+          return void 0;
+        }
+      };
+      XMLHttpRequest.XMLHttpRequestUpload = XMLHttpRequestUpload;
+    }).call(exports);
+  }
+});
 
 // node_modules/web-streams-polyfill/dist/ponyfill.es2018.js
 var require_ponyfill_es2018 = __commonJS({
@@ -57,8 +797,8 @@ var require_ponyfill_es2018 = __commonJS({
       function newPromise(executor) {
         return new originalPromise(executor);
       }
-      function promiseResolvedWith(value) {
-        return originalPromiseResolve(value);
+      function promiseResolvedWith(value2) {
+        return originalPromiseResolve(value2);
       }
       function promiseRejectedWith(reason) {
         return originalPromiseReject(reason);
@@ -98,8 +838,8 @@ var require_ponyfill_es2018 = __commonJS({
       function promiseCall(F2, V, args) {
         try {
           return promiseResolvedWith(reflectCall(F2, V, args));
-        } catch (value) {
-          return promiseRejectedWith(value);
+        } catch (value2) {
+          return promiseRejectedWith(value2);
         }
       }
       const QUEUE_MAX_ARRAY_SIZE = 16384;
@@ -200,8 +940,8 @@ var require_ponyfill_es2018 = __commonJS({
         reader._ownerReadableStream._reader = void 0;
         reader._ownerReadableStream = void 0;
       }
-      function readerLockException(name2) {
-        return new TypeError("Cannot " + name2 + " a stream using a released reader");
+      function readerLockException(name3) {
+        return new TypeError("Cannot " + name3 + " a stream using a released reader");
       }
       function defaultReaderClosedPromiseInitialize(reader) {
         reader._closedPromise = newPromise((resolve2, reject) => {
@@ -278,8 +1018,8 @@ var require_ponyfill_es2018 = __commonJS({
           throw new TypeError(`${field} is required in '${context}'.`);
         }
       }
-      function convertUnrestrictedDouble(value) {
-        return Number(value);
+      function convertUnrestrictedDouble(value2) {
+        return Number(value2);
       }
       function censorNegativeZero(x2) {
         return x2 === 0 ? 0 : x2;
@@ -287,10 +1027,10 @@ var require_ponyfill_es2018 = __commonJS({
       function integerPart(x2) {
         return censorNegativeZero(MathTrunc(x2));
       }
-      function convertUnsignedLongLongWithEnforceRange(value, context) {
+      function convertUnsignedLongLongWithEnforceRange(value2, context) {
         const lowerBound = 0;
         const upperBound = Number.MAX_SAFE_INTEGER;
-        let x2 = Number(value);
+        let x2 = Number(value2);
         x2 = censorNegativeZero(x2);
         if (!NumberIsFinite(x2)) {
           throw new TypeError(`${context} is not a finite number`);
@@ -428,8 +1168,8 @@ var require_ponyfill_es2018 = __commonJS({
           stream._readableStreamController[PullSteps](readRequest);
         }
       }
-      function defaultReaderBrandCheckException(name2) {
-        return new TypeError(`ReadableStreamDefaultReader.prototype.${name2} can only be used on a ReadableStreamDefaultReader`);
+      function defaultReaderBrandCheckException(name3) {
+        return new TypeError(`ReadableStreamDefaultReader.prototype.${name3} can only be used on a ReadableStreamDefaultReader`);
       }
       const AsyncIteratorPrototype = Object.getPrototypeOf(Object.getPrototypeOf(async function* () {
       }).prototype);
@@ -445,8 +1185,8 @@ var require_ponyfill_es2018 = __commonJS({
           this._ongoingPromise = this._ongoingPromise ? transformPromiseWith(this._ongoingPromise, nextSteps, nextSteps) : nextSteps();
           return this._ongoingPromise;
         }
-        return(value) {
-          const returnSteps = () => this._returnSteps(value);
+        return(value2) {
+          const returnSteps = () => this._returnSteps(value2);
           return this._ongoingPromise ? transformPromiseWith(this._ongoingPromise, returnSteps, returnSteps) : returnSteps();
         }
         _nextSteps() {
@@ -484,9 +1224,9 @@ var require_ponyfill_es2018 = __commonJS({
           ReadableStreamDefaultReaderRead(reader, readRequest);
           return promise2;
         }
-        _returnSteps(value) {
+        _returnSteps(value2) {
           if (this._isFinished) {
-            return Promise.resolve({ value, done: true });
+            return Promise.resolve({ value: value2, done: true });
           }
           this._isFinished = true;
           const reader = this._reader;
@@ -494,12 +1234,12 @@ var require_ponyfill_es2018 = __commonJS({
             return promiseRejectedWith(readerLockException("finish iterating"));
           }
           if (!this._preventCancel) {
-            const result = ReadableStreamReaderGenericCancel(reader, value);
+            const result = ReadableStreamReaderGenericCancel(reader, value2);
             ReadableStreamReaderGenericRelease(reader);
-            return transformPromiseWith(result, () => ({ value, done: true }));
+            return transformPromiseWith(result, () => ({ value: value2, done: true }));
           }
           ReadableStreamReaderGenericRelease(reader);
-          return promiseResolvedWith({ value, done: true });
+          return promiseResolvedWith({ value: value2, done: true });
         }
       }
       const ReadableStreamAsyncIteratorPrototype = {
@@ -509,11 +1249,11 @@ var require_ponyfill_es2018 = __commonJS({
           }
           return this._asyncIteratorImpl.next();
         },
-        return(value) {
+        return(value2) {
           if (!IsReadableStreamAsyncIterator(this)) {
             return promiseRejectedWith(streamAsyncIteratorBrandCheckException("return"));
           }
-          return this._asyncIteratorImpl.return(value);
+          return this._asyncIteratorImpl.return(value2);
         }
       };
       if (AsyncIteratorPrototype !== void 0) {
@@ -539,8 +1279,8 @@ var require_ponyfill_es2018 = __commonJS({
           return false;
         }
       }
-      function streamAsyncIteratorBrandCheckException(name2) {
-        return new TypeError(`ReadableStreamAsyncIterator.${name2} can only be used on a ReadableSteamAsyncIterator`);
+      function streamAsyncIteratorBrandCheckException(name3) {
+        return new TypeError(`ReadableStreamAsyncIterator.${name3} can only be used on a ReadableSteamAsyncIterator`);
       }
       const NumberIsNaN = Number.isNaN || function(x2) {
         return x2 !== x2;
@@ -590,11 +1330,11 @@ var require_ponyfill_es2018 = __commonJS({
         }
         return pair.value;
       }
-      function EnqueueValueWithSize(container, value, size5) {
+      function EnqueueValueWithSize(container, value2, size5) {
         if (!IsNonNegativeNumber(size5) || size5 === Infinity) {
           throw new RangeError("Size must be a finite, non-NaN, non-negative number.");
         }
-        container._queue.push({ value, size: size5 });
+        container._queue.push({ value: value2, size: size5 });
         container._queueTotalSize += size5;
       }
       function PeekQueueValue(container) {
@@ -1176,15 +1916,15 @@ var require_ponyfill_es2018 = __commonJS({
         }
         SetUpReadableByteStreamController(stream, controller, startAlgorithm, pullAlgorithm, cancelAlgorithm, highWaterMark, autoAllocateChunkSize);
       }
-      function SetUpReadableStreamBYOBRequest(request, controller, view) {
-        request._associatedReadableByteStreamController = controller;
-        request._view = view;
+      function SetUpReadableStreamBYOBRequest(request3, controller, view) {
+        request3._associatedReadableByteStreamController = controller;
+        request3._view = view;
       }
-      function byobRequestBrandCheckException(name2) {
-        return new TypeError(`ReadableStreamBYOBRequest.prototype.${name2} can only be used on a ReadableStreamBYOBRequest`);
+      function byobRequestBrandCheckException(name3) {
+        return new TypeError(`ReadableStreamBYOBRequest.prototype.${name3} can only be used on a ReadableStreamBYOBRequest`);
       }
-      function byteStreamControllerBrandCheckException(name2) {
-        return new TypeError(`ReadableByteStreamController.prototype.${name2} can only be used on a ReadableByteStreamController`);
+      function byteStreamControllerBrandCheckException(name3) {
+        return new TypeError(`ReadableByteStreamController.prototype.${name3} can only be used on a ReadableByteStreamController`);
       }
       function AcquireReadableStreamBYOBReader(stream) {
         return new ReadableStreamBYOBReader(stream);
@@ -1317,8 +2057,8 @@ var require_ponyfill_es2018 = __commonJS({
           ReadableByteStreamControllerPullInto(stream._readableStreamController, view, readIntoRequest);
         }
       }
-      function byobReaderBrandCheckException(name2) {
-        return new TypeError(`ReadableStreamBYOBReader.prototype.${name2} can only be used on a ReadableStreamBYOBReader`);
+      function byobReaderBrandCheckException(name3) {
+        return new TypeError(`ReadableStreamBYOBReader.prototype.${name3} can only be used on a ReadableStreamBYOBReader`);
       }
       function ExtractHighWaterMark(strategy, defaultHWM) {
         const { highWaterMark } = strategy;
@@ -1356,12 +2096,12 @@ var require_ponyfill_es2018 = __commonJS({
         const close3 = original === null || original === void 0 ? void 0 : original.close;
         const start = original === null || original === void 0 ? void 0 : original.start;
         const type = original === null || original === void 0 ? void 0 : original.type;
-        const write9 = original === null || original === void 0 ? void 0 : original.write;
+        const write8 = original === null || original === void 0 ? void 0 : original.write;
         return {
           abort: abort === void 0 ? void 0 : convertUnderlyingSinkAbortCallback(abort, original, `${context} has member 'abort' that`),
           close: close3 === void 0 ? void 0 : convertUnderlyingSinkCloseCallback(close3, original, `${context} has member 'close' that`),
           start: start === void 0 ? void 0 : convertUnderlyingSinkStartCallback(start, original, `${context} has member 'start' that`),
-          write: write9 === void 0 ? void 0 : convertUnderlyingSinkWriteCallback(write9, original, `${context} has member 'write' that`),
+          write: write8 === void 0 ? void 0 : convertUnderlyingSinkWriteCallback(write8, original, `${context} has member 'write' that`),
           type
         };
       }
@@ -1386,12 +2126,12 @@ var require_ponyfill_es2018 = __commonJS({
           throw new TypeError(`${context} is not a WritableStream.`);
         }
       }
-      function isAbortSignal2(value) {
-        if (typeof value !== "object" || value === null) {
+      function isAbortSignal2(value2) {
+        if (typeof value2 !== "object" || value2 === null) {
           return false;
         }
         try {
-          return typeof value.aborted === "boolean";
+          return typeof value2.aborted === "boolean";
         } catch (_a) {
           return false;
         }
@@ -1567,10 +2307,10 @@ var require_ponyfill_es2018 = __commonJS({
         });
         return promise2;
       }
-      function WritableStreamDealWithRejection(stream, error5) {
+      function WritableStreamDealWithRejection(stream, error6) {
         const state2 = stream._state;
         if (state2 === "writable") {
-          WritableStreamStartErroring(stream, error5);
+          WritableStreamStartErroring(stream, error6);
           return;
         }
         WritableStreamFinishErroring(stream);
@@ -1619,10 +2359,10 @@ var require_ponyfill_es2018 = __commonJS({
         stream._inFlightWriteRequest._resolve(void 0);
         stream._inFlightWriteRequest = void 0;
       }
-      function WritableStreamFinishInFlightWriteWithError(stream, error5) {
-        stream._inFlightWriteRequest._reject(error5);
+      function WritableStreamFinishInFlightWriteWithError(stream, error6) {
+        stream._inFlightWriteRequest._reject(error6);
         stream._inFlightWriteRequest = void 0;
-        WritableStreamDealWithRejection(stream, error5);
+        WritableStreamDealWithRejection(stream, error6);
       }
       function WritableStreamFinishInFlightClose(stream) {
         stream._inFlightCloseRequest._resolve(void 0);
@@ -1641,14 +2381,14 @@ var require_ponyfill_es2018 = __commonJS({
           defaultWriterClosedPromiseResolve(writer);
         }
       }
-      function WritableStreamFinishInFlightCloseWithError(stream, error5) {
-        stream._inFlightCloseRequest._reject(error5);
+      function WritableStreamFinishInFlightCloseWithError(stream, error6) {
+        stream._inFlightCloseRequest._reject(error6);
         stream._inFlightCloseRequest = void 0;
         if (stream._pendingAbortRequest !== void 0) {
-          stream._pendingAbortRequest._reject(error5);
+          stream._pendingAbortRequest._reject(error6);
           stream._pendingAbortRequest = void 0;
         }
-        WritableStreamDealWithRejection(stream, error5);
+        WritableStreamDealWithRejection(stream, error6);
       }
       function WritableStreamCloseQueuedOrInFlight(stream) {
         if (stream._closeRequest === void 0 && stream._inFlightCloseRequest === void 0) {
@@ -1825,18 +2565,18 @@ var require_ponyfill_es2018 = __commonJS({
         }
         return WritableStreamDefaultWriterClose(writer);
       }
-      function WritableStreamDefaultWriterEnsureClosedPromiseRejected(writer, error5) {
+      function WritableStreamDefaultWriterEnsureClosedPromiseRejected(writer, error6) {
         if (writer._closedPromiseState === "pending") {
-          defaultWriterClosedPromiseReject(writer, error5);
+          defaultWriterClosedPromiseReject(writer, error6);
         } else {
-          defaultWriterClosedPromiseResetToRejected(writer, error5);
+          defaultWriterClosedPromiseResetToRejected(writer, error6);
         }
       }
-      function WritableStreamDefaultWriterEnsureReadyPromiseRejected(writer, error5) {
+      function WritableStreamDefaultWriterEnsureReadyPromiseRejected(writer, error6) {
         if (writer._readyPromiseState === "pending") {
-          defaultWriterReadyPromiseReject(writer, error5);
+          defaultWriterReadyPromiseReject(writer, error6);
         } else {
-          defaultWriterReadyPromiseResetToRejected(writer, error5);
+          defaultWriterReadyPromiseResetToRejected(writer, error6);
         }
       }
       function WritableStreamDefaultWriterGetDesiredSize(writer) {
@@ -2035,16 +2775,16 @@ var require_ponyfill_es2018 = __commonJS({
         if (controller._queue.length === 0) {
           return;
         }
-        const value = PeekQueueValue(controller);
-        if (value === closeSentinel) {
+        const value2 = PeekQueueValue(controller);
+        if (value2 === closeSentinel) {
           WritableStreamDefaultControllerProcessClose(controller);
         } else {
-          WritableStreamDefaultControllerProcessWrite(controller, value);
+          WritableStreamDefaultControllerProcessWrite(controller, value2);
         }
       }
-      function WritableStreamDefaultControllerErrorIfNeeded(controller, error5) {
+      function WritableStreamDefaultControllerErrorIfNeeded(controller, error6) {
         if (controller._controlledWritableStream._state === "writable") {
-          WritableStreamDefaultControllerError(controller, error5);
+          WritableStreamDefaultControllerError(controller, error6);
         }
       }
       function WritableStreamDefaultControllerProcessClose(controller) {
@@ -2083,22 +2823,22 @@ var require_ponyfill_es2018 = __commonJS({
         const desiredSize = WritableStreamDefaultControllerGetDesiredSize(controller);
         return desiredSize <= 0;
       }
-      function WritableStreamDefaultControllerError(controller, error5) {
+      function WritableStreamDefaultControllerError(controller, error6) {
         const stream = controller._controlledWritableStream;
         WritableStreamDefaultControllerClearAlgorithms(controller);
-        WritableStreamStartErroring(stream, error5);
+        WritableStreamStartErroring(stream, error6);
       }
-      function streamBrandCheckException$2(name2) {
-        return new TypeError(`WritableStream.prototype.${name2} can only be used on a WritableStream`);
+      function streamBrandCheckException$2(name3) {
+        return new TypeError(`WritableStream.prototype.${name3} can only be used on a WritableStream`);
       }
-      function defaultControllerBrandCheckException$2(name2) {
-        return new TypeError(`WritableStreamDefaultController.prototype.${name2} can only be used on a WritableStreamDefaultController`);
+      function defaultControllerBrandCheckException$2(name3) {
+        return new TypeError(`WritableStreamDefaultController.prototype.${name3} can only be used on a WritableStreamDefaultController`);
       }
-      function defaultWriterBrandCheckException(name2) {
-        return new TypeError(`WritableStreamDefaultWriter.prototype.${name2} can only be used on a WritableStreamDefaultWriter`);
+      function defaultWriterBrandCheckException(name3) {
+        return new TypeError(`WritableStreamDefaultWriter.prototype.${name3} can only be used on a WritableStreamDefaultWriter`);
       }
-      function defaultWriterLockException(name2) {
-        return new TypeError("Cannot " + name2 + " a stream using a released writer");
+      function defaultWriterLockException(name3) {
+        return new TypeError("Cannot " + name3 + " a stream using a released writer");
       }
       function defaultWriterClosedPromiseInitialize(writer) {
         writer._closedPromise = newPromise((resolve2, reject) => {
@@ -2190,9 +2930,9 @@ var require_ponyfill_es2018 = __commonJS({
         }
       }
       function createDOMExceptionPolyfill() {
-        const ctor = function DOMException3(message2, name2) {
+        const ctor = function DOMException3(message2, name3) {
           this.message = message2 || "";
-          this.name = name2 || "Error";
+          this.name = name3 || "Error";
           if (Error.captureStackTrace) {
             Error.captureStackTrace(this, this.constructor);
           }
@@ -2212,12 +2952,12 @@ var require_ponyfill_es2018 = __commonJS({
           let abortAlgorithm;
           if (signal !== void 0) {
             abortAlgorithm = () => {
-              const error5 = new DOMException$1("Aborted", "AbortError");
+              const error6 = new DOMException$1("Aborted", "AbortError");
               const actions = [];
               if (!preventAbort) {
                 actions.push(() => {
                   if (dest._state === "writable") {
-                    return WritableStreamAbort(dest, error5);
+                    return WritableStreamAbort(dest, error6);
                   }
                   return promiseResolvedWith(void 0);
                 });
@@ -2225,12 +2965,12 @@ var require_ponyfill_es2018 = __commonJS({
               if (!preventCancel) {
                 actions.push(() => {
                   if (source2._state === "readable") {
-                    return ReadableStreamCancel(source2, error5);
+                    return ReadableStreamCancel(source2, error6);
                   }
                   return promiseResolvedWith(void 0);
                 });
               }
-              shutdownWithAction(() => Promise.all(actions.map((action) => action())), true, error5);
+              shutdownWithAction(() => Promise.all(actions.map((action) => action())), true, error6);
             };
             if (signal.aborted) {
               abortAlgorithm();
@@ -2329,25 +3069,25 @@ var require_ponyfill_es2018 = __commonJS({
               uponPromise(action(), () => finalize(originalIsError, originalError), (newError) => finalize(true, newError));
             }
           }
-          function shutdown(isError, error5) {
+          function shutdown(isError, error6) {
             if (shuttingDown) {
               return;
             }
             shuttingDown = true;
             if (dest._state === "writable" && !WritableStreamCloseQueuedOrInFlight(dest)) {
-              uponFulfillment(waitForWritesToFinish(), () => finalize(isError, error5));
+              uponFulfillment(waitForWritesToFinish(), () => finalize(isError, error6));
             } else {
-              finalize(isError, error5);
+              finalize(isError, error6);
             }
           }
-          function finalize(isError, error5) {
+          function finalize(isError, error6) {
             WritableStreamDefaultWriterRelease(writer);
             ReadableStreamReaderGenericRelease(reader);
             if (signal !== void 0) {
               signal.removeEventListener("abort", abortAlgorithm);
             }
             if (isError) {
-              reject(error5);
+              reject(error6);
             } else {
               resolve2(void 0);
             }
@@ -2580,8 +3320,8 @@ var require_ponyfill_es2018 = __commonJS({
         }
         SetUpReadableStreamDefaultController(stream, controller, startAlgorithm, pullAlgorithm, cancelAlgorithm, highWaterMark, sizeAlgorithm);
       }
-      function defaultControllerBrandCheckException$1(name2) {
-        return new TypeError(`ReadableStreamDefaultController.prototype.${name2} can only be used on a ReadableStreamDefaultController`);
+      function defaultControllerBrandCheckException$1(name3) {
+        return new TypeError(`ReadableStreamDefaultController.prototype.${name3} can only be used on a ReadableStreamDefaultController`);
       }
       function ReadableStreamTee(stream, cloneForBranch2) {
         if (IsReadableByteStreamController(stream._readableStreamController)) {
@@ -3189,8 +3929,8 @@ var require_ponyfill_es2018 = __commonJS({
           reader._readIntoRequests = new SimpleQueue();
         }
       }
-      function streamBrandCheckException$1(name2) {
-        return new TypeError(`ReadableStream.prototype.${name2} can only be used on a ReadableStream`);
+      function streamBrandCheckException$1(name3) {
+        return new TypeError(`ReadableStream.prototype.${name3} can only be used on a ReadableStream`);
       }
       function convertQueuingStrategyInit(init3, context) {
         assertDictionary(init3, context);
@@ -3239,8 +3979,8 @@ var require_ponyfill_es2018 = __commonJS({
           configurable: true
         });
       }
-      function byteLengthBrandCheckException(name2) {
-        return new TypeError(`ByteLengthQueuingStrategy.prototype.${name2} can only be used on a ByteLengthQueuingStrategy`);
+      function byteLengthBrandCheckException(name3) {
+        return new TypeError(`ByteLengthQueuingStrategy.prototype.${name3} can only be used on a ByteLengthQueuingStrategy`);
       }
       function IsByteLengthQueuingStrategy(x2) {
         if (!typeIsObject(x2)) {
@@ -3290,8 +4030,8 @@ var require_ponyfill_es2018 = __commonJS({
           configurable: true
         });
       }
-      function countBrandCheckException(name2) {
-        return new TypeError(`CountQueuingStrategy.prototype.${name2} can only be used on a CountQueuingStrategy`);
+      function countBrandCheckException(name3) {
+        return new TypeError(`CountQueuingStrategy.prototype.${name3} can only be used on a CountQueuingStrategy`);
       }
       function IsCountQueuingStrategy(x2) {
         if (!typeIsObject(x2)) {
@@ -3550,8 +4290,8 @@ var require_ponyfill_es2018 = __commonJS({
         const stream = controller._controlledTransformStream;
         const readableController = stream._readable._readableStreamController;
         ReadableStreamDefaultControllerClose(readableController);
-        const error5 = new TypeError("TransformStream terminated");
-        TransformStreamErrorWritableAndUnblockWrite(stream, error5);
+        const error6 = new TypeError("TransformStream terminated");
+        TransformStreamErrorWritableAndUnblockWrite(stream, error6);
       }
       function TransformStreamDefaultSinkWriteAlgorithm(stream, chunk) {
         const controller = stream._transformStreamController;
@@ -3591,11 +4331,11 @@ var require_ponyfill_es2018 = __commonJS({
         TransformStreamSetBackpressure(stream, false);
         return stream._backpressureChangePromise;
       }
-      function defaultControllerBrandCheckException(name2) {
-        return new TypeError(`TransformStreamDefaultController.prototype.${name2} can only be used on a TransformStreamDefaultController`);
+      function defaultControllerBrandCheckException(name3) {
+        return new TypeError(`TransformStreamDefaultController.prototype.${name3} can only be used on a TransformStreamDefaultController`);
       }
-      function streamBrandCheckException(name2) {
-        return new TypeError(`TransformStream.prototype.${name2} can only be used on a TransformStream`);
+      function streamBrandCheckException(name3) {
+        return new TypeError(`TransformStream.prototype.${name3} can only be used on a TransformStream`);
       }
       exports2.ByteLengthQueuingStrategy = ByteLengthQueuingStrategy;
       exports2.CountQueuingStrategy = CountQueuingStrategy;
@@ -3628,18 +4368,18 @@ var require_streams = __commonJS({
           };
           Object.assign(globalThis, require("node:stream/web"));
           process4.emitWarning = emitWarning;
-        } catch (error5) {
+        } catch (error6) {
           process4.emitWarning = emitWarning;
-          throw error5;
+          throw error6;
         }
-      } catch (error5) {
+      } catch (error6) {
         Object.assign(globalThis, require_ponyfill_es2018());
       }
     }
     try {
-      const { Blob: Blob3 } = require("buffer");
-      if (Blob3 && !Blob3.prototype.stream) {
-        Blob3.prototype.stream = function name2(params) {
+      const { Blob: Blob5 } = require("buffer");
+      if (Blob5 && !Blob5.prototype.stream) {
+        Blob5.prototype.stream = function name3(params) {
           let position = 0;
           const blob = this;
           return new ReadableStream({
@@ -3656,7 +4396,7 @@ var require_streams = __commonJS({
           });
         };
       }
-    } catch (error5) {
+    } catch (error6) {
     }
   }
 });
@@ -3690,12 +4430,12 @@ async function* toIterator(parts, clone2 = true) {
     }
   }
 }
-var import_streams, POOL_SIZE, _Blob, Blob2, fetch_blob_default;
+var import_streams, POOL_SIZE, _Blob, Blob4, fetch_blob_default;
 var init_fetch_blob = __esm({
   "node_modules/fetch-blob/index.js"() {
     import_streams = __toESM(require_streams(), 1);
     POOL_SIZE = 65536;
-    _Blob = class Blob {
+    _Blob = class Blob3 {
       #parts = [];
       #type = "";
       #size = 0;
@@ -3719,7 +4459,7 @@ var init_fetch_blob = __esm({
             part = new Uint8Array(element.buffer.slice(element.byteOffset, element.byteOffset + element.byteLength));
           } else if (element instanceof ArrayBuffer) {
             part = new Uint8Array(element.slice(0));
-          } else if (element instanceof Blob) {
+          } else if (element instanceof Blob3) {
             part = element;
           } else {
             part = encoder.encode(`${element}`);
@@ -3801,7 +4541,7 @@ var init_fetch_blob = __esm({
             relativeStart = 0;
           }
         }
-        const blob = new Blob([], { type: String(type).toLowerCase() });
+        const blob = new Blob3([], { type: String(type).toLowerCase() });
         blob.#size = span3;
         blob.#parts = blobParts;
         return blob;
@@ -3818,8 +4558,8 @@ var init_fetch_blob = __esm({
       type: { enumerable: true },
       slice: { enumerable: true }
     });
-    Blob2 = _Blob;
-    fetch_blob_default = Blob2;
+    Blob4 = _Blob;
+    fetch_blob_default = Blob4;
   }
 });
 
@@ -3876,7 +4616,7 @@ Content-Type: ${v.type || "application/octet-stream"}\r
   c.push(`--${b}--`);
   return new B(c, { type: "multipart/form-data; boundary=" + b });
 }
-var t, i, h, r, m, f, e, x, FormData;
+var t, i, h, r, m, f, e, x, FormData2;
 var init_esm_min = __esm({
   "node_modules/formdata-polyfill/esm.min.js"() {
     init_fetch_blob();
@@ -3891,7 +4631,7 @@ var init_esm_min = __esm({
         throw new TypeError(`Failed to execute '${n}' on 'FormData': ${e2} arguments required, but only ${a.length} present.`);
       }
     };
-    FormData = class FormData2 {
+    FormData2 = class FormData3 {
       #d = [];
       constructor(...a) {
         if (a.length)
@@ -4059,7 +4799,7 @@ async function toFormData(Body2, ct) {
   let contentType;
   let filename;
   const entryChunks = [];
-  const formData = new FormData();
+  const formData = new FormData2();
   const onPartData = (ui8a) => {
     entryValue += decoder.decode(ui8a, { stream: true });
   };
@@ -4182,27 +4922,27 @@ var init_multipart_parser = __esm({
         const bufferLength = data.length;
         let c;
         let cl;
-        const mark = (name2) => {
-          this[name2 + "Mark"] = i2;
+        const mark = (name3) => {
+          this[name3 + "Mark"] = i2;
         };
-        const clear2 = (name2) => {
-          delete this[name2 + "Mark"];
+        const clear2 = (name3) => {
+          delete this[name3 + "Mark"];
         };
         const callback = (callbackSymbol, start, end2, ui8a) => {
           if (start === void 0 || start !== end2) {
             this[callbackSymbol](ui8a && ui8a.subarray(start, end2));
           }
         };
-        const dataCallback = (name2, clear3) => {
-          const markSymbol = name2 + "Mark";
+        const dataCallback = (name3, clear3) => {
+          const markSymbol = name3 + "Mark";
           if (!(markSymbol in this)) {
             return;
           }
           if (clear3) {
-            callback(name2, this[markSymbol], i2, data);
+            callback(name3, this[markSymbol], i2, data);
             delete this[markSymbol];
           } else {
-            callback(name2, this[markSymbol], data.length, data);
+            callback(name3, this[markSymbol], data.length, data);
             this[markSymbol] = 0;
           }
         };
@@ -4389,6 +5129,7 @@ var refEq = function(r1) {
 };
 var eqIntImpl = refEq;
 var eqCharImpl = refEq;
+var eqStringImpl = refEq;
 
 // output/Type.Proxy/index.js
 var $$Proxy = /* @__PURE__ */ function() {
@@ -4412,6 +5153,9 @@ var unsafeGet = function(label) {
 };
 
 // output/Data.Eq/index.js
+var eqString = {
+  eq: eqStringImpl
+};
 var eqInt = {
   eq: eqIntImpl
 };
@@ -4443,14 +5187,25 @@ var un = function() {
     return unwrap1;
   };
 };
+var alaF = function() {
+  return function() {
+    return function() {
+      return function() {
+        return function(v) {
+          return coerce2;
+        };
+      };
+    };
+  };
+};
 
 // output/Data.Ord/foreign.js
 var unsafeCompareImpl = function(lt) {
-  return function(eq3) {
+  return function(eq4) {
     return function(gt) {
       return function(x2) {
         return function(y) {
-          return x2 < y ? lt : x2 === y ? eq3 : gt;
+          return x2 < y ? lt : x2 === y ? eq4 : gt;
         };
       };
     };
@@ -4681,6 +5436,15 @@ var categoryFn = {
 var otherwise = true;
 
 // output/Data.Function/index.js
+var on = function(f3) {
+  return function(g) {
+    return function(x2) {
+      return function(y) {
+        return f3(g(x2))(g(y));
+      };
+    };
+  };
+};
 var flip = function(f3) {
   return function(b) {
     return function(a) {
@@ -4704,10 +5468,10 @@ var map = function(dict) {
   return dict.map;
 };
 var mapFlipped = function(dictFunctor) {
-  var map112 = map(dictFunctor);
+  var map113 = map(dictFunctor);
   return function(fa) {
     return function(f3) {
-      return map112(f3)(fa);
+      return map113(f3)(fa);
     };
   };
 };
@@ -4715,17 +5479,17 @@ var $$void = function(dictFunctor) {
   return map(dictFunctor)($$const(unit));
 };
 var voidLeft = function(dictFunctor) {
-  var map112 = map(dictFunctor);
+  var map113 = map(dictFunctor);
   return function(f3) {
     return function(x2) {
-      return map112($$const(x2))(f3);
+      return map113($$const(x2))(f3);
     };
   };
 };
 var voidRight = function(dictFunctor) {
-  var map112 = map(dictFunctor);
+  var map113 = map(dictFunctor);
   return function(x2) {
-    return map112($$const(x2));
+    return map113($$const(x2));
   };
 };
 var functorArray = {
@@ -4813,20 +5577,20 @@ var apply = function(dict) {
 };
 var applySecond = function(dictApply) {
   var apply1 = apply(dictApply);
-  var map26 = map(dictApply.Functor0());
+  var map28 = map(dictApply.Functor0());
   return function(a) {
     return function(b) {
-      return apply1(map26($$const(identity2))(a))(b);
+      return apply1(map28($$const(identity2))(a))(b);
     };
   };
 };
 var lift2 = function(dictApply) {
   var apply1 = apply(dictApply);
-  var map26 = map(dictApply.Functor0());
+  var map28 = map(dictApply.Functor0());
   return function(f3) {
     return function(a) {
       return function(b) {
-        return apply1(map26(f3)(a))(b);
+        return apply1(map28(f3)(a))(b);
       };
     };
   };
@@ -4837,7 +5601,7 @@ var pure = function(dict) {
   return dict.pure;
 };
 var unless = function(dictApplicative) {
-  var pure15 = pure(dictApplicative);
+  var pure17 = pure(dictApplicative);
   return function(v) {
     return function(v1) {
       if (!v) {
@@ -4845,7 +5609,7 @@ var unless = function(dictApplicative) {
       }
       ;
       if (v) {
-        return pure15(unit);
+        return pure17(unit);
       }
       ;
       throw new Error("Failed pattern match at Control.Applicative (line 68, column 1 - line 68, column 65): " + [v.constructor.name, v1.constructor.name]);
@@ -4853,7 +5617,7 @@ var unless = function(dictApplicative) {
   };
 };
 var when = function(dictApplicative) {
-  var pure15 = pure(dictApplicative);
+  var pure17 = pure(dictApplicative);
   return function(v) {
     return function(v1) {
       if (v) {
@@ -4861,7 +5625,7 @@ var when = function(dictApplicative) {
       }
       ;
       if (!v) {
-        return pure15(unit);
+        return pure17(unit);
       }
       ;
       throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
@@ -4869,11 +5633,11 @@ var when = function(dictApplicative) {
   };
 };
 var liftA1 = function(dictApplicative) {
-  var apply4 = apply(dictApplicative.Apply0());
-  var pure15 = pure(dictApplicative);
+  var apply5 = apply(dictApplicative.Apply0());
+  var pure17 = pure(dictApplicative);
   return function(f3) {
     return function(a) {
-      return apply4(pure15(f3))(a);
+      return apply5(pure17(f3))(a);
     };
   };
 };
@@ -4917,11 +5681,11 @@ var composeKleisliFlipped = function(dictBind) {
   };
 };
 var composeKleisli = function(dictBind) {
-  var bind14 = bind(dictBind);
+  var bind15 = bind(dictBind);
   return function(f3) {
     return function(g) {
       return function(a) {
-        return bind14(f3(a))(g);
+        return bind15(f3(a))(g);
       };
     };
   };
@@ -4932,9 +5696,9 @@ var discardUnit = {
   }
 };
 var join = function(dictBind) {
-  var bind14 = bind(dictBind);
+  var bind15 = bind(dictBind);
   return function(m2) {
-    return bind14(m2)(identity3);
+    return bind15(m2)(identity3);
   };
 };
 
@@ -5273,13 +6037,13 @@ var bindE = function(a) {
 
 // output/Control.Monad/index.js
 var ap = function(dictMonad) {
-  var bind14 = bind(dictMonad.Bind1());
-  var pure15 = pure(dictMonad.Applicative0());
+  var bind15 = bind(dictMonad.Bind1());
+  var pure17 = pure(dictMonad.Applicative0());
   return function(f3) {
     return function(a) {
-      return bind14(f3)(function(f$prime) {
-        return bind14(a)(function(a$prime) {
-          return pure15(f$prime(a$prime));
+      return bind15(f3)(function(f$prime) {
+        return bind15(a)(function(a$prime) {
+          return pure17(f$prime(a$prime));
         });
       });
     };
@@ -5365,14 +6129,14 @@ var monoidFn = function(dictMonoid) {
 };
 
 // output/Effect/index.js
-var $runtime_lazy = function(name2, moduleName, init3) {
+var $runtime_lazy = function(name3, moduleName, init3) {
   var state2 = 0;
   var val;
   return function(lineNumber) {
     if (state2 === 2)
       return val;
     if (state2 === 1)
-      throw new ReferenceError(name2 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
+      throw new ReferenceError(name3 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
     state2 = 1;
     val = init3();
     state2 = 2;
@@ -5486,11 +6250,11 @@ var catchError = function(dict) {
 var $$try2 = function(dictMonadError) {
   var catchError1 = catchError(dictMonadError);
   var Monad0 = dictMonadError.MonadThrow0().Monad0();
-  var map26 = map(Monad0.Bind1().Apply0().Functor0());
-  var pure15 = pure(Monad0.Applicative0());
+  var map28 = map(Monad0.Bind1().Apply0().Functor0());
+  var pure17 = pure(Monad0.Applicative0());
   return function(a) {
-    return catchError1(map26(Right.create)(a))(function($52) {
-      return pure15(Left.create($52));
+    return catchError1(map28(Right.create)(a))(function($52) {
+      return pure17(Left.create($52));
     });
   };
 };
@@ -5581,6 +6345,44 @@ var modify_ = function(f3) {
   };
 };
 
+// output/Data.HeytingAlgebra/foreign.js
+var boolConj = function(b1) {
+  return function(b2) {
+    return b1 && b2;
+  };
+};
+var boolDisj = function(b1) {
+  return function(b2) {
+    return b1 || b2;
+  };
+};
+var boolNot = function(b) {
+  return !b;
+};
+
+// output/Data.HeytingAlgebra/index.js
+var not = function(dict) {
+  return dict.not;
+};
+var ff = function(dict) {
+  return dict.ff;
+};
+var disj = function(dict) {
+  return dict.disj;
+};
+var heytingAlgebraBoolean = {
+  ff: false,
+  tt: true,
+  implies: function(a) {
+    return function(b) {
+      return disj(heytingAlgebraBoolean)(not(heytingAlgebraBoolean)(a))(b);
+    };
+  },
+  conj: boolConj,
+  disj: boolDisj,
+  not: boolNot
+};
+
 // output/Data.Tuple/index.js
 var Tuple = /* @__PURE__ */ function() {
   function Tuple2(value0, value1) {
@@ -5624,7 +6426,7 @@ var ExceptT = function(x2) {
   return x2;
 };
 var withExceptT = function(dictFunctor) {
-  var map112 = map(dictFunctor);
+  var map113 = map(dictFunctor);
   return function(f3) {
     return function(v) {
       var mapLeft = function(v1) {
@@ -5640,7 +6442,7 @@ var withExceptT = function(dictFunctor) {
           throw new Error("Failed pattern match at Control.Monad.Except.Trans (line 42, column 3 - line 42, column 32): " + [v1.constructor.name, v2.constructor.name]);
         };
       };
-      return map112(mapLeft(f3))(v);
+      return map113(mapLeft(f3))(v);
     };
   };
 };
@@ -5653,10 +6455,10 @@ var mapExceptT = function(f3) {
   };
 };
 var functorExceptT = function(dictFunctor) {
-  var map112 = map(dictFunctor);
+  var map113 = map(dictFunctor);
   return {
     map: function(f3) {
-      return mapExceptT(map112(map5(f3)));
+      return mapExceptT(map113(map5(f3)));
     }
   };
 };
@@ -5677,13 +6479,13 @@ var monadExceptT = function(dictMonad) {
   };
 };
 var bindExceptT = function(dictMonad) {
-  var bind14 = bind(dictMonad.Bind1());
-  var pure15 = pure(dictMonad.Applicative0());
+  var bind15 = bind(dictMonad.Bind1());
+  var pure17 = pure(dictMonad.Applicative0());
   return {
     bind: function(v) {
       return function(k) {
-        return bind14(v)(either(function($187) {
-          return pure15(Left.create($187));
+        return bind15(v)(either(function($187) {
+          return pure17(Left.create($187));
         })(function(a) {
           var v1 = k(a);
           return v1;
@@ -5735,25 +6537,25 @@ var altExceptT = function(dictSemigroup) {
   var append2 = append(dictSemigroup);
   return function(dictMonad) {
     var Bind1 = dictMonad.Bind1();
-    var bind14 = bind(Bind1);
-    var pure15 = pure(dictMonad.Applicative0());
+    var bind15 = bind(Bind1);
+    var pure17 = pure(dictMonad.Applicative0());
     var functorExceptT1 = functorExceptT(Bind1.Apply0().Functor0());
     return {
       alt: function(v) {
         return function(v1) {
-          return bind14(v)(function(rm) {
+          return bind15(v)(function(rm) {
             if (rm instanceof Right) {
-              return pure15(new Right(rm.value0));
+              return pure17(new Right(rm.value0));
             }
             ;
             if (rm instanceof Left) {
-              return bind14(v1)(function(rn) {
+              return bind15(v1)(function(rn) {
                 if (rn instanceof Right) {
-                  return pure15(new Right(rn.value0));
+                  return pure17(new Right(rn.value0));
                 }
                 ;
                 if (rn instanceof Left) {
-                  return pure15(new Left(append2(rm.value0)(rn.value0)));
+                  return pure17(new Left(append2(rm.value0)(rn.value0)));
                 }
                 ;
                 throw new Error("Failed pattern match at Control.Monad.Except.Trans (line 86, column 9 - line 88, column 49): " + [rn.constructor.name]);
@@ -5780,34 +6582,34 @@ var runExcept = function($3) {
 
 // output/Data.Array/foreign.js
 var replicateFill = function(count) {
-  return function(value) {
+  return function(value2) {
     if (count < 1) {
       return [];
     }
     var result = new Array(count);
-    return result.fill(value);
+    return result.fill(value2);
   };
 };
 var replicatePolyfill = function(count) {
-  return function(value) {
+  return function(value2) {
     var result = [];
     var n = 0;
     for (var i2 = 0; i2 < count; i2++) {
-      result[n++] = value;
+      result[n++] = value2;
     }
     return result;
   };
 };
 var replicate = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
 var fromFoldableImpl = function() {
-  function Cons3(head4, tail2) {
-    this.head = head4;
+  function Cons3(head5, tail2) {
+    this.head = head5;
     this.tail = tail2;
   }
   var emptyList = {};
-  function curryCons(head4) {
+  function curryCons(head5) {
     return function(tail2) {
-      return new Cons3(head4, tail2);
+      return new Cons3(head5, tail2);
     };
   }
   function listToArray(list) {
@@ -5937,14 +6739,14 @@ var foreach = function(as) {
 };
 
 // output/Control.Monad.ST.Internal/index.js
-var $runtime_lazy2 = function(name2, moduleName, init3) {
+var $runtime_lazy2 = function(name3, moduleName, init3) {
   var state2 = 0;
   var val;
   return function(lineNumber) {
     if (state2 === 2)
       return val;
     if (state2 === 1)
-      throw new ReferenceError(name2 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
+      throw new ReferenceError(name3 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
     state2 = 1;
     val = init3();
     state2 = 2;
@@ -5984,6 +6786,24 @@ var $lazy_applyST = /* @__PURE__ */ $runtime_lazy2("applyST", "Control.Monad.ST.
 });
 
 // output/Data.Array.ST/foreign.js
+var pushAll = function(as) {
+  return function(xs) {
+    return function() {
+      return xs.push.apply(xs, as);
+    };
+  };
+};
+var unsafeFreeze = function(xs) {
+  return function() {
+    return xs;
+  };
+};
+function copyImpl(xs) {
+  return function() {
+    return xs.slice();
+  };
+}
+var thaw = copyImpl;
 var sortByImpl2 = function() {
   function mergeFromTo(compare3, fromOrdering, xs1, xs2, from3, to2) {
     var mid;
@@ -6033,6 +6853,20 @@ var sortByImpl2 = function() {
     };
   };
 }();
+
+// output/Data.Array.ST/index.js
+var withArray = function(f3) {
+  return function(xs) {
+    return function __do2() {
+      var result = thaw(xs)();
+      f3(result)();
+      return unsafeFreeze(result)();
+    };
+  };
+};
+var push = function(a) {
+  return pushAll([a]);
+};
 
 // output/Data.Foldable/foreign.js
 var foldrArray = function(f3) {
@@ -6094,19 +6928,44 @@ var bifunctorEither = {
   }
 };
 
+// output/Data.Monoid.Disj/index.js
+var Disj = function(x2) {
+  return x2;
+};
+var semigroupDisj = function(dictHeytingAlgebra) {
+  var disj2 = disj(dictHeytingAlgebra);
+  return {
+    append: function(v) {
+      return function(v1) {
+        return disj2(v)(v1);
+      };
+    }
+  };
+};
+var monoidDisj = function(dictHeytingAlgebra) {
+  var semigroupDisj1 = semigroupDisj(dictHeytingAlgebra);
+  return {
+    mempty: ff(dictHeytingAlgebra),
+    Semigroup0: function() {
+      return semigroupDisj1;
+    }
+  };
+};
+
 // output/Data.Foldable/index.js
+var alaF2 = /* @__PURE__ */ alaF()()()();
 var foldr = function(dict) {
   return dict.foldr;
 };
 var traverse_ = function(dictApplicative) {
   var applySecond2 = applySecond(dictApplicative.Apply0());
-  var pure15 = pure(dictApplicative);
+  var pure17 = pure(dictApplicative);
   return function(dictFoldable) {
     var foldr22 = foldr(dictFoldable);
     return function(f3) {
       return foldr22(function($449) {
         return applySecond2(f3($449));
-      })(pure15(unit));
+      })(pure17(unit));
     };
   };
 };
@@ -6215,6 +7074,12 @@ var foldableArray = {
 var foldMap = function(dict) {
   return dict.foldMap;
 };
+var any = function(dictFoldable) {
+  var foldMap23 = foldMap(dictFoldable);
+  return function(dictHeytingAlgebra) {
+    return alaF2(Disj)(foldMap23(monoidDisj(dictHeytingAlgebra)));
+  };
+};
 
 // output/Data.Traversable/foreign.js
 var traverseArrayImpl = function() {
@@ -6238,24 +7103,24 @@ var traverseArrayImpl = function() {
       return xs.concat(ys);
     };
   }
-  return function(apply4) {
-    return function(map26) {
-      return function(pure15) {
+  return function(apply5) {
+    return function(map28) {
+      return function(pure17) {
         return function(f3) {
           return function(array) {
             function go(bot, top5) {
               switch (top5 - bot) {
                 case 0:
-                  return pure15([]);
+                  return pure17([]);
                 case 1:
-                  return map26(array1)(f3(array[bot]));
+                  return map28(array1)(f3(array[bot]));
                 case 2:
-                  return apply4(map26(array2)(f3(array[bot])))(f3(array[bot + 1]));
+                  return apply5(map28(array2)(f3(array[bot])))(f3(array[bot + 1]));
                 case 3:
-                  return apply4(apply4(map26(array3)(f3(array[bot])))(f3(array[bot + 1])))(f3(array[bot + 2]));
+                  return apply5(apply5(map28(array3)(f3(array[bot])))(f3(array[bot + 1])))(f3(array[bot + 2]));
                 default:
                   var pivot = bot + Math.floor((top5 - bot) / 4) * 2;
-                  return apply4(map26(concat22)(go(bot, pivot)))(go(pivot, top5));
+                  return apply5(map28(concat22)(go(bot, pivot)))(go(pivot, top5));
               }
             }
             return go(0, array.length);
@@ -6314,14 +7179,14 @@ var unfoldrArrayImpl = function(isNothing2) {
         return function(f3) {
           return function(b) {
             var result = [];
-            var value = b;
+            var value2 = b;
             while (true) {
-              var maybe2 = f3(value);
+              var maybe2 = f3(value2);
               if (isNothing2(maybe2))
                 return result;
               var tuple = fromJust5(maybe2);
               result.push(fst2(tuple));
-              value = snd2(tuple);
+              value2 = snd2(tuple);
             }
           };
         };
@@ -6338,14 +7203,14 @@ var unfoldr1ArrayImpl = function(isNothing2) {
         return function(f3) {
           return function(b) {
             var result = [];
-            var value = b;
+            var value2 = b;
             while (true) {
-              var tuple = f3(value);
+              var tuple = f3(value2);
               result.push(fst2(tuple));
               var maybe2 = snd2(tuple);
               if (isNothing2(maybe2))
                 return result;
-              value = fromJust5(maybe2);
+              value2 = fromJust5(maybe2);
             }
           };
         };
@@ -6404,6 +7269,11 @@ var unsafeIndex = function() {
   return unsafeIndexImpl;
 };
 var unsafeIndex1 = /* @__PURE__ */ unsafeIndex();
+var snoc = function(xs) {
+  return function(x2) {
+    return withArray(push(x2))(xs)();
+  };
+};
 var singleton2 = function(a) {
   return [a];
 };
@@ -6447,12 +7317,12 @@ var traverse1Impl = function() {
     this.fn = fn;
   }
   var emptyList = {};
-  var ConsCell = function(head4, tail2) {
-    this.head = head4;
+  var ConsCell = function(head5, tail2) {
+    this.head = head5;
     this.tail = tail2;
   };
-  function finalCell(head4) {
-    return new ConsCell(head4, emptyList);
+  function finalCell(head5) {
+    return new ConsCell(head5, emptyList);
   }
   function consList(x2) {
     return function(xs) {
@@ -6468,11 +7338,11 @@ var traverse1Impl = function() {
     }
     return arr;
   }
-  return function(apply4) {
-    return function(map26) {
+  return function(apply5) {
+    return function(map28) {
       return function(f3) {
         var buildFrom = function(x2, ys) {
-          return apply4(map26(consList)(f3(x2)))(ys);
+          return apply5(map28(consList)(f3(x2)))(ys);
         };
         var go = function(acc, currentLen, xs) {
           if (currentLen === 0) {
@@ -6486,12 +7356,12 @@ var traverse1Impl = function() {
           }
         };
         return function(array) {
-          var acc = map26(finalCell)(f3(array[array.length - 1]));
+          var acc = map28(finalCell)(f3(array[array.length - 1]));
           var result = go(acc, array.length - 1, array);
           while (result instanceof Cont) {
             result = result.fn();
           }
-          return map26(listToArray)(result);
+          return map28(listToArray)(result);
         };
       };
     };
@@ -6648,11 +7518,11 @@ var showNonEmpty = function(dictShow) {
   };
 };
 var functorNonEmpty = function(dictFunctor) {
-  var map26 = map(dictFunctor);
+  var map28 = map(dictFunctor);
   return {
     map: function(f3) {
       return function(m2) {
-        return new NonEmpty(f3(m2.value0), map26(f3)(m2.value1));
+        return new NonEmpty(f3(m2.value0), map28(f3)(m2.value1));
       };
     }
   };
@@ -7061,6 +7931,9 @@ var singleton4 = /* @__PURE__ */ function() {
     return NonEmptyList($199($200));
   };
 }();
+var head3 = function(v) {
+  return v.value0;
+};
 
 // output/Data.Nullable/foreign.js
 var nullImpl = null;
@@ -7087,11 +7960,11 @@ function fromCharCode(c) {
 
 // output/Control.Alternative/index.js
 var guard = function(dictAlternative) {
-  var pure15 = pure(dictAlternative.Applicative0());
+  var pure17 = pure(dictAlternative.Applicative0());
   var empty4 = empty(dictAlternative.Plus1());
   return function(v) {
     if (v) {
-      return pure15(unit);
+      return pure17(unit);
     }
     ;
     if (!v) {
@@ -7252,10 +8125,10 @@ var inj = function() {
   return function(dictIsSymbol) {
     var reflectSymbol2 = reflectSymbol(dictIsSymbol);
     return function(p) {
-      return function(value) {
+      return function(value2) {
         return {
           type: reflectSymbol2(p),
-          value
+          value: value2
         };
       };
     };
@@ -7288,20 +8161,20 @@ var unsafePerformEffect = function(f3) {
 };
 
 // output/Foreign/foreign.js
-function typeOf(value) {
-  return typeof value;
+function typeOf(value2) {
+  return typeof value2;
 }
-function tagOf(value) {
-  return Object.prototype.toString.call(value).slice(8, -1);
+function tagOf(value2) {
+  return Object.prototype.toString.call(value2).slice(8, -1);
 }
-function isNull(value) {
-  return value === null;
+function isNull(value2) {
+  return value2 === null;
 }
-function isUndefined(value) {
-  return value === void 0;
+function isUndefined(value2) {
+  return value2 === void 0;
 }
-var isArray = Array.isArray || function(value) {
-  return Object.prototype.toString.call(value) === "[object Array]";
+var isArray = Array.isArray || function(value2) {
+  return Object.prototype.toString.call(value2) === "[object Array]";
 };
 
 // output/Data.String.CodeUnits/foreign.js
@@ -7427,34 +8300,34 @@ var fail = function(dictMonad) {
   };
 };
 var readArray = function(dictMonad) {
-  var pure15 = pure(applicativeExceptT(dictMonad));
+  var pure17 = pure(applicativeExceptT(dictMonad));
   var fail1 = fail(dictMonad);
-  return function(value) {
-    if (isArray(value)) {
-      return pure15(unsafeFromForeign(value));
+  return function(value2) {
+    if (isArray(value2)) {
+      return pure17(unsafeFromForeign(value2));
     }
     ;
     if (otherwise) {
-      return fail1(new TypeMismatch("array", tagOf(value)));
+      return fail1(new TypeMismatch("array", tagOf(value2)));
     }
     ;
-    throw new Error("Failed pattern match at Foreign (line 164, column 1 - line 164, column 99): " + [value.constructor.name]);
+    throw new Error("Failed pattern match at Foreign (line 164, column 1 - line 164, column 99): " + [value2.constructor.name]);
   };
 };
 var unsafeReadTagged = function(dictMonad) {
-  var pure15 = pure(applicativeExceptT(dictMonad));
+  var pure17 = pure(applicativeExceptT(dictMonad));
   var fail1 = fail(dictMonad);
   return function(tag) {
-    return function(value) {
-      if (tagOf(value) === tag) {
-        return pure15(unsafeFromForeign(value));
+    return function(value2) {
+      if (tagOf(value2) === tag) {
+        return pure17(unsafeFromForeign(value2));
       }
       ;
       if (otherwise) {
-        return fail1(new TypeMismatch(tag, tagOf(value)));
+        return fail1(new TypeMismatch(tag, tagOf(value2)));
       }
       ;
-      throw new Error("Failed pattern match at Foreign (line 123, column 1 - line 123, column 104): " + [tag.constructor.name, value.constructor.name]);
+      throw new Error("Failed pattern match at Foreign (line 123, column 1 - line 123, column 104): " + [tag.constructor.name, value2.constructor.name]);
     };
   };
 };
@@ -7469,17 +8342,17 @@ var readString = function(dictMonad) {
 };
 
 // output/Foreign.Index/foreign.js
-function unsafeReadPropImpl(f3, s2, key, value) {
-  return value == null ? f3 : s2(value[key]);
+function unsafeReadPropImpl(f3, s2, key, value2) {
+  return value2 == null ? f3 : s2(value2[key]);
 }
 
 // output/Foreign.Index/index.js
 var unsafeReadProp = function(dictMonad) {
-  var fail5 = fail(dictMonad);
-  var pure15 = pure(applicativeExceptT(dictMonad));
+  var fail6 = fail(dictMonad);
+  var pure17 = pure(applicativeExceptT(dictMonad));
   return function(k) {
-    return function(value) {
-      return unsafeReadPropImpl(fail5(new TypeMismatch("object", typeOf(value))), pure15, k, value);
+    return function(value2) {
+      return unsafeReadPropImpl(fail6(new TypeMismatch("object", typeOf(value2))), pure17, k, value2);
     };
   };
 };
@@ -7521,7 +8394,7 @@ function _mapWithKey(m0, f3) {
   }
   return m2;
 }
-function _foldM(bind14) {
+function _foldM(bind15) {
   return function(f3) {
     return function(mz) {
       return function(m2) {
@@ -7533,7 +8406,7 @@ function _foldM(bind14) {
         }
         for (var k in m2) {
           if (hasOwnProperty.call(m2, k)) {
-            acc = bind14(acc)(g(k));
+            acc = bind15(acc)(g(k));
           }
         }
         return acc;
@@ -7562,6 +8435,15 @@ var keys = Object.keys || toArrayWithKey(function(k) {
 });
 
 // output/Data.Function.Uncurried/foreign.js
+var runFn3 = function(fn) {
+  return function(a) {
+    return function(b) {
+      return function(c) {
+        return fn(a, b, c);
+      };
+    };
+  };
+};
 var runFn4 = function(fn) {
   return function(a) {
     return function(b) {
@@ -7712,18 +8594,18 @@ var foldableWithIndexObject = {
 var traversableWithIndexObject = {
   traverseWithIndex: function(dictApplicative) {
     var Apply0 = dictApplicative.Apply0();
-    var apply4 = apply(Apply0);
-    var map26 = map(Apply0.Functor0());
-    var pure15 = pure(dictApplicative);
+    var apply5 = apply(Apply0);
+    var map28 = map(Apply0.Functor0());
+    var pure17 = pure(dictApplicative);
     return function(f3) {
       return function(ms) {
         return fold2(function(acc) {
           return function(k) {
             return function(v) {
-              return apply4(map26(flip(insert2(k)))(acc))(f3(k)(v));
+              return apply5(map28(flip(insert2(k)))(acc))(f3(k)(v));
             };
           };
-        })(pure15(empty2))(ms);
+        })(pure17(empty2))(ms);
       };
     };
   },
@@ -7921,7 +8803,7 @@ var writeForeignArray = function(dictWriteForeign) {
 };
 var writeImpl1 = /* @__PURE__ */ writeImpl(/* @__PURE__ */ writeForeignArray(writeForeignForeign));
 var writeForeignFieldsCons = function(dictIsSymbol) {
-  var get2 = get(dictIsSymbol)();
+  var get3 = get(dictIsSymbol)();
   var insert32 = insert5(dictIsSymbol);
   return function(dictWriteForeign) {
     var writeImpl32 = writeImpl(dictWriteForeign);
@@ -7934,8 +8816,8 @@ var writeForeignFieldsCons = function(dictIsSymbol) {
               writeImplFields: function(v) {
                 return function(rec) {
                   var rest = writeImplFields1($$Proxy.value)(rec);
-                  var value = writeImpl32(get2($$Proxy.value)(rec));
-                  var result = compose1(insert32($$Proxy.value)(value))(rest);
+                  var value2 = writeImpl32(get3($$Proxy.value)(rec));
+                  var result = compose1(insert32($$Proxy.value)(value2))(rest);
                   return result;
                 };
               }
@@ -7979,9 +8861,9 @@ var writeForeignVariantCons = function(dictIsSymbol) {
         return {
           writeVariantImpl: function(v) {
             return function(variant) {
-              var name2 = reflectSymbol2($$Proxy.value);
-              var writeVariant = function(value) {
-                return writeImpl2(singleton6(name2)(writeImpl32(value)));
+              var name3 = reflectSymbol2($$Proxy.value);
+              var writeVariant = function(value2) {
+                return writeImpl2(singleton6(name3)(writeImpl32(value2)));
               };
               return on1($$Proxy.value)(writeVariant)(writeVariantImpl1($$Proxy.value))(variant);
             };
@@ -8007,12 +8889,12 @@ var readForeignMaybe = function(dictReadForeign) {
   return {
     readImpl: function() {
       var readNullOrUndefined = function(v) {
-        return function(value) {
-          if (isNull(value) || isUndefined(value)) {
+        return function(value2) {
+          if (isNull(value2) || isUndefined(value2)) {
             return pure3(Nothing.value);
           }
           ;
-          return map12(Just.create)(v(value));
+          return map12(Just.create)(v(value2));
         };
       };
       return readNullOrUndefined(readImpl(dictReadForeign));
@@ -8022,16 +8904,16 @@ var readForeignMaybe = function(dictReadForeign) {
 var readForeignObject = function(dictReadForeign) {
   return {
     readImpl: function() {
-      var readObject$prime = function(value) {
-        if (tagOf(value) === "Object") {
-          return pure3(unsafeFromForeign(value));
+      var readObject$prime = function(value2) {
+        if (tagOf(value2) === "Object") {
+          return pure3(unsafeFromForeign(value2));
         }
         ;
         if (otherwise) {
-          return fail2(new TypeMismatch("Object", tagOf(value)));
+          return fail2(new TypeMismatch("Object", tagOf(value2)));
         }
         ;
-        throw new Error("Failed pattern match at Yoga.JSON (line 207, column 5 - line 207, column 47): " + [value.constructor.name]);
+        throw new Error("Failed pattern match at Yoga.JSON (line 207, column 5 - line 207, column 47): " + [value2.constructor.name]);
       };
       return composeKleisliFlipped2(function() {
         var $291 = mapWithKey($$const(readImpl(dictReadForeign)));
@@ -8101,10 +8983,10 @@ var readForeignFieldsCons = function(dictIsSymbol) {
             getFields: function(v) {
               return function(obj) {
                 var rest = getFields1($$Proxy.value)(obj);
-                var name2 = reflectSymbol2($$Proxy.value);
-                var withExcept$prime = withExcept(map22(ErrorAtProperty.create(name2)));
-                var value = withExcept$prime(bindFlipped3(readImpl22)(readProp2(name2)(obj)));
-                var first = map12(insert32($$Proxy.value))(value);
+                var name3 = reflectSymbol2($$Proxy.value);
+                var withExcept$prime = withExcept(map22(ErrorAtProperty.create(name3)));
+                var value2 = withExcept$prime(bindFlipped3(readImpl22)(readProp2(name3)(obj)));
+                var first = map12(insert32($$Proxy.value))(value2);
                 return apply3(map12(compose1)(first))(rest);
               };
             }
@@ -8410,14 +9292,14 @@ var genericEnumSumRepConstruc = function(dictIsSymbol) {
   var reflectSymbol2 = reflectSymbol(dictIsSymbol);
   return {
     genericEnumReadForeign: function(f3) {
-      var name2 = reflectSymbol2($$Proxy.value);
+      var name3 = reflectSymbol2($$Proxy.value);
       return bind3(readImpl3(f3))(function(s2) {
-        var $35 = s2 === name2;
+        var $35 = s2 === name3;
         if ($35) {
           return pure4(NoArguments.value);
         }
         ;
-        return fail3(ForeignError.create("Enum string " + (s2 + (" did not match expected string " + name2))));
+        return fail3(ForeignError.create("Enum string " + (s2 + (" did not match expected string " + name3))));
       });
     },
     genericEnumWriteForeign: function(v) {
@@ -8711,13 +9593,13 @@ var readGenericTaggedSumRepCo = function(dictIsSymbol) {
   return {
     genericReadForeignTaggedSumRep: function(v) {
       return function(f3) {
-        var name2 = v.toConstructorName(reflectSymbol2($$Proxy.value));
+        var name3 = v.toConstructorName(reflectSymbol2($$Proxy.value));
         return bind4(read$prime2(f3))(function(v1) {
           return bind4(maybe(fail4(new ErrorAtProperty(v.typeTag, new ForeignError("Missing type tag: " + v.typeTag))))(pure5)(lookup2(v.typeTag)(v1)))(function(typeFgn) {
             return bind4(read$prime1(typeFgn))(function(typeStr) {
-              var $78 = typeStr === name2;
+              var $78 = typeStr === name3;
               if ($78) {
-                return withExcept(map11(ErrorAtProperty.create(name2)))(pure5(NoArguments.value));
+                return withExcept(map11(ErrorAtProperty.create(name3)))(pure5(NoArguments.value));
               }
               ;
               return fail4(new ForeignError("Wrong type tag " + (typeStr + (" where " + (v.typeTag + " was expected.")))));
@@ -8748,8 +9630,8 @@ var writeGenericTaggedSumRepC = function(dictWriteGenericTaggedSumRep) {
     return {
       genericWriteForeignTaggedSumRep: function(v) {
         return function(v1) {
-          var name2 = v.toConstructorName(reflectSymbol2($$Proxy.value));
-          return write4(fromFoldable4([new Tuple(v.typeTag, write1(name2)), new Tuple(v.valueTag, genericWriteForeignTaggedSumRep1(v)(v1))]));
+          var name3 = v.toConstructorName(reflectSymbol2($$Proxy.value));
+          return write4(fromFoldable4([new Tuple(v.typeTag, write1(name3)), new Tuple(v.valueTag, genericWriteForeignTaggedSumRep1(v)(v1))]));
         };
       }
     };
@@ -8797,17 +9679,17 @@ var readGenericTaggedSumRepCo1 = function(dictReadGenericTaggedSumRep) {
     return {
       genericReadForeignTaggedSumRep: function(v) {
         return function(f3) {
-          var name2 = v.toConstructorName(reflectSymbol2($$Proxy.value));
+          var name3 = v.toConstructorName(reflectSymbol2($$Proxy.value));
           return bind4(read$prime2(f3))(function(v1) {
             return bind4(maybe(fail4(new ErrorAtProperty(v.typeTag, new ForeignError("Missing type tag: " + v.typeTag))))(pure5)(lookup2(v.typeTag)(v1)))(function(typeFgn) {
               return bind4(read$prime1(typeFgn))(function(typeStr) {
-                return bind4(maybe(fail4(new ErrorAtProperty(v.valueTag, new ForeignError("Missing value tag: " + v.valueTag))))(pure5)(lookup2(v.valueTag)(v1)))(function(value) {
-                  var $94 = typeStr === name2;
+                return bind4(maybe(fail4(new ErrorAtProperty(v.valueTag, new ForeignError("Missing value tag: " + v.valueTag))))(pure5)(lookup2(v.valueTag)(v1)))(function(value2) {
+                  var $94 = typeStr === name3;
                   if ($94) {
-                    return withExcept(map11(ErrorAtProperty.create(name2)))(map13(Constructor)(genericReadForeignTaggedSumRep1(v)(value)));
+                    return withExcept(map11(ErrorAtProperty.create(name3)))(map13(Constructor)(genericReadForeignTaggedSumRep1(v)(value2)));
                   }
                   ;
-                  return fail4(new ForeignError("Wrong constructor name tag " + (typeStr + (" where " + (name2 + " was expected.")))));
+                  return fail4(new ForeignError("Wrong constructor name tag " + (typeStr + (" where " + (name3 + " was expected.")))));
                 });
               });
             });
@@ -27652,13 +28534,13 @@ var asciiWords = /* @__PURE__ */ function() {
     return $22($23($24));
   };
 }();
-var words = function(string) {
-  var $13 = hasUnicodeWords(string);
+var words = function(string3) {
+  var $13 = hasUnicodeWords(string3);
   if ($13) {
-    return unicodeWords(string);
+    return unicodeWords(string3);
   }
   ;
-  return asciiWords(string);
+  return asciiWords(string3);
 };
 var kebabCase = /* @__PURE__ */ function() {
   var $25 = joinWith("-");
@@ -28601,30 +29483,30 @@ var Aff = function() {
     fn.tag = tag;
     return fn;
   }
-  function nonCanceler2(error5) {
+  function nonCanceler2(error6) {
     return new Aff2(PURE, void 0);
   }
   function runEff(eff) {
     try {
       eff();
-    } catch (error5) {
+    } catch (error6) {
       setTimeout(function() {
-        throw error5;
+        throw error6;
       }, 0);
     }
   }
   function runSync(left, right, eff) {
     try {
       return right(eff());
-    } catch (error5) {
-      return left(error5);
+    } catch (error6) {
+      return left(error6);
     }
   }
   function runAsync(left, eff, k) {
     try {
       return eff(k)();
-    } catch (error5) {
-      k(left(error5))();
+    } catch (error6) {
+      k(left(error6))();
       return nonCanceler2;
     }
   }
@@ -28665,7 +29547,7 @@ var Aff = function() {
       }
     };
   }();
-  function Supervisor(util2) {
+  function Supervisor(util) {
     var fibers = {};
     var fiberId = 0;
     var count = 0;
@@ -28699,9 +29581,9 @@ var Aff = function() {
               return function() {
                 delete kills[fid];
                 killCount--;
-                if (util2.isLeft(result) && util2.fromLeft(result)) {
+                if (util.isLeft(result) && util.fromLeft(result)) {
                   setTimeout(function() {
-                    throw util2.fromLeft(result);
+                    throw util.fromLeft(result);
                   }, 0);
                 }
                 if (killCount === 0) {
@@ -28719,7 +29601,7 @@ var Aff = function() {
           fibers = {};
           fiberId = 0;
           count = 0;
-          return function(error5) {
+          return function(error6) {
             return new Aff2(SYNC, function() {
               for (var k2 in kills) {
                 if (kills.hasOwnProperty(k2)) {
@@ -28739,11 +29621,11 @@ var Aff = function() {
   var PENDING = 4;
   var RETURN = 5;
   var COMPLETED = 6;
-  function Fiber(util2, supervisor, aff) {
+  function Fiber(util, supervisor, aff) {
     var runTick = 0;
     var status = SUSPENDED;
     var step2 = aff;
-    var fail5 = null;
+    var fail6 = null;
     var interrupt = null;
     var bhead = null;
     var btail = null;
@@ -28771,20 +29653,20 @@ var Aff = function() {
               }
             } catch (e2) {
               status = RETURN;
-              fail5 = util2.left(e2);
+              fail6 = util.left(e2);
               step2 = null;
             }
             break;
           case STEP_RESULT:
-            if (util2.isLeft(step2)) {
+            if (util.isLeft(step2)) {
               status = RETURN;
-              fail5 = step2;
+              fail6 = step2;
               step2 = null;
             } else if (bhead === null) {
               status = RETURN;
             } else {
               status = STEP_BIND;
-              step2 = util2.fromRight(step2);
+              step2 = util.fromRight(step2);
             }
             break;
           case CONTINUE:
@@ -28800,7 +29682,7 @@ var Aff = function() {
               case PURE:
                 if (bhead === null) {
                   status = RETURN;
-                  step2 = util2.right(step2._1);
+                  step2 = util.right(step2._1);
                 } else {
                   status = STEP_BIND;
                   step2 = step2._1;
@@ -28808,11 +29690,11 @@ var Aff = function() {
                 break;
               case SYNC:
                 status = STEP_RESULT;
-                step2 = runSync(util2.left, util2.right, step2._1);
+                step2 = runSync(util.left, util.right, step2._1);
                 break;
               case ASYNC:
                 status = PENDING;
-                step2 = runAsync(util2.left, step2._1, function(result2) {
+                step2 = runAsync(util.left, step2._1, function(result2) {
                   return function() {
                     if (runTick !== localRunTick) {
                       return;
@@ -28831,7 +29713,7 @@ var Aff = function() {
                 return;
               case THROW:
                 status = RETURN;
-                fail5 = util2.left(step2._1);
+                fail6 = util.left(step2._1);
                 step2 = null;
                 break;
               case CATCH:
@@ -28859,18 +29741,18 @@ var Aff = function() {
                 break;
               case FORK:
                 status = STEP_RESULT;
-                tmp = Fiber(util2, supervisor, step2._2);
+                tmp = Fiber(util, supervisor, step2._2);
                 if (supervisor) {
                   supervisor.register(tmp);
                 }
                 if (step2._1) {
                   tmp.run();
                 }
-                step2 = util2.right(tmp);
+                step2 = util.right(tmp);
                 break;
               case SEQ:
                 status = CONTINUE;
-                step2 = sequential2(util2, supervisor, step2._1);
+                step2 = sequential2(util, supervisor, step2._1);
                 break;
             }
             break;
@@ -28879,7 +29761,7 @@ var Aff = function() {
             btail = null;
             if (attempts === null) {
               status = COMPLETED;
-              step2 = interrupt || fail5 || step2;
+              step2 = interrupt || fail6 || step2;
             } else {
               tmp = attempts._3;
               attempt2 = attempts._1;
@@ -28888,26 +29770,26 @@ var Aff = function() {
                 case CATCH:
                   if (interrupt && interrupt !== tmp && bracketCount === 0) {
                     status = RETURN;
-                  } else if (fail5) {
+                  } else if (fail6) {
                     status = CONTINUE;
-                    step2 = attempt2._2(util2.fromLeft(fail5));
-                    fail5 = null;
+                    step2 = attempt2._2(util.fromLeft(fail6));
+                    fail6 = null;
                   }
                   break;
                 case RESUME:
-                  if (interrupt && interrupt !== tmp && bracketCount === 0 || fail5) {
+                  if (interrupt && interrupt !== tmp && bracketCount === 0 || fail6) {
                     status = RETURN;
                   } else {
                     bhead = attempt2._1;
                     btail = attempt2._2;
                     status = STEP_BIND;
-                    step2 = util2.fromRight(step2);
+                    step2 = util.fromRight(step2);
                   }
                   break;
                 case BRACKET:
                   bracketCount--;
-                  if (fail5 === null) {
-                    result = util2.fromRight(step2);
+                  if (fail6 === null) {
+                    result = util.fromRight(step2);
                     attempts = new Aff2(CONS, new Aff2(RELEASE, attempt2._2, result), attempts, tmp);
                     if (interrupt === tmp || bracketCount > 0) {
                       status = CONTINUE;
@@ -28916,21 +29798,21 @@ var Aff = function() {
                   }
                   break;
                 case RELEASE:
-                  attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail5), attempts, interrupt);
+                  attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail6), attempts, interrupt);
                   status = CONTINUE;
                   if (interrupt && interrupt !== tmp && bracketCount === 0) {
-                    step2 = attempt2._1.killed(util2.fromLeft(interrupt))(attempt2._2);
-                  } else if (fail5) {
-                    step2 = attempt2._1.failed(util2.fromLeft(fail5))(attempt2._2);
+                    step2 = attempt2._1.killed(util.fromLeft(interrupt))(attempt2._2);
+                  } else if (fail6) {
+                    step2 = attempt2._1.failed(util.fromLeft(fail6))(attempt2._2);
                   } else {
-                    step2 = attempt2._1.completed(util2.fromRight(step2))(attempt2._2);
+                    step2 = attempt2._1.completed(util.fromRight(step2))(attempt2._2);
                   }
-                  fail5 = null;
+                  fail6 = null;
                   bracketCount++;
                   break;
                 case FINALIZER:
                   bracketCount++;
-                  attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail5), attempts, interrupt);
+                  attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail6), attempts, interrupt);
                   status = CONTINUE;
                   step2 = attempt2._1;
                   break;
@@ -28938,7 +29820,7 @@ var Aff = function() {
                   bracketCount--;
                   status = RETURN;
                   step2 = attempt2._1;
-                  fail5 = attempt2._2;
+                  fail6 = attempt2._2;
                   break;
               }
             }
@@ -28951,14 +29833,14 @@ var Aff = function() {
               }
             }
             joins = null;
-            if (interrupt && fail5) {
+            if (interrupt && fail6) {
               setTimeout(function() {
-                throw util2.fromLeft(fail5);
+                throw util.fromLeft(fail6);
               }, 0);
-            } else if (util2.isLeft(step2) && rethrow) {
+            } else if (util.isLeft(step2) && rethrow) {
               setTimeout(function() {
                 if (rethrow) {
-                  throw util2.fromLeft(step2);
+                  throw util.fromLeft(step2);
                 }
               }, 0);
             }
@@ -28989,48 +29871,48 @@ var Aff = function() {
         };
       };
     }
-    function kill2(error5, cb) {
+    function kill2(error6, cb) {
       return function() {
         if (status === COMPLETED) {
-          cb(util2.right(void 0))();
+          cb(util.right(void 0))();
           return function() {
           };
         }
         var canceler = onComplete({
           rethrow: false,
           handler: function() {
-            return cb(util2.right(void 0));
+            return cb(util.right(void 0));
           }
         })();
         switch (status) {
           case SUSPENDED:
-            interrupt = util2.left(error5);
+            interrupt = util.left(error6);
             status = COMPLETED;
             step2 = interrupt;
             run3(runTick);
             break;
           case PENDING:
             if (interrupt === null) {
-              interrupt = util2.left(error5);
+              interrupt = util.left(error6);
             }
             if (bracketCount === 0) {
               if (status === PENDING) {
-                attempts = new Aff2(CONS, new Aff2(FINALIZER, step2(error5)), attempts, interrupt);
+                attempts = new Aff2(CONS, new Aff2(FINALIZER, step2(error6)), attempts, interrupt);
               }
               status = RETURN;
               step2 = null;
-              fail5 = null;
+              fail6 = null;
               run3(++runTick);
             }
             break;
           default:
             if (interrupt === null) {
-              interrupt = util2.left(error5);
+              interrupt = util.left(error6);
             }
             if (bracketCount === 0) {
               status = RETURN;
               step2 = null;
-              fail5 = null;
+              fail6 = null;
             }
         }
         return canceler;
@@ -29068,7 +29950,7 @@ var Aff = function() {
       }
     };
   }
-  function runPar(util2, supervisor, par, cb) {
+  function runPar(util, supervisor, par, cb) {
     var fiberId = 0;
     var fibers = {};
     var killId = 0;
@@ -29076,9 +29958,9 @@ var Aff = function() {
     var early = new Error("[ParAff] Early exit");
     var interrupt = null;
     var root = EMPTY;
-    function kill2(error5, par2, cb2) {
+    function kill2(error6, par2, cb2) {
       var step2 = par2;
-      var head4 = null;
+      var head5 = null;
       var tail2 = null;
       var count = 0;
       var kills2 = {};
@@ -29090,7 +29972,7 @@ var Aff = function() {
             case FORKED:
               if (step2._3 === EMPTY) {
                 tmp = fibers[step2._1];
-                kills2[count++] = tmp.kill(error5, function(result) {
+                kills2[count++] = tmp.kill(error6, function(result) {
                   return function() {
                     count--;
                     if (count === 0) {
@@ -29099,14 +29981,14 @@ var Aff = function() {
                   };
                 });
               }
-              if (head4 === null) {
+              if (head5 === null) {
                 break loop;
               }
-              step2 = head4._2;
+              step2 = head5._2;
               if (tail2 === null) {
-                head4 = null;
+                head5 = null;
               } else {
-                head4 = tail2._1;
+                head5 = tail2._1;
                 tail2 = tail2._2;
               }
               break;
@@ -29115,16 +29997,16 @@ var Aff = function() {
               break;
             case APPLY:
             case ALT:
-              if (head4) {
-                tail2 = new Aff2(CONS, head4, tail2);
+              if (head5) {
+                tail2 = new Aff2(CONS, head5, tail2);
               }
-              head4 = step2;
+              head5 = step2;
               step2 = step2._1;
               break;
           }
         }
       if (count === 0) {
-        cb2(util2.right(void 0))();
+        cb2(util.right(void 0))();
       } else {
         kid = 0;
         tmp = count;
@@ -29134,14 +30016,14 @@ var Aff = function() {
       }
       return kills2;
     }
-    function join3(result, head4, tail2) {
-      var fail5, step2, lhs, rhs, tmp, kid;
-      if (util2.isLeft(result)) {
-        fail5 = result;
+    function join3(result, head5, tail2) {
+      var fail6, step2, lhs, rhs, tmp, kid;
+      if (util.isLeft(result)) {
+        fail6 = result;
         step2 = null;
       } else {
         step2 = result;
-        fail5 = null;
+        fail6 = null;
       }
       loop:
         while (true) {
@@ -29152,38 +30034,38 @@ var Aff = function() {
           if (interrupt !== null) {
             return;
           }
-          if (head4 === null) {
-            cb(fail5 || step2)();
+          if (head5 === null) {
+            cb(fail6 || step2)();
             return;
           }
-          if (head4._3 !== EMPTY) {
+          if (head5._3 !== EMPTY) {
             return;
           }
-          switch (head4.tag) {
+          switch (head5.tag) {
             case MAP:
-              if (fail5 === null) {
-                head4._3 = util2.right(head4._1(util2.fromRight(step2)));
-                step2 = head4._3;
+              if (fail6 === null) {
+                head5._3 = util.right(head5._1(util.fromRight(step2)));
+                step2 = head5._3;
               } else {
-                head4._3 = fail5;
+                head5._3 = fail6;
               }
               break;
             case APPLY:
-              lhs = head4._1._3;
-              rhs = head4._2._3;
-              if (fail5) {
-                head4._3 = fail5;
+              lhs = head5._1._3;
+              rhs = head5._2._3;
+              if (fail6) {
+                head5._3 = fail6;
                 tmp = true;
                 kid = killId++;
-                kills[kid] = kill2(early, fail5 === lhs ? head4._2 : head4._1, function() {
+                kills[kid] = kill2(early, fail6 === lhs ? head5._2 : head5._1, function() {
                   return function() {
                     delete kills[kid];
                     if (tmp) {
                       tmp = false;
                     } else if (tail2 === null) {
-                      join3(fail5, null, null);
+                      join3(fail6, null, null);
                     } else {
-                      join3(fail5, tail2._1, tail2._2);
+                      join3(fail6, tail2._1, tail2._2);
                     }
                   };
                 });
@@ -29194,25 +30076,25 @@ var Aff = function() {
               } else if (lhs === EMPTY || rhs === EMPTY) {
                 return;
               } else {
-                step2 = util2.right(util2.fromRight(lhs)(util2.fromRight(rhs)));
-                head4._3 = step2;
+                step2 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
+                head5._3 = step2;
               }
               break;
             case ALT:
-              lhs = head4._1._3;
-              rhs = head4._2._3;
-              if (lhs === EMPTY && util2.isLeft(rhs) || rhs === EMPTY && util2.isLeft(lhs)) {
+              lhs = head5._1._3;
+              rhs = head5._2._3;
+              if (lhs === EMPTY && util.isLeft(rhs) || rhs === EMPTY && util.isLeft(lhs)) {
                 return;
               }
-              if (lhs !== EMPTY && util2.isLeft(lhs) && rhs !== EMPTY && util2.isLeft(rhs)) {
-                fail5 = step2 === lhs ? rhs : lhs;
+              if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
+                fail6 = step2 === lhs ? rhs : lhs;
                 step2 = null;
-                head4._3 = fail5;
+                head5._3 = fail6;
               } else {
-                head4._3 = step2;
+                head5._3 = step2;
                 tmp = true;
                 kid = killId++;
-                kills[kid] = kill2(early, step2 === lhs ? head4._2 : head4._1, function() {
+                kills[kid] = kill2(early, step2 === lhs ? head5._2 : head5._1, function() {
                   return function() {
                     delete kills[kid];
                     if (tmp) {
@@ -29232,9 +30114,9 @@ var Aff = function() {
               break;
           }
           if (tail2 === null) {
-            head4 = null;
+            head5 = null;
           } else {
-            head4 = tail2._1;
+            head5 = tail2._1;
             tail2 = tail2._2;
           }
         }
@@ -29251,7 +30133,7 @@ var Aff = function() {
     function run3() {
       var status = CONTINUE;
       var step2 = par;
-      var head4 = null;
+      var head5 = null;
       var tail2 = null;
       var tmp, fid;
       loop:
@@ -29262,32 +30144,32 @@ var Aff = function() {
             case CONTINUE:
               switch (step2.tag) {
                 case MAP:
-                  if (head4) {
-                    tail2 = new Aff2(CONS, head4, tail2);
+                  if (head5) {
+                    tail2 = new Aff2(CONS, head5, tail2);
                   }
-                  head4 = new Aff2(MAP, step2._1, EMPTY, EMPTY);
+                  head5 = new Aff2(MAP, step2._1, EMPTY, EMPTY);
                   step2 = step2._2;
                   break;
                 case APPLY:
-                  if (head4) {
-                    tail2 = new Aff2(CONS, head4, tail2);
+                  if (head5) {
+                    tail2 = new Aff2(CONS, head5, tail2);
                   }
-                  head4 = new Aff2(APPLY, EMPTY, step2._2, EMPTY);
+                  head5 = new Aff2(APPLY, EMPTY, step2._2, EMPTY);
                   step2 = step2._1;
                   break;
                 case ALT:
-                  if (head4) {
-                    tail2 = new Aff2(CONS, head4, tail2);
+                  if (head5) {
+                    tail2 = new Aff2(CONS, head5, tail2);
                   }
-                  head4 = new Aff2(ALT, EMPTY, step2._2, EMPTY);
+                  head5 = new Aff2(ALT, EMPTY, step2._2, EMPTY);
                   step2 = step2._1;
                   break;
                 default:
                   fid = fiberId++;
                   status = RETURN;
                   tmp = step2;
-                  step2 = new Aff2(FORKED, fid, new Aff2(CONS, head4, tail2), EMPTY);
-                  tmp = Fiber(util2, supervisor, tmp);
+                  step2 = new Aff2(FORKED, fid, new Aff2(CONS, head5, tail2), EMPTY);
+                  tmp = Fiber(util, supervisor, tmp);
                   tmp.onComplete({
                     rethrow: false,
                     handler: resolve2(step2)
@@ -29299,21 +30181,21 @@ var Aff = function() {
               }
               break;
             case RETURN:
-              if (head4 === null) {
+              if (head5 === null) {
                 break loop;
               }
-              if (head4._1 === EMPTY) {
-                head4._1 = step2;
+              if (head5._1 === EMPTY) {
+                head5._1 = step2;
                 status = CONTINUE;
-                step2 = head4._2;
-                head4._2 = EMPTY;
+                step2 = head5._2;
+                head5._2 = EMPTY;
               } else {
-                head4._2 = step2;
-                step2 = head4;
+                head5._2 = step2;
+                step2 = head5;
                 if (tail2 === null) {
-                  head4 = null;
+                  head5 = null;
                 } else {
-                  head4 = tail2._1;
+                  head5 = tail2._1;
                   tail2 = tail2._2;
                 }
               }
@@ -29324,8 +30206,8 @@ var Aff = function() {
         fibers[fid].run();
       }
     }
-    function cancel(error5, cb2) {
-      interrupt = util2.left(error5);
+    function cancel(error6, cb2) {
+      interrupt = util.left(error6);
       var innerKills;
       for (var kid in kills) {
         if (kills.hasOwnProperty(kid)) {
@@ -29338,7 +30220,7 @@ var Aff = function() {
         }
       }
       kills = null;
-      var newKills = kill2(error5, root, cb2);
+      var newKills = kill2(error6, root, cb2);
       return function(killError) {
         return new Aff2(ASYNC, function(killCb) {
           return function() {
@@ -29361,10 +30243,10 @@ var Aff = function() {
       });
     };
   }
-  function sequential2(util2, supervisor, par) {
+  function sequential2(util, supervisor, par) {
     return new Aff2(ASYNC, function(cb) {
       return function() {
-        return runPar(util2, supervisor, par, cb);
+        return runPar(util, supervisor, par, cb);
       };
     });
   }
@@ -29399,8 +30281,8 @@ function _map(f3) {
     if (aff.tag === Aff.Pure.tag) {
       return Aff.Pure(f3(aff._1));
     } else {
-      return Aff.Bind(aff, function(value) {
-        return Aff.Pure(f3(value));
+      return Aff.Bind(aff, function(value2) {
+        return Aff.Pure(f3(value2));
       });
     }
   };
@@ -29422,9 +30304,9 @@ function _parAffApply(aff1) {
   };
 }
 var makeAff = Aff.Async;
-function _makeFiber(util2, aff) {
+function _makeFiber(util, aff) {
   return function() {
-    return Aff.Fiber(util2, null, aff);
+    return Aff.Fiber(util, null, aff);
   };
 }
 var _delay = function() {
@@ -29491,14 +30373,14 @@ var parSequence_ = function(dictParallel) {
 };
 
 // output/Effect.Aff/index.js
-var $runtime_lazy3 = function(name2, moduleName, init3) {
+var $runtime_lazy3 = function(name3, moduleName, init3) {
   var state2 = 0;
   var val;
   return function(lineNumber) {
     if (state2 === 2)
       return val;
     if (state2 === 1)
-      throw new ReferenceError(name2 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
+      throw new ReferenceError(name3 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
     state2 = 1;
     val = init3();
     state2 = 2;
@@ -30432,11 +31314,11 @@ var Pipe = /* @__PURE__ */ function() {
   return Pipe2;
 }();
 var Ignore = /* @__PURE__ */ function() {
-  function Ignore2() {
+  function Ignore3() {
   }
   ;
-  Ignore2.value = new Ignore2();
-  return Ignore2;
+  Ignore3.value = new Ignore3();
+  return Ignore3;
 }();
 var ShareStream = /* @__PURE__ */ function() {
   function ShareStream2(value0) {
@@ -30641,11 +31523,11 @@ function copyAll(a) {
   };
 }
 function writeInternal(ty) {
-  return (value) => {
+  return (value2) => {
     return (offset) => {
       return (buf) => {
         return () => {
-          buf["write" + ty](value, offset);
+          buf["write" + ty](value2, offset);
         };
       };
     };
@@ -30654,21 +31536,21 @@ function writeInternal(ty) {
 function writeStringInternal(encoding) {
   return (offset) => {
     return (length4) => {
-      return (value) => {
+      return (value2) => {
         return (buff) => {
           return () => {
-            return buff.write(value, offset, length4, encoding);
+            return buff.write(value2, offset, length4, encoding);
           };
         };
       };
     };
   };
 }
-function setAtOffset(value) {
+function setAtOffset(value2) {
   return (offset) => {
     return (buff) => {
       return () => {
-        buff[offset] = value;
+        buff[offset] = value2;
       };
     };
   };
@@ -30988,11 +31870,11 @@ var unsafeFreeze2 = function(dictMonad) {
   };
 };
 var usingFromImmutable = function(dictMonad) {
-  var map26 = map(dictMonad.Bind1().Apply0().Functor0());
+  var map28 = map(dictMonad.Bind1().Apply0().Functor0());
   var unsafeFreeze1 = unsafeFreeze2(dictMonad);
   return function(f3) {
     return function(buf) {
-      return map26(f3)(unsafeFreeze1(buf));
+      return map28(f3)(unsafeFreeze1(buf));
     };
   };
 };
@@ -31166,8 +32048,8 @@ var spawn$prime = function(encoding) {
             var process4 = spawn2(v.cmd)(v.args)(options)();
             (function() {
               if (v.stdin instanceof Just) {
-                var write9 = stdin(process4);
-                return $$void5(writeString3(write9)(UTF8.value)(v.stdin.value0)($$const(end(write9)(mempty2))))();
+                var write8 = stdin(process4);
+                return $$void5(writeString3(write8)(UTF8.value)(v.stdin.value0)($$const(end(write8)(mempty2))))();
               }
               ;
               if (v.stdin instanceof Nothing) {
@@ -31176,14 +32058,14 @@ var spawn$prime = function(encoding) {
               ;
               throw new Error("Failed pattern match at Sunde (line 41, column 3 - line 46, column 25): " + [v.stdin.constructor.name]);
             })();
-            onDataString(stdout(process4))(encoding)(function(string) {
+            onDataString(stdout(process4))(encoding)(function(string3) {
               return modify_(function(v1) {
-                return v1 + string;
+                return v1 + string3;
               })(stdoutRef);
             })();
-            onDataString(stderr(process4))(encoding)(function(string) {
+            onDataString(stderr(process4))(encoding)(function(string3) {
               return modify_(function(v1) {
-                return v1 + string;
+                return v1 + string3;
               })(stderrRef);
             })();
             onError(process4)(function($23) {
@@ -31381,11 +32263,11 @@ var operatingSystem\u0294 = /* @__PURE__ */ bind(bindMaybe)(platform)(function(v
 // output/Node.FS.Async/foreign.js
 var import_fs = require("fs");
 function handleCallbackImpl(left, right, f3) {
-  return function(err, value) {
+  return function(err, value2) {
     if (err) {
       f3(left(err))();
     } else {
-      f3(right(value))();
+      f3(right(value2))();
     }
   };
 }
@@ -31532,6 +32414,966 @@ var readSolutionDefinition = function(dir) {
   });
 };
 
+// output/Affjax/foreign.js
+function _ajax(platformSpecificDriver, timeoutErrorMessageIdent, requestFailedMessageIdent, mkHeader, options) {
+  return function(errback, callback) {
+    var xhr = platformSpecificDriver.newXHR();
+    var fixedUrl = platformSpecificDriver.fixupUrl(options.url, xhr);
+    xhr.open(options.method || "GET", fixedUrl, true, options.username, options.password);
+    if (options.headers) {
+      try {
+        for (var i2 = 0, header; (header = options.headers[i2]) != null; i2++) {
+          xhr.setRequestHeader(header.field, header.value);
+        }
+      } catch (e2) {
+        errback(e2);
+      }
+    }
+    var onerror = function(msgIdent) {
+      return function() {
+        errback(new Error(msgIdent));
+      };
+    };
+    xhr.onerror = onerror(requestFailedMessageIdent);
+    xhr.ontimeout = onerror(timeoutErrorMessageIdent);
+    xhr.onload = function() {
+      callback({
+        status: xhr.status,
+        statusText: xhr.statusText,
+        headers: xhr.getAllResponseHeaders().split("\r\n").filter(function(header2) {
+          return header2.length > 0;
+        }).map(function(header2) {
+          var i3 = header2.indexOf(":");
+          return mkHeader(header2.substring(0, i3))(header2.substring(i3 + 2));
+        }),
+        body: xhr.response
+      });
+    };
+    xhr.responseType = options.responseType;
+    xhr.withCredentials = options.withCredentials;
+    xhr.timeout = options.timeout;
+    xhr.send(options.content);
+    return function(error6, cancelErrback, cancelCallback) {
+      try {
+        xhr.abort();
+      } catch (e2) {
+        return cancelErrback(e2);
+      }
+      return cancelCallback();
+    };
+  };
+}
+
+// output/Data.MediaType.Common/index.js
+var applicationJSON = "application/json";
+var applicationFormURLEncoded = "application/x-www-form-urlencoded";
+
+// output/Affjax.RequestBody/index.js
+var ArrayView = /* @__PURE__ */ function() {
+  function ArrayView2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  ArrayView2.create = function(value0) {
+    return new ArrayView2(value0);
+  };
+  return ArrayView2;
+}();
+var Blob = /* @__PURE__ */ function() {
+  function Blob5(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Blob5.create = function(value0) {
+    return new Blob5(value0);
+  };
+  return Blob5;
+}();
+var Document = /* @__PURE__ */ function() {
+  function Document3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Document3.create = function(value0) {
+    return new Document3(value0);
+  };
+  return Document3;
+}();
+var $$String = /* @__PURE__ */ function() {
+  function $$String3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  $$String3.create = function(value0) {
+    return new $$String3(value0);
+  };
+  return $$String3;
+}();
+var FormData = /* @__PURE__ */ function() {
+  function FormData4(value0) {
+    this.value0 = value0;
+  }
+  ;
+  FormData4.create = function(value0) {
+    return new FormData4(value0);
+  };
+  return FormData4;
+}();
+var FormURLEncoded = /* @__PURE__ */ function() {
+  function FormURLEncoded2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  FormURLEncoded2.create = function(value0) {
+    return new FormURLEncoded2(value0);
+  };
+  return FormURLEncoded2;
+}();
+var Json = /* @__PURE__ */ function() {
+  function Json3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Json3.create = function(value0) {
+    return new Json3(value0);
+  };
+  return Json3;
+}();
+var toMediaType = function(v) {
+  if (v instanceof FormURLEncoded) {
+    return new Just(applicationFormURLEncoded);
+  }
+  ;
+  if (v instanceof Json) {
+    return new Just(applicationJSON);
+  }
+  ;
+  return Nothing.value;
+};
+var string = /* @__PURE__ */ function() {
+  return $$String.create;
+}();
+
+// output/Affjax.RequestHeader/index.js
+var unwrap3 = /* @__PURE__ */ unwrap();
+var Accept = /* @__PURE__ */ function() {
+  function Accept2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Accept2.create = function(value0) {
+    return new Accept2(value0);
+  };
+  return Accept2;
+}();
+var ContentType = /* @__PURE__ */ function() {
+  function ContentType2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  ContentType2.create = function(value0) {
+    return new ContentType2(value0);
+  };
+  return ContentType2;
+}();
+var RequestHeader = /* @__PURE__ */ function() {
+  function RequestHeader2(value0, value1) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+  ;
+  RequestHeader2.create = function(value0) {
+    return function(value1) {
+      return new RequestHeader2(value0, value1);
+    };
+  };
+  return RequestHeader2;
+}();
+var value = function(v) {
+  if (v instanceof Accept) {
+    return unwrap3(v.value0);
+  }
+  ;
+  if (v instanceof ContentType) {
+    return unwrap3(v.value0);
+  }
+  ;
+  if (v instanceof RequestHeader) {
+    return v.value1;
+  }
+  ;
+  throw new Error("Failed pattern match at Affjax.RequestHeader (line 26, column 1 - line 26, column 33): " + [v.constructor.name]);
+};
+var name2 = function(v) {
+  if (v instanceof Accept) {
+    return "Accept";
+  }
+  ;
+  if (v instanceof ContentType) {
+    return "Content-Type";
+  }
+  ;
+  if (v instanceof RequestHeader) {
+    return v.value0;
+  }
+  ;
+  throw new Error("Failed pattern match at Affjax.RequestHeader (line 21, column 1 - line 21, column 32): " + [v.constructor.name]);
+};
+
+// output/Affjax.ResponseFormat/index.js
+var identity11 = /* @__PURE__ */ identity(categoryFn);
+var $$ArrayBuffer = /* @__PURE__ */ function() {
+  function $$ArrayBuffer2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  $$ArrayBuffer2.create = function(value0) {
+    return new $$ArrayBuffer2(value0);
+  };
+  return $$ArrayBuffer2;
+}();
+var Blob2 = /* @__PURE__ */ function() {
+  function Blob5(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Blob5.create = function(value0) {
+    return new Blob5(value0);
+  };
+  return Blob5;
+}();
+var Document2 = /* @__PURE__ */ function() {
+  function Document3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Document3.create = function(value0) {
+    return new Document3(value0);
+  };
+  return Document3;
+}();
+var Json2 = /* @__PURE__ */ function() {
+  function Json3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Json3.create = function(value0) {
+    return new Json3(value0);
+  };
+  return Json3;
+}();
+var $$String2 = /* @__PURE__ */ function() {
+  function $$String3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  $$String3.create = function(value0) {
+    return new $$String3(value0);
+  };
+  return $$String3;
+}();
+var Ignore2 = /* @__PURE__ */ function() {
+  function Ignore3(value0) {
+    this.value0 = value0;
+  }
+  ;
+  Ignore3.create = function(value0) {
+    return new Ignore3(value0);
+  };
+  return Ignore3;
+}();
+var toResponseType = function(v) {
+  if (v instanceof $$ArrayBuffer) {
+    return "arraybuffer";
+  }
+  ;
+  if (v instanceof Blob2) {
+    return "blob";
+  }
+  ;
+  if (v instanceof Document2) {
+    return "document";
+  }
+  ;
+  if (v instanceof Json2) {
+    return "text";
+  }
+  ;
+  if (v instanceof $$String2) {
+    return "text";
+  }
+  ;
+  if (v instanceof Ignore2) {
+    return "";
+  }
+  ;
+  throw new Error("Failed pattern match at Affjax.ResponseFormat (line 44, column 3 - line 50, column 19): " + [v.constructor.name]);
+};
+var toMediaType2 = function(v) {
+  if (v instanceof Json2) {
+    return new Just(applicationJSON);
+  }
+  ;
+  return Nothing.value;
+};
+var string2 = /* @__PURE__ */ function() {
+  return new $$String2(identity11);
+}();
+var ignore = /* @__PURE__ */ function() {
+  return new Ignore2(identity11);
+}();
+
+// output/Affjax.ResponseHeader/index.js
+var ResponseHeader = /* @__PURE__ */ function() {
+  function ResponseHeader2(value0, value1) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+  ;
+  ResponseHeader2.create = function(value0) {
+    return function(value1) {
+      return new ResponseHeader2(value0, value1);
+    };
+  };
+  return ResponseHeader2;
+}();
+
+// output/Data.Argonaut.Core/foreign.js
+function id(x2) {
+  return x2;
+}
+function stringify(j) {
+  return JSON.stringify(j);
+}
+
+// output/Data.Argonaut.Core/index.js
+var jsonEmptyObject = /* @__PURE__ */ id(empty2);
+
+// output/Data.Argonaut.Parser/foreign.js
+function _jsonParser(fail6, succ2, s2) {
+  try {
+    return succ2(JSON.parse(s2));
+  } catch (e2) {
+    return fail6(e2.message);
+  }
+}
+
+// output/Data.Argonaut.Parser/index.js
+var jsonParser = function(j) {
+  return _jsonParser(Left.create, Right.create, j);
+};
+
+// output/JSURI/foreign.js
+function toRFC3896(input) {
+  return input.replace(/[!'()*]/g, function(c) {
+    return "%" + c.charCodeAt(0).toString(16);
+  });
+}
+var _encodeFormURLComponent = function encode(fail6, succeed, input) {
+  try {
+    return succeed(toRFC3896(encodeURIComponent(input)).replace(/%20/g, "+"));
+  } catch (err) {
+    return fail6(err);
+  }
+};
+
+// output/JSURI/index.js
+var encodeFormURLComponent = /* @__PURE__ */ function() {
+  return runFn3(_encodeFormURLComponent)($$const(Nothing.value))(Just.create);
+}();
+
+// output/Data.FormURLEncoded/index.js
+var apply4 = /* @__PURE__ */ apply(applyMaybe);
+var map19 = /* @__PURE__ */ map(functorMaybe);
+var traverse3 = /* @__PURE__ */ traverse(traversableArray)(applicativeMaybe);
+var toArray5 = function(v) {
+  return v;
+};
+var encode2 = /* @__PURE__ */ function() {
+  var encodePart = function(v) {
+    if (v.value1 instanceof Nothing) {
+      return encodeFormURLComponent(v.value0);
+    }
+    ;
+    if (v.value1 instanceof Just) {
+      return apply4(map19(function(key) {
+        return function(val) {
+          return key + ("=" + val);
+        };
+      })(encodeFormURLComponent(v.value0)))(encodeFormURLComponent(v.value1.value0));
+    }
+    ;
+    throw new Error("Failed pattern match at Data.FormURLEncoded (line 37, column 16 - line 39, column 114): " + [v.constructor.name]);
+  };
+  var $37 = map19(joinWith("&"));
+  var $38 = traverse3(encodePart);
+  return function($39) {
+    return $37($38(toArray5($39)));
+  };
+}();
+
+// output/Data.HTTP.Method/index.js
+var OPTIONS = /* @__PURE__ */ function() {
+  function OPTIONS2() {
+  }
+  ;
+  OPTIONS2.value = new OPTIONS2();
+  return OPTIONS2;
+}();
+var GET = /* @__PURE__ */ function() {
+  function GET2() {
+  }
+  ;
+  GET2.value = new GET2();
+  return GET2;
+}();
+var HEAD = /* @__PURE__ */ function() {
+  function HEAD2() {
+  }
+  ;
+  HEAD2.value = new HEAD2();
+  return HEAD2;
+}();
+var POST = /* @__PURE__ */ function() {
+  function POST2() {
+  }
+  ;
+  POST2.value = new POST2();
+  return POST2;
+}();
+var PUT = /* @__PURE__ */ function() {
+  function PUT2() {
+  }
+  ;
+  PUT2.value = new PUT2();
+  return PUT2;
+}();
+var DELETE = /* @__PURE__ */ function() {
+  function DELETE2() {
+  }
+  ;
+  DELETE2.value = new DELETE2();
+  return DELETE2;
+}();
+var TRACE = /* @__PURE__ */ function() {
+  function TRACE2() {
+  }
+  ;
+  TRACE2.value = new TRACE2();
+  return TRACE2;
+}();
+var CONNECT = /* @__PURE__ */ function() {
+  function CONNECT2() {
+  }
+  ;
+  CONNECT2.value = new CONNECT2();
+  return CONNECT2;
+}();
+var PROPFIND = /* @__PURE__ */ function() {
+  function PROPFIND2() {
+  }
+  ;
+  PROPFIND2.value = new PROPFIND2();
+  return PROPFIND2;
+}();
+var PROPPATCH = /* @__PURE__ */ function() {
+  function PROPPATCH2() {
+  }
+  ;
+  PROPPATCH2.value = new PROPPATCH2();
+  return PROPPATCH2;
+}();
+var MKCOL = /* @__PURE__ */ function() {
+  function MKCOL2() {
+  }
+  ;
+  MKCOL2.value = new MKCOL2();
+  return MKCOL2;
+}();
+var COPY = /* @__PURE__ */ function() {
+  function COPY2() {
+  }
+  ;
+  COPY2.value = new COPY2();
+  return COPY2;
+}();
+var MOVE = /* @__PURE__ */ function() {
+  function MOVE2() {
+  }
+  ;
+  MOVE2.value = new MOVE2();
+  return MOVE2;
+}();
+var LOCK = /* @__PURE__ */ function() {
+  function LOCK2() {
+  }
+  ;
+  LOCK2.value = new LOCK2();
+  return LOCK2;
+}();
+var UNLOCK = /* @__PURE__ */ function() {
+  function UNLOCK2() {
+  }
+  ;
+  UNLOCK2.value = new UNLOCK2();
+  return UNLOCK2;
+}();
+var PATCH = /* @__PURE__ */ function() {
+  function PATCH2() {
+  }
+  ;
+  PATCH2.value = new PATCH2();
+  return PATCH2;
+}();
+var unCustomMethod = function(v) {
+  return v;
+};
+var showMethod = {
+  show: function(v) {
+    if (v instanceof OPTIONS) {
+      return "OPTIONS";
+    }
+    ;
+    if (v instanceof GET) {
+      return "GET";
+    }
+    ;
+    if (v instanceof HEAD) {
+      return "HEAD";
+    }
+    ;
+    if (v instanceof POST) {
+      return "POST";
+    }
+    ;
+    if (v instanceof PUT) {
+      return "PUT";
+    }
+    ;
+    if (v instanceof DELETE) {
+      return "DELETE";
+    }
+    ;
+    if (v instanceof TRACE) {
+      return "TRACE";
+    }
+    ;
+    if (v instanceof CONNECT) {
+      return "CONNECT";
+    }
+    ;
+    if (v instanceof PROPFIND) {
+      return "PROPFIND";
+    }
+    ;
+    if (v instanceof PROPPATCH) {
+      return "PROPPATCH";
+    }
+    ;
+    if (v instanceof MKCOL) {
+      return "MKCOL";
+    }
+    ;
+    if (v instanceof COPY) {
+      return "COPY";
+    }
+    ;
+    if (v instanceof MOVE) {
+      return "MOVE";
+    }
+    ;
+    if (v instanceof LOCK) {
+      return "LOCK";
+    }
+    ;
+    if (v instanceof UNLOCK) {
+      return "UNLOCK";
+    }
+    ;
+    if (v instanceof PATCH) {
+      return "PATCH";
+    }
+    ;
+    throw new Error("Failed pattern match at Data.HTTP.Method (line 43, column 1 - line 59, column 23): " + [v.constructor.name]);
+  }
+};
+var print = /* @__PURE__ */ either(/* @__PURE__ */ show(showMethod))(unCustomMethod);
+
+// output/Effect.Aff.Compat/index.js
+var fromEffectFnAff = function(v) {
+  return makeAff(function(k) {
+    return function __do2() {
+      var v1 = v(function($9) {
+        return k(Left.create($9))();
+      }, function($10) {
+        return k(Right.create($10))();
+      });
+      return function(e2) {
+        return makeAff(function(k2) {
+          return function __do3() {
+            v1(e2, function($11) {
+              return k2(Left.create($11))();
+            }, function($12) {
+              return k2(Right.create($12))();
+            });
+            return nonCanceler;
+          };
+        });
+      };
+    };
+  });
+};
+
+// output/Affjax/index.js
+var pure8 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
+var fail5 = /* @__PURE__ */ fail(monadIdentity);
+var unsafeReadTagged2 = /* @__PURE__ */ unsafeReadTagged(monadIdentity);
+var alt5 = /* @__PURE__ */ alt(/* @__PURE__ */ altExceptT(semigroupNonEmptyList)(monadIdentity));
+var composeKleisliFlipped4 = /* @__PURE__ */ composeKleisliFlipped(/* @__PURE__ */ bindExceptT(monadIdentity));
+var map20 = /* @__PURE__ */ map(functorMaybe);
+var any3 = /* @__PURE__ */ any(foldableArray)(heytingAlgebraBoolean);
+var eq2 = /* @__PURE__ */ eq(eqString);
+var bindFlipped5 = /* @__PURE__ */ bindFlipped(bindMaybe);
+var map110 = /* @__PURE__ */ map(functorArray);
+var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorAff);
+var $$try4 = /* @__PURE__ */ $$try2(monadErrorAff);
+var pure13 = /* @__PURE__ */ pure(applicativeAff);
+var RequestContentError = /* @__PURE__ */ function() {
+  function RequestContentError2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  RequestContentError2.create = function(value0) {
+    return new RequestContentError2(value0);
+  };
+  return RequestContentError2;
+}();
+var ResponseBodyError = /* @__PURE__ */ function() {
+  function ResponseBodyError2(value0, value1) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+  ;
+  ResponseBodyError2.create = function(value0) {
+    return function(value1) {
+      return new ResponseBodyError2(value0, value1);
+    };
+  };
+  return ResponseBodyError2;
+}();
+var TimeoutError = /* @__PURE__ */ function() {
+  function TimeoutError2() {
+  }
+  ;
+  TimeoutError2.value = new TimeoutError2();
+  return TimeoutError2;
+}();
+var RequestFailedError = /* @__PURE__ */ function() {
+  function RequestFailedError2() {
+  }
+  ;
+  RequestFailedError2.value = new RequestFailedError2();
+  return RequestFailedError2;
+}();
+var XHROtherError = /* @__PURE__ */ function() {
+  function XHROtherError2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  XHROtherError2.create = function(value0) {
+    return new XHROtherError2(value0);
+  };
+  return XHROtherError2;
+}();
+var request = function(driver2) {
+  return function(req) {
+    var parseJSON2 = function(v2) {
+      if (v2 === "") {
+        return pure8(jsonEmptyObject);
+      }
+      ;
+      return either(function($74) {
+        return fail5(ForeignError.create($74));
+      })(pure8)(jsonParser(v2));
+    };
+    var fromResponse = function() {
+      if (req.responseFormat instanceof $$ArrayBuffer) {
+        return unsafeReadTagged2("ArrayBuffer");
+      }
+      ;
+      if (req.responseFormat instanceof Blob2) {
+        return unsafeReadTagged2("Blob");
+      }
+      ;
+      if (req.responseFormat instanceof Document2) {
+        return function(x2) {
+          return alt5(unsafeReadTagged2("Document")(x2))(alt5(unsafeReadTagged2("XMLDocument")(x2))(unsafeReadTagged2("HTMLDocument")(x2)));
+        };
+      }
+      ;
+      if (req.responseFormat instanceof Json2) {
+        return composeKleisliFlipped4(function($75) {
+          return req.responseFormat.value0(parseJSON2($75));
+        })(unsafeReadTagged2("String"));
+      }
+      ;
+      if (req.responseFormat instanceof $$String2) {
+        return unsafeReadTagged2("String");
+      }
+      ;
+      if (req.responseFormat instanceof Ignore2) {
+        return $$const(req.responseFormat.value0(pure8(unit)));
+      }
+      ;
+      throw new Error("Failed pattern match at Affjax (line 326, column 18 - line 335, column 56): " + [req.responseFormat.constructor.name]);
+    }();
+    var extractContent = function(v2) {
+      if (v2 instanceof ArrayView) {
+        return new Right(v2.value0(unsafeToForeign));
+      }
+      ;
+      if (v2 instanceof Blob) {
+        return new Right(unsafeToForeign(v2.value0));
+      }
+      ;
+      if (v2 instanceof Document) {
+        return new Right(unsafeToForeign(v2.value0));
+      }
+      ;
+      if (v2 instanceof $$String) {
+        return new Right(unsafeToForeign(v2.value0));
+      }
+      ;
+      if (v2 instanceof FormData) {
+        return new Right(unsafeToForeign(v2.value0));
+      }
+      ;
+      if (v2 instanceof FormURLEncoded) {
+        return note("Body contains values that cannot be encoded as application/x-www-form-urlencoded")(map20(unsafeToForeign)(encode2(v2.value0)));
+      }
+      ;
+      if (v2 instanceof Json) {
+        return new Right(unsafeToForeign(stringify(v2.value0)));
+      }
+      ;
+      throw new Error("Failed pattern match at Affjax (line 285, column 20 - line 301, column 67): " + [v2.constructor.name]);
+    };
+    var addHeader = function(mh) {
+      return function(hs) {
+        if (mh instanceof Just && !any3(on(eq2)(name2)(mh.value0))(hs)) {
+          return snoc(hs)(mh.value0);
+        }
+        ;
+        return hs;
+      };
+    };
+    var headers = function(reqContent) {
+      return addHeader(map20(ContentType.create)(bindFlipped5(toMediaType)(reqContent)))(addHeader(map20(Accept.create)(toMediaType2(req.responseFormat)))(req.headers));
+    };
+    var ajaxRequest = function(v2) {
+      return {
+        method: print(req.method),
+        url: req.url,
+        headers: map110(function(h2) {
+          return {
+            field: name2(h2),
+            value: value(h2)
+          };
+        })(headers(req.content)),
+        content: v2,
+        responseType: toResponseType(req.responseFormat),
+        username: toNullable(req.username),
+        password: toNullable(req.password),
+        withCredentials: req.withCredentials,
+        timeout: fromMaybe(0)(map20(function(v1) {
+          return v1;
+        })(req.timeout))
+      };
+    };
+    var send = function(content) {
+      return mapFlipped2($$try4(fromEffectFnAff(_ajax(driver2, "AffjaxTimeoutErrorMessageIdent", "AffjaxRequestFailedMessageIdent", ResponseHeader.create, ajaxRequest(content)))))(function(v2) {
+        if (v2 instanceof Right) {
+          var v1 = runExcept(fromResponse(v2.value0.body));
+          if (v1 instanceof Left) {
+            return new Left(new ResponseBodyError(head3(v1.value0), v2.value0));
+          }
+          ;
+          if (v1 instanceof Right) {
+            return new Right({
+              body: v1.value0,
+              headers: v2.value0.headers,
+              status: v2.value0.status,
+              statusText: v2.value0.statusText
+            });
+          }
+          ;
+          throw new Error("Failed pattern match at Affjax (line 257, column 9 - line 259, column 51): " + [v1.constructor.name]);
+        }
+        ;
+        if (v2 instanceof Left) {
+          return new Left(function() {
+            var message2 = message(v2.value0);
+            var $61 = message2 === "AffjaxTimeoutErrorMessageIdent";
+            if ($61) {
+              return TimeoutError.value;
+            }
+            ;
+            var $62 = message2 === "AffjaxRequestFailedMessageIdent";
+            if ($62) {
+              return RequestFailedError.value;
+            }
+            ;
+            return new XHROtherError(v2.value0);
+          }());
+        }
+        ;
+        throw new Error("Failed pattern match at Affjax (line 255, column 13 - line 267, column 28): " + [v2.constructor.name]);
+      });
+    };
+    if (req.content instanceof Nothing) {
+      return send(toNullable(Nothing.value));
+    }
+    ;
+    if (req.content instanceof Just) {
+      var v = extractContent(req.content.value0);
+      if (v instanceof Right) {
+        return send(toNullable(new Just(v.value0)));
+      }
+      ;
+      if (v instanceof Left) {
+        return pure13(new Left(new RequestContentError(v.value0)));
+      }
+      ;
+      throw new Error("Failed pattern match at Affjax (line 240, column 7 - line 244, column 48): " + [v.constructor.name]);
+    }
+    ;
+    throw new Error("Failed pattern match at Affjax (line 236, column 3 - line 244, column 48): " + [req.content.constructor.name]);
+  };
+};
+var printError = function(v) {
+  if (v instanceof RequestContentError) {
+    return "There was a problem with the request content: " + v.value0;
+  }
+  ;
+  if (v instanceof ResponseBodyError) {
+    return "There was a problem with the response body: " + renderForeignError(v.value0);
+  }
+  ;
+  if (v instanceof TimeoutError) {
+    return "There was a problem making the request: timeout";
+  }
+  ;
+  if (v instanceof RequestFailedError) {
+    return "There was a problem making the request: request failed";
+  }
+  ;
+  if (v instanceof XHROtherError) {
+    return "There was a problem making the request: " + message(v.value0);
+  }
+  ;
+  throw new Error("Failed pattern match at Affjax (line 113, column 14 - line 123, column 66): " + [v.constructor.name]);
+};
+var defaultRequest = /* @__PURE__ */ function() {
+  return {
+    method: new Left(GET.value),
+    url: "/",
+    headers: [],
+    content: Nothing.value,
+    username: Nothing.value,
+    password: Nothing.value,
+    withCredentials: false,
+    responseFormat: ignore,
+    timeout: Nothing.value
+  };
+}();
+
+// output/Affjax.Node/foreign.js
+var import_xhr2 = __toESM(require_xhr2(), 1);
+var import_url = __toESM(require("url"), 1);
+var driver = {
+  newXHR: function() {
+    return new import_xhr2.default();
+  },
+  fixupUrl: function(url, xhr) {
+    if (xhr.nodejsBaseUrl === null) {
+      var u = import_url.default.parse(url);
+      u.protocol = u.protocol || "http:";
+      u.hostname = u.hostname || "localhost";
+      return import_url.default.format(u);
+    } else {
+      return url || "/";
+    }
+  }
+};
+
+// output/Affjax.Node/index.js
+var request2 = /* @__PURE__ */ request(driver);
+
+// output/Effect.Console/foreign.js
+var error2 = function(s2) {
+  return function() {
+    console.error(s2);
+  };
+};
+var info = function(s2) {
+  return function() {
+    console.info(s2);
+  };
+};
+
+// output/Effect.Class.Console/index.js
+var info2 = function(dictMonadEffect) {
+  var $55 = liftEffect(dictMonadEffect);
+  return function($56) {
+    return $55(info($56));
+  };
+};
+var error3 = function(dictMonadEffect) {
+  var $59 = liftEffect(dictMonadEffect);
+  return function($60) {
+    return $59(error2($60));
+  };
+};
+
+// output/Backend.Github.API/index.js
+var bind6 = /* @__PURE__ */ bind(bindAff);
+var un3 = /* @__PURE__ */ un();
+var discard3 = /* @__PURE__ */ discard(discardUnit)(bindAff);
+var error4 = /* @__PURE__ */ error3(monadEffectAff);
+var throwError3 = /* @__PURE__ */ throwError(monadThrowAff);
+var pure9 = /* @__PURE__ */ pure(applicativeAff);
+var sendRequest = function(v) {
+  return function(query) {
+    return bind6(request2({
+      method: new Left(POST.value),
+      url: "https://api.github.com/graphql",
+      headers: [new RequestHeader("Authorization", un3(TokenType)(v.token_type) + (" " + un3(AccessToken)(v.access_token)))],
+      content: new Just(string(unGithubGraphQLQuery(query))),
+      username: defaultRequest.username,
+      password: defaultRequest.password,
+      withCredentials: defaultRequest.withCredentials,
+      responseFormat: string2,
+      timeout: defaultRequest.timeout
+    }))(function(errorOrResponse) {
+      if (errorOrResponse instanceof Left) {
+        return discard3(error4(printError(errorOrResponse.value0)))(function() {
+          return throwError3(error(printError(errorOrResponse.value0)));
+        });
+      }
+      ;
+      if (errorOrResponse instanceof Right) {
+        return pure9(errorOrResponse.value0.body);
+      }
+      ;
+      throw new Error("Failed pattern match at Backend.Github.API (line 41, column 3 - line 46, column 51): " + [errorOrResponse.constructor.name]);
+    });
+  };
+};
+
+// output/Biz.Github/index.js
+var scopes = ["user", "repo"];
+var clientID = "e1bbd08c15830196cff5";
+
 // output/Yoga.Fetch/foreign.js
 var _fetch = (fetchImpl) => (url) => (options) => () => {
   return fetchImpl(url, options).catch(function(e2) {
@@ -31554,12 +33396,12 @@ function thenImpl(promise2) {
 // output/Control.Promise/index.js
 var voidRight2 = /* @__PURE__ */ voidRight(functorEffect);
 var mempty3 = /* @__PURE__ */ mempty(monoidCanceler);
-var identity11 = /* @__PURE__ */ identity(categoryFn);
-var alt5 = /* @__PURE__ */ alt(/* @__PURE__ */ altExceptT(semigroupNonEmptyList)(monadIdentity));
-var unsafeReadTagged2 = /* @__PURE__ */ unsafeReadTagged(monadIdentity);
-var map19 = /* @__PURE__ */ map(/* @__PURE__ */ functorExceptT(functorIdentity));
+var identity12 = /* @__PURE__ */ identity(categoryFn);
+var alt6 = /* @__PURE__ */ alt(/* @__PURE__ */ altExceptT(semigroupNonEmptyList)(monadIdentity));
+var unsafeReadTagged3 = /* @__PURE__ */ unsafeReadTagged(monadIdentity);
+var map21 = /* @__PURE__ */ map(/* @__PURE__ */ functorExceptT(functorIdentity));
 var readString5 = /* @__PURE__ */ readString(monadIdentity);
-var bind6 = /* @__PURE__ */ bind(bindAff);
+var bind7 = /* @__PURE__ */ bind(bindAff);
 var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var toAff$prime = function(customCoerce) {
   return function(p) {
@@ -31575,16 +33417,26 @@ var toAff$prime = function(customCoerce) {
 var coerce3 = function(fn) {
   return either(function(v) {
     return error("Promise failed, couldn't extract JS Error or String");
-  })(identity11)(runExcept(alt5(unsafeReadTagged2("Error")(fn))(map19(error)(readString5(fn)))));
+  })(identity12)(runExcept(alt6(unsafeReadTagged3("Error")(fn))(map21(error)(readString5(fn)))));
 };
 var toAff4 = /* @__PURE__ */ toAff$prime(coerce3);
 var toAffE = function(f3) {
-  return bind6(liftEffect4(f3))(toAff4);
+  return bind7(liftEffect4(f3))(toAff4);
 };
 
+// output/Foreign.Internal.Stringify/foreign.js
+var unsafeStringify = JSON.stringify;
+
 // output/Yoga.Fetch/index.js
+var bind8 = /* @__PURE__ */ bind(bindAff);
+var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var text = function(res) {
-  return toAffE(textImpl(res));
+  var toAffE$prime = function(f3) {
+    return bind8(liftEffect5(f3))(toAff$prime(function($14) {
+      return error(unsafeStringify($14));
+    }));
+  };
+  return toAffE$prime(textImpl(res));
 };
 var statusCode = function(response) {
   return response.status;
@@ -31594,11 +33446,246 @@ var fetch = function(impl) {
   return function() {
     return function(url$prime) {
       return function(opts) {
-        return toAffE(_fetch(impl)(url$prime)(opts));
+        var toAffE$prime = function(f3) {
+          return bind8(liftEffect5(f3))(toAff$prime(function($15) {
+            return error(unsafeStringify($15));
+          }));
+        };
+        return toAffE$prime(_fetch(impl)(url$prime)(opts));
       };
     };
   };
 };
+
+// output/Biz.Github.API.Auth/index.js
+var mapFlipped3 = /* @__PURE__ */ mapFlipped(functorAff);
+var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
+var show7 = /* @__PURE__ */ show(showError);
+var join2 = /* @__PURE__ */ join(bindEither);
+var bind9 = /* @__PURE__ */ bind(bindAff);
+var fromHomogeneous2 = /* @__PURE__ */ fromHomogeneous();
+var writeJSON2 = /* @__PURE__ */ writeJSON(writeForeignDeviceCodeReq);
+var readJSON3 = /* @__PURE__ */ readJSON(readForeignDeviceCodeResp);
+var pure10 = /* @__PURE__ */ pure(applicativeAff);
+var show12 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
+var show22 = /* @__PURE__ */ show(showInt);
+var writeJSON1 = /* @__PURE__ */ writeJSON(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons({
+  reflectSymbol: function() {
+    return "client_id";
+  }
+})(writeForeignClientID)(/* @__PURE__ */ writeForeignFieldsCons({
+  reflectSymbol: function() {
+    return "device_code";
+  }
+})(writeForeignDeviceCode)(/* @__PURE__ */ writeForeignFieldsCons({
+  reflectSymbol: function() {
+    return "grant_type";
+  }
+})(writeForeignGrantType)(writeForeignFieldsNilRowR)()()())()()())()()()));
+var alt7 = /* @__PURE__ */ alt(altEither);
+var bimap2 = /* @__PURE__ */ bimap(bifunctorEither);
+var readForeignRecord4 = /* @__PURE__ */ readForeignRecord();
+var readJSON1 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord4(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "error";
+  }
+})(readForeignString)(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "error_description";
+  }
+})(readForeignString)(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "error_uri";
+  }
+})(readForeignString)(readForeignFieldsNilRowRo)()())()())()()));
+var readJSON22 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord4(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "access_token";
+  }
+})(readForeignAccessToken)(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "scope";
+  }
+})(readForeignScopeList)(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "token_type";
+  }
+})(readForeignTokenType)(readForeignFieldsNilRowRo)()())()())()()));
+var attemptString = function(aff) {
+  return mapFlipped3(attempt(aff))(function() {
+    var $89 = lmap2(show7);
+    return function($90) {
+      return join2($89($90));
+    };
+  }());
+};
+var getDeviceCode = function(fetch3) {
+  return attemptString(bind9(fetch3()("https://github.com/login/device/code")({
+    method: postMethod,
+    headers: fromHomogeneous2({
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    }),
+    body: writeJSON2({
+      client_id: clientID,
+      scope: scopes
+    })
+  }))(function(res) {
+    var v = statusCode(res);
+    if (v === 200) {
+      return bind9(mapFlipped3(text(res))(readJSON3))(function(errorOrBody) {
+        return pure10(lmap2(show12)(errorOrBody));
+      });
+    }
+    ;
+    return mapFlipped3(text(res))(function($91) {
+      return Left.create(function(v1) {
+        return show22(v) + v1;
+      }($91));
+    });
+  }));
+};
+var pollAccessToken = function(fetch3) {
+  var fetch1 = fetch3();
+  return function(device_code) {
+    return attemptString(bind9(fetch1("https://github.com/login/oauth/access_token")({
+      method: postMethod,
+      headers: fromHomogeneous2({
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }),
+      body: writeJSON1({
+        client_id: clientID,
+        device_code,
+        grant_type: "urn:ietf:params:oauth:grant-type:device_code"
+      })
+    }))(function(res) {
+      var v = statusCode(res);
+      if (v === 200) {
+        return bind9(text(res))(function(stringBody) {
+          return pure10(alt7(bimap2(show12)(Left.create)(readJSON1(stringBody)))(bimap2(show12)(Right.create)(readJSON22(stringBody))));
+        });
+      }
+      ;
+      return mapFlipped3(text(res))(function($92) {
+        return Left.create(function(v1) {
+          return show22(v) + v1;
+        }($92));
+      });
+    }));
+  };
+};
+
+// output/Electron/foreign.js
+var import_electron = require("electron");
+var whenReadyImpl = () => import_electron.app.whenReady();
+var newBrowserWindow = (config) => () => new import_electron.BrowserWindow(config);
+var loadFileImpl = (name3) => (browserWindow) => () => browserWindow.loadFile(name3);
+var onIPCMainMessage = (listener) => (channel) => () => {
+  import_electron.ipcMain.on(channel, listener);
+};
+var showOpenDialogImpl = (options) => (window2) => () => import_electron.dialog.showOpenDialog(window2, options);
+var sendToWebContentsImpl = (message2) => (channel) => (win) => () => {
+  win.webContents.send(channel, message2);
+};
+var getUserDataDirectory = () => import_electron.app.getPath("userData");
+var isDefaultProtocolClient = (protocol) => () => import_electron.app.isDefaultProtocolClient(protocol);
+var setAsDefaultProtocolClient = (protocol) => () => import_electron.app.setAsDefaultProtocolClient(protocol);
+var setWindowOpenHandlerToExternal = (win) => () => {
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith("https:")) {
+      import_electron.shell.openExternal(url);
+    }
+    return { action: "deny" };
+  });
+};
+var openHttpsInBrowserAndBlockOtherURLs = () => {
+  import_electron.app.on("web-contents-created", (createEvent, contents) => {
+    contents.on("new-window", (newEvent) => {
+      console.log("Blocked by 'new-window'");
+      newEvent.preventDefault();
+    });
+    contents.on("will-navigate", (newEvent, url) => {
+      console.log("will-navigate", url);
+      console.log("Blocked by 'will-navigate'");
+      newEvent.preventDefault();
+      if (url.startsWith("https:") || url.startsWith("http:")) {
+        import_electron.shell.openExternal(url);
+      }
+    });
+    contents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith("https://doyensec.com/")) {
+        setImmediate(() => {
+          import_electron.shell.openExternal(url);
+        });
+        return { action: "allow" };
+      } else {
+        console.log("Blocked by 'setWindowOpenHandler'");
+        return { action: "deny" };
+      }
+    });
+  });
+};
+var encryptStringImpl = (just, nothing, plainText) => {
+  try {
+    const res = import_electron.safeStorage.encryptString(plainText);
+    return just(res);
+  } catch {
+    return nothing;
+  }
+};
+var decryptStringImpl = (just, nothing, buffer) => {
+  try {
+    const res = import_electron.safeStorage.decryptString(buffer);
+    return just(res);
+  } catch {
+    return nothing;
+  }
+};
+var copyToClipboard = (text2) => () => import_electron.clipboard.writeText(text2);
+var getClipboardText = () => import_electron.clipboard.readText();
+var showWhenReadyToShow = (win) => () => {
+  win.once("ready-to-show", () => win.show());
+};
+var appendSwitch = (name3) => (value2) => () => import_electron.app.commandLine.appendSwitch(name3, value2);
+
+// output/Untagged.Castable/index.js
+var cast = function() {
+  return unsafeCoerce2;
+};
+
+// output/Electron/index.js
+var cast2 = /* @__PURE__ */ cast();
+var waitUntilAppReady = /* @__PURE__ */ toAffE(whenReadyImpl);
+var showOpenDialog = function() {
+  return function(options) {
+    return function(win) {
+      return toAffE(showOpenDialogImpl(cast2(options))(win));
+    };
+  };
+};
+var sendToWebContents = function(dictWriteForeign) {
+  var write8 = write3(dictWriteForeign);
+  return function(msg) {
+    return function(channel) {
+      return function(window2) {
+        return sendToWebContentsImpl(write8(msg))(channel)(window2);
+      };
+    };
+  };
+};
+var openDirectory = "openDirectory";
+var loadFile = function(s2) {
+  return function(bw) {
+    return toAffE(loadFileImpl(s2)(bw));
+  };
+};
+var encryptString = /* @__PURE__ */ function() {
+  return runEffectFn3(encryptStringImpl)(Just.create)(Nothing.value);
+}();
+var decryptString = /* @__PURE__ */ function() {
+  return runEffectFn3(decryptStringImpl)(Just.create)(Nothing.value);
+}();
 
 // node_modules/node-fetch/src/index.js
 var import_node_http2 = __toESM(require("node:http"), 1);
@@ -31715,7 +33802,7 @@ var Body = class {
     } else if (ArrayBuffer.isView(body)) {
       body = import_node_buffer.Buffer.from(body.buffer, body.byteOffset, body.byteLength);
     } else if (body instanceof import_node_stream.default) {
-    } else if (body instanceof FormData) {
+    } else if (body instanceof FormData2) {
       body = formDataToBlob(body);
       boundary = body.type.split("=")[1];
     } else {
@@ -31737,8 +33824,8 @@ var Body = class {
     this.size = size5;
     if (body instanceof import_node_stream.default) {
       body.on("error", (error_) => {
-        const error5 = error_ instanceof FetchBaseError ? error_ : new FetchError(`Invalid response body while trying to fetch ${this.url}: ${error_.message}`, "system", error_);
-        this[INTERNALS].error = error5;
+        const error6 = error_ instanceof FetchBaseError ? error_ : new FetchError(`Invalid response body while trying to fetch ${this.url}: ${error_.message}`, "system", error_);
+        this[INTERNALS].error = error6;
       });
     }
   }
@@ -31755,10 +33842,10 @@ var Body = class {
   async formData() {
     const ct = this.headers.get("content-type");
     if (ct.startsWith("application/x-www-form-urlencoded")) {
-      const formData = new FormData();
+      const formData = new FormData2();
       const parameters = new URLSearchParams(await this.text());
-      for (const [name2, value] of parameters) {
-        formData.append(name2, value);
+      for (const [name3, value2] of parameters) {
+        formData.append(name3, value2);
       }
       return formData;
     }
@@ -31815,15 +33902,15 @@ async function consumeBody(data) {
   try {
     for await (const chunk of body) {
       if (data.size > 0 && accumBytes + chunk.length > data.size) {
-        const error5 = new FetchError(`content size at ${data.url} over limit: ${data.size}`, "max-size");
-        body.destroy(error5);
-        throw error5;
+        const error6 = new FetchError(`content size at ${data.url} over limit: ${data.size}`, "max-size");
+        body.destroy(error6);
+        throw error6;
       }
       accumBytes += chunk.length;
       accum.push(chunk);
     }
-  } catch (error5) {
-    const error_ = error5 instanceof FetchBaseError ? error5 : new FetchError(`Invalid response body while trying to fetch ${data.url}: ${error5.message}`, "system", error5);
+  } catch (error6) {
+    const error_ = error6 instanceof FetchBaseError ? error6 : new FetchError(`Invalid response body while trying to fetch ${data.url}: ${error6.message}`, "system", error6);
     throw error_;
   }
   if (body.readableEnded === true || body._readableState.ended === true) {
@@ -31832,8 +33919,8 @@ async function consumeBody(data) {
         return import_node_buffer.Buffer.from(accum.join(""));
       }
       return import_node_buffer.Buffer.concat(accum, accumBytes);
-    } catch (error5) {
-      throw new FetchError(`Could not create Buffer from response body for ${data.url}: ${error5.message}`, "system", error5);
+    } catch (error6) {
+      throw new FetchError(`Could not create Buffer from response body for ${data.url}: ${error6.message}`, "system", error6);
     }
   } else {
     throw new FetchError(`Premature close of server response while trying to fetch ${data.url}`);
@@ -31857,7 +33944,7 @@ var clone = (instance, highWaterMark) => {
   return body;
 };
 var getNonSpecFormDataBoundary = (0, import_node_util.deprecate)((body) => body.getBoundary(), "form-data doesn't follow the spec and requires special treatment. Use alternative package", "https://github.com/node-fetch/node-fetch/issues/1167");
-var extractContentType = (body, request) => {
+var extractContentType = (body, request3) => {
   if (body === null) {
     return null;
   }
@@ -31873,8 +33960,8 @@ var extractContentType = (body, request) => {
   if (import_node_buffer.Buffer.isBuffer(body) || import_node_util.types.isAnyArrayBuffer(body) || ArrayBuffer.isView(body)) {
     return null;
   }
-  if (body instanceof FormData) {
-    return `multipart/form-data; boundary=${request[INTERNALS].boundary}`;
+  if (body instanceof FormData2) {
+    return `multipart/form-data; boundary=${request3[INTERNALS].boundary}`;
   }
   if (body && typeof body.getBoundary === "function") {
     return `multipart/form-data;boundary=${getNonSpecFormDataBoundary(body)}`;
@@ -31884,8 +33971,8 @@ var extractContentType = (body, request) => {
   }
   return "text/plain;charset=UTF-8";
 };
-var getTotalBytes = (request) => {
-  const { body } = request[INTERNALS];
+var getTotalBytes = (request3) => {
+  const { body } = request3[INTERNALS];
   if (body === null) {
     return 0;
   }
@@ -31911,18 +33998,18 @@ var writeToStream = async (dest, { body }) => {
 // node_modules/node-fetch/src/headers.js
 var import_node_util2 = require("node:util");
 var import_node_http = __toESM(require("node:http"), 1);
-var validateHeaderName = typeof import_node_http.default.validateHeaderName === "function" ? import_node_http.default.validateHeaderName : (name2) => {
-  if (!/^[\^`\-\w!#$%&'*+.|~]+$/.test(name2)) {
-    const error5 = new TypeError(`Header name must be a valid HTTP token [${name2}]`);
-    Object.defineProperty(error5, "code", { value: "ERR_INVALID_HTTP_TOKEN" });
-    throw error5;
+var validateHeaderName = typeof import_node_http.default.validateHeaderName === "function" ? import_node_http.default.validateHeaderName : (name3) => {
+  if (!/^[\^`\-\w!#$%&'*+.|~]+$/.test(name3)) {
+    const error6 = new TypeError(`Header name must be a valid HTTP token [${name3}]`);
+    Object.defineProperty(error6, "code", { value: "ERR_INVALID_HTTP_TOKEN" });
+    throw error6;
   }
 };
-var validateHeaderValue = typeof import_node_http.default.validateHeaderValue === "function" ? import_node_http.default.validateHeaderValue : (name2, value) => {
-  if (/[^\t\u0020-\u007E\u0080-\u00FF]/.test(value)) {
-    const error5 = new TypeError(`Invalid character in header content ["${name2}"]`);
-    Object.defineProperty(error5, "code", { value: "ERR_INVALID_CHAR" });
-    throw error5;
+var validateHeaderValue = typeof import_node_http.default.validateHeaderValue === "function" ? import_node_http.default.validateHeaderValue : (name3, value2) => {
+  if (/[^\t\u0020-\u007E\u0080-\u00FF]/.test(value2)) {
+    const error6 = new TypeError(`Invalid character in header content ["${name3}"]`);
+    Object.defineProperty(error6, "code", { value: "ERR_INVALID_CHAR" });
+    throw error6;
   }
 };
 var Headers = class extends URLSearchParams {
@@ -31930,8 +34017,8 @@ var Headers = class extends URLSearchParams {
     let result = [];
     if (init3 instanceof Headers) {
       const raw = init3.raw();
-      for (const [name2, values2] of Object.entries(raw)) {
-        result.push(...values2.map((value) => [name2, value]));
+      for (const [name3, values2] of Object.entries(raw)) {
+        result.push(...values2.map((value2) => [name3, value2]));
       }
     } else if (init3 == null) {
     } else if (typeof init3 === "object" && !import_node_util2.types.isBoxedPrimitive(init3)) {
@@ -31957,10 +34044,10 @@ var Headers = class extends URLSearchParams {
     } else {
       throw new TypeError("Failed to construct 'Headers': The provided value is not of type '(sequence<sequence<ByteString>> or record<ByteString, ByteString>)");
     }
-    result = result.length > 0 ? result.map(([name2, value]) => {
-      validateHeaderName(name2);
-      validateHeaderValue(name2, String(value));
-      return [String(name2).toLowerCase(), String(value)];
+    result = result.length > 0 ? result.map(([name3, value2]) => {
+      validateHeaderName(name3);
+      validateHeaderValue(name3, String(value2));
+      return [String(name3).toLowerCase(), String(value2)];
     }) : void 0;
     super(result);
     return new Proxy(this, {
@@ -31968,17 +34055,17 @@ var Headers = class extends URLSearchParams {
         switch (p) {
           case "append":
           case "set":
-            return (name2, value) => {
-              validateHeaderName(name2);
-              validateHeaderValue(name2, String(value));
-              return URLSearchParams.prototype[p].call(target, String(name2).toLowerCase(), String(value));
+            return (name3, value2) => {
+              validateHeaderName(name3);
+              validateHeaderValue(name3, String(value2));
+              return URLSearchParams.prototype[p].call(target, String(name3).toLowerCase(), String(value2));
             };
           case "delete":
           case "has":
           case "getAll":
-            return (name2) => {
-              validateHeaderName(name2);
-              return URLSearchParams.prototype[p].call(target, String(name2).toLowerCase());
+            return (name3) => {
+              validateHeaderName(name3);
+              return URLSearchParams.prototype[p].call(target, String(name3).toLowerCase());
             };
           case "keys":
             return () => {
@@ -31997,30 +34084,30 @@ var Headers = class extends URLSearchParams {
   toString() {
     return Object.prototype.toString.call(this);
   }
-  get(name2) {
-    const values2 = this.getAll(name2);
+  get(name3) {
+    const values2 = this.getAll(name3);
     if (values2.length === 0) {
       return null;
     }
-    let value = values2.join(", ");
-    if (/^content-encoding$/i.test(name2)) {
-      value = value.toLowerCase();
+    let value2 = values2.join(", ");
+    if (/^content-encoding$/i.test(name3)) {
+      value2 = value2.toLowerCase();
     }
-    return value;
+    return value2;
   }
   forEach(callback, thisArg = void 0) {
-    for (const name2 of this.keys()) {
-      Reflect.apply(callback, thisArg, [this.get(name2), name2, this]);
+    for (const name3 of this.keys()) {
+      Reflect.apply(callback, thisArg, [this.get(name3), name3, this]);
     }
   }
   *values() {
-    for (const name2 of this.keys()) {
-      yield this.get(name2);
+    for (const name3 of this.keys()) {
+      yield this.get(name3);
     }
   }
   *entries() {
-    for (const name2 of this.keys()) {
-      yield [name2, this.get(name2)];
+    for (const name3 of this.keys()) {
+      yield [name3, this.get(name3)];
     }
   }
   [Symbol.iterator]() {
@@ -32049,15 +34136,15 @@ Object.defineProperties(Headers.prototype, ["get", "entries", "forEach", "values
   return result;
 }, {}));
 function fromRawHeaders(headers = []) {
-  return new Headers(headers.reduce((result, value, index3, array) => {
+  return new Headers(headers.reduce((result, value2, index3, array) => {
     if (index3 % 2 === 0) {
       result.push(array.slice(index3, index3 + 2));
     }
     return result;
-  }, []).filter(([name2, value]) => {
+  }, []).filter(([name3, value2]) => {
     try {
-      validateHeaderName(name2);
-      validateHeaderValue(name2, String(value));
+      validateHeaderName(name3);
+      validateHeaderValue(name3, String(value2));
       return true;
     } catch {
       return false;
@@ -32245,15 +34332,15 @@ function isUrlPotentiallyTrustworthy(url) {
   }
   return isOriginPotentiallyTrustworthy(url);
 }
-function determineRequestsReferrer(request, { referrerURLCallback, referrerOriginCallback } = {}) {
-  if (request.referrer === "no-referrer" || request.referrerPolicy === "") {
+function determineRequestsReferrer(request3, { referrerURLCallback, referrerOriginCallback } = {}) {
+  if (request3.referrer === "no-referrer" || request3.referrerPolicy === "") {
     return null;
   }
-  const policy = request.referrerPolicy;
-  if (request.referrer === "about:client") {
+  const policy = request3.referrerPolicy;
+  if (request3.referrer === "about:client") {
     return "no-referrer";
   }
-  const referrerSource = request.referrer;
+  const referrerSource = request3.referrer;
   let referrerURL = stripURLForUseAsAReferrer(referrerSource);
   let referrerOrigin = stripURLForUseAsAReferrer(referrerSource, true);
   if (referrerURL.toString().length > 4096) {
@@ -32265,7 +34352,7 @@ function determineRequestsReferrer(request, { referrerURLCallback, referrerOrigi
   if (referrerOriginCallback) {
     referrerOrigin = referrerOriginCallback(referrerOrigin);
   }
-  const currentURL = new URL(request.url);
+  const currentURL = new URL(request3.url);
   switch (policy) {
     case "no-referrer":
       return "no-referrer";
@@ -32438,18 +34525,18 @@ Object.defineProperties(Request.prototype, {
   referrer: { enumerable: true },
   referrerPolicy: { enumerable: true }
 });
-var getNodeRequestOptions = (request) => {
-  const { parsedURL } = request[INTERNALS3];
-  const headers = new Headers(request[INTERNALS3].headers);
+var getNodeRequestOptions = (request3) => {
+  const { parsedURL } = request3[INTERNALS3];
+  const headers = new Headers(request3[INTERNALS3].headers);
   if (!headers.has("Accept")) {
     headers.set("Accept", "*/*");
   }
   let contentLengthValue = null;
-  if (request.body === null && /^(post|put)$/i.test(request.method)) {
+  if (request3.body === null && /^(post|put)$/i.test(request3.method)) {
     contentLengthValue = "0";
   }
-  if (request.body !== null) {
-    const totalBytes = getTotalBytes(request);
+  if (request3.body !== null) {
+    const totalBytes = getTotalBytes(request3);
     if (typeof totalBytes === "number" && !Number.isNaN(totalBytes)) {
       contentLengthValue = String(totalBytes);
     }
@@ -32457,24 +34544,24 @@ var getNodeRequestOptions = (request) => {
   if (contentLengthValue) {
     headers.set("Content-Length", contentLengthValue);
   }
-  if (request.referrerPolicy === "") {
-    request.referrerPolicy = DEFAULT_REFERRER_POLICY;
+  if (request3.referrerPolicy === "") {
+    request3.referrerPolicy = DEFAULT_REFERRER_POLICY;
   }
-  if (request.referrer && request.referrer !== "no-referrer") {
-    request[INTERNALS3].referrer = determineRequestsReferrer(request);
+  if (request3.referrer && request3.referrer !== "no-referrer") {
+    request3[INTERNALS3].referrer = determineRequestsReferrer(request3);
   } else {
-    request[INTERNALS3].referrer = "no-referrer";
+    request3[INTERNALS3].referrer = "no-referrer";
   }
-  if (request[INTERNALS3].referrer instanceof URL) {
-    headers.set("Referer", request.referrer);
+  if (request3[INTERNALS3].referrer instanceof URL) {
+    headers.set("Referer", request3.referrer);
   }
   if (!headers.has("User-Agent")) {
     headers.set("User-Agent", "node-fetch");
   }
-  if (request.compress && !headers.has("Accept-Encoding")) {
+  if (request3.compress && !headers.has("Accept-Encoding")) {
     headers.set("Accept-Encoding", "gzip, deflate, br");
   }
-  let { agent } = request;
+  let { agent } = request3;
   if (typeof agent === "function") {
     agent = agent(parsedURL);
   }
@@ -32484,9 +34571,9 @@ var getNodeRequestOptions = (request) => {
   const search = getSearch(parsedURL);
   const options = {
     path: parsedURL.pathname + search,
-    method: request.method,
+    method: request3.method,
     headers: headers[Symbol.for("nodejs.util.inspect.custom")](),
-    insecureHTTPParser: request.insecureHTTPParser,
+    insecureHTTPParser: request3.insecureHTTPParser,
     agent
   };
   return {
@@ -32508,30 +34595,30 @@ init_from();
 var supportedSchemas = /* @__PURE__ */ new Set(["data:", "http:", "https:"]);
 async function fetch2(url, options_) {
   return new Promise((resolve2, reject) => {
-    const request = new Request(url, options_);
-    const { parsedURL, options } = getNodeRequestOptions(request);
+    const request3 = new Request(url, options_);
+    const { parsedURL, options } = getNodeRequestOptions(request3);
     if (!supportedSchemas.has(parsedURL.protocol)) {
       throw new TypeError(`node-fetch cannot load ${url}. URL scheme "${parsedURL.protocol.replace(/:$/, "")}" is not supported.`);
     }
     if (parsedURL.protocol === "data:") {
-      const data = dist_default(request.url);
+      const data = dist_default(request3.url);
       const response2 = new Response(data, { headers: { "Content-Type": data.typeFull } });
       resolve2(response2);
       return;
     }
     const send = (parsedURL.protocol === "https:" ? import_node_https.default : import_node_http2.default).request;
-    const { signal } = request;
+    const { signal } = request3;
     let response = null;
     const abort = () => {
-      const error5 = new AbortError("The operation was aborted.");
-      reject(error5);
-      if (request.body && request.body instanceof import_node_stream2.default.Readable) {
-        request.body.destroy(error5);
+      const error6 = new AbortError("The operation was aborted.");
+      reject(error6);
+      if (request3.body && request3.body instanceof import_node_stream2.default.Readable) {
+        request3.body.destroy(error6);
       }
       if (!response || !response.body) {
         return;
       }
-      response.body.emit("error", error5);
+      response.body.emit("error", error6);
     };
     if (signal && signal.aborted) {
       abort();
@@ -32551,13 +34638,13 @@ async function fetch2(url, options_) {
         signal.removeEventListener("abort", abortAndFinalize);
       }
     };
-    request_.on("error", (error5) => {
-      reject(new FetchError(`request to ${request.url} failed, reason: ${error5.message}`, "system", error5));
+    request_.on("error", (error6) => {
+      reject(new FetchError(`request to ${request3.url} failed, reason: ${error6.message}`, "system", error6));
       finalize();
     });
-    fixResponseChunkedTransferBadEnding(request_, (error5) => {
+    fixResponseChunkedTransferBadEnding(request_, (error6) => {
       if (response && response.body) {
-        response.body.destroy(error5);
+        response.body.destroy(error6);
       }
     });
     if (process.version < "v14") {
@@ -32568,9 +34655,9 @@ async function fetch2(url, options_) {
         });
         s2.prependListener("close", (hadError) => {
           if (response && endedWithEventsCount < s2._eventsCount && !hadError) {
-            const error5 = new Error("Premature close");
-            error5.code = "ERR_STREAM_PREMATURE_CLOSE";
-            response.body.emit("error", error5);
+            const error6 = new Error("Premature close");
+            error6.code = "ERR_STREAM_PREMATURE_CLOSE";
+            response.body.emit("error", error6);
           }
         });
       });
@@ -32582,17 +34669,17 @@ async function fetch2(url, options_) {
         const location = headers.get("Location");
         let locationURL = null;
         try {
-          locationURL = location === null ? null : new URL(location, request.url);
+          locationURL = location === null ? null : new URL(location, request3.url);
         } catch {
-          if (request.redirect !== "manual") {
+          if (request3.redirect !== "manual") {
             reject(new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, "invalid-redirect"));
             finalize();
             return;
           }
         }
-        switch (request.redirect) {
+        switch (request3.redirect) {
           case "error":
-            reject(new FetchError(`uri requested responds with a redirect, redirect mode is set to error: ${request.url}`, "no-redirect"));
+            reject(new FetchError(`uri requested responds with a redirect, redirect mode is set to error: ${request3.url}`, "no-redirect"));
             finalize();
             return;
           case "manual":
@@ -32601,35 +34688,35 @@ async function fetch2(url, options_) {
             if (locationURL === null) {
               break;
             }
-            if (request.counter >= request.follow) {
-              reject(new FetchError(`maximum redirect reached at: ${request.url}`, "max-redirect"));
+            if (request3.counter >= request3.follow) {
+              reject(new FetchError(`maximum redirect reached at: ${request3.url}`, "max-redirect"));
               finalize();
               return;
             }
             const requestOptions = {
-              headers: new Headers(request.headers),
-              follow: request.follow,
-              counter: request.counter + 1,
-              agent: request.agent,
-              compress: request.compress,
-              method: request.method,
-              body: clone(request),
-              signal: request.signal,
-              size: request.size,
-              referrer: request.referrer,
-              referrerPolicy: request.referrerPolicy
+              headers: new Headers(request3.headers),
+              follow: request3.follow,
+              counter: request3.counter + 1,
+              agent: request3.agent,
+              compress: request3.compress,
+              method: request3.method,
+              body: clone(request3),
+              signal: request3.signal,
+              size: request3.size,
+              referrer: request3.referrer,
+              referrerPolicy: request3.referrerPolicy
             };
-            if (!isDomainOrSubdomain(request.url, locationURL)) {
-              for (const name2 of ["authorization", "www-authenticate", "cookie", "cookie2"]) {
-                requestOptions.headers.delete(name2);
+            if (!isDomainOrSubdomain(request3.url, locationURL)) {
+              for (const name3 of ["authorization", "www-authenticate", "cookie", "cookie2"]) {
+                requestOptions.headers.delete(name3);
               }
             }
-            if (response_.statusCode !== 303 && request.body && options_.body instanceof import_node_stream2.default.Readable) {
+            if (response_.statusCode !== 303 && request3.body && options_.body instanceof import_node_stream2.default.Readable) {
               reject(new FetchError("Cannot follow redirect with body being a readable stream", "unsupported-redirect"));
               finalize();
               return;
             }
-            if (response_.statusCode === 303 || (response_.statusCode === 301 || response_.statusCode === 302) && request.method === "POST") {
+            if (response_.statusCode === 303 || (response_.statusCode === 301 || response_.statusCode === 302) && request3.method === "POST") {
               requestOptions.method = "GET";
               requestOptions.body = void 0;
               requestOptions.headers.delete("content-length");
@@ -32643,7 +34730,7 @@ async function fetch2(url, options_) {
             return;
           }
           default:
-            return reject(new TypeError(`Redirect option '${request.redirect}' is not a valid value of RequestRedirect`));
+            return reject(new TypeError(`Redirect option '${request3.redirect}' is not a valid value of RequestRedirect`));
         }
       }
       if (signal) {
@@ -32651,25 +34738,25 @@ async function fetch2(url, options_) {
           signal.removeEventListener("abort", abortAndFinalize);
         });
       }
-      let body = (0, import_node_stream2.pipeline)(response_, new import_node_stream2.PassThrough(), (error5) => {
-        if (error5) {
-          reject(error5);
+      let body = (0, import_node_stream2.pipeline)(response_, new import_node_stream2.PassThrough(), (error6) => {
+        if (error6) {
+          reject(error6);
         }
       });
       if (process.version < "v12.10") {
         response_.on("aborted", abortAndFinalize);
       }
       const responseOptions = {
-        url: request.url,
+        url: request3.url,
         status: response_.statusCode,
         statusText: response_.statusMessage,
         headers,
-        size: request.size,
-        counter: request.counter,
-        highWaterMark: request.highWaterMark
+        size: request3.size,
+        counter: request3.counter,
+        highWaterMark: request3.highWaterMark
       };
       const codings = headers.get("Content-Encoding");
-      if (!request.compress || request.method === "HEAD" || codings === null || response_.statusCode === 204 || response_.statusCode === 304) {
+      if (!request3.compress || request3.method === "HEAD" || codings === null || response_.statusCode === 204 || response_.statusCode === 304) {
         response = new Response(body, responseOptions);
         resolve2(response);
         return;
@@ -32679,9 +34766,9 @@ async function fetch2(url, options_) {
         finishFlush: import_node_zlib.default.Z_SYNC_FLUSH
       };
       if (codings === "gzip" || codings === "x-gzip") {
-        body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createGunzip(zlibOptions), (error5) => {
-          if (error5) {
-            reject(error5);
+        body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createGunzip(zlibOptions), (error6) => {
+          if (error6) {
+            reject(error6);
           }
         });
         response = new Response(body, responseOptions);
@@ -32689,22 +34776,22 @@ async function fetch2(url, options_) {
         return;
       }
       if (codings === "deflate" || codings === "x-deflate") {
-        const raw = (0, import_node_stream2.pipeline)(response_, new import_node_stream2.PassThrough(), (error5) => {
-          if (error5) {
-            reject(error5);
+        const raw = (0, import_node_stream2.pipeline)(response_, new import_node_stream2.PassThrough(), (error6) => {
+          if (error6) {
+            reject(error6);
           }
         });
         raw.once("data", (chunk) => {
           if ((chunk[0] & 15) === 8) {
-            body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createInflate(), (error5) => {
-              if (error5) {
-                reject(error5);
+            body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createInflate(), (error6) => {
+              if (error6) {
+                reject(error6);
               }
             });
           } else {
-            body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createInflateRaw(), (error5) => {
-              if (error5) {
-                reject(error5);
+            body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createInflateRaw(), (error6) => {
+              if (error6) {
+                reject(error6);
               }
             });
           }
@@ -32720,9 +34807,9 @@ async function fetch2(url, options_) {
         return;
       }
       if (codings === "br") {
-        body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createBrotliDecompress(), (error5) => {
-          if (error5) {
-            reject(error5);
+        body = (0, import_node_stream2.pipeline)(body, import_node_zlib.default.createBrotliDecompress(), (error6) => {
+          if (error6) {
+            reject(error6);
           }
         });
         response = new Response(body, responseOptions);
@@ -32732,24 +34819,24 @@ async function fetch2(url, options_) {
       response = new Response(body, responseOptions);
       resolve2(response);
     });
-    writeToStream(request_, request).catch(reject);
+    writeToStream(request_, request3).catch(reject);
   });
 }
-function fixResponseChunkedTransferBadEnding(request, errorCallback) {
+function fixResponseChunkedTransferBadEnding(request3, errorCallback) {
   const LAST_CHUNK = import_node_buffer2.Buffer.from("0\r\n\r\n");
   let isChunkedTransfer = false;
   let properLastChunkReceived = false;
   let previousChunk;
-  request.on("response", (response) => {
+  request3.on("response", (response) => {
     const { headers } = response;
     isChunkedTransfer = headers["transfer-encoding"] === "chunked" && !headers["content-length"];
   });
-  request.on("socket", (socket) => {
+  request3.on("socket", (socket) => {
     const onSocketClose = () => {
       if (isChunkedTransfer && !properLastChunkReceived) {
-        const error5 = new Error("Premature close");
-        error5.code = "ERR_STREAM_PREMATURE_CLOSE";
-        errorCallback(error5);
+        const error6 = new Error("Premature close");
+        error6.code = "ERR_STREAM_PREMATURE_CLOSE";
+        errorCallback(error6);
       }
     };
     const onData2 = (buf) => {
@@ -32761,273 +34848,18 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
     };
     socket.prependListener("close", onSocketClose);
     socket.on("data", onData2);
-    request.on("close", () => {
+    request3.on("close", () => {
       socket.removeListener("close", onSocketClose);
       socket.removeListener("data", onData2);
     });
   });
 }
 
-// output/Backend.Github.API/index.js
-var bind7 = /* @__PURE__ */ bind(bindAff);
-var fromHomogeneous2 = /* @__PURE__ */ fromHomogeneous();
-var un3 = /* @__PURE__ */ un();
-var pure8 = /* @__PURE__ */ pure(applicativeAff);
-var sendRequest = function(v) {
-  return function(query) {
-    return bind7(fetch(fetch2)()("https://api.github.com/graphql")({
-      method: postMethod,
-      headers: fromHomogeneous2({
-        Authorization: un3(TokenType)(v.token_type) + (" " + un3(AccessToken)(v.access_token)),
-        "Content-Type": "application/json"
-      }),
-      body: unGithubGraphQLQuery(query)
-    }))(function(response) {
-      return bind7(text(response))(function(body) {
-        return pure8(body);
-      });
-    });
-  };
-};
-
-// output/Biz.Github/index.js
-var scopes = ["user", "repo"];
-var clientID = "e1bbd08c15830196cff5";
-
-// output/Biz.Github.API.Auth/index.js
-var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorAff);
-var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
-var show7 = /* @__PURE__ */ show(showError);
-var join2 = /* @__PURE__ */ join(bindEither);
-var bind8 = /* @__PURE__ */ bind(bindAff);
-var fromHomogeneous3 = /* @__PURE__ */ fromHomogeneous();
-var writeJSON2 = /* @__PURE__ */ writeJSON(writeForeignDeviceCodeReq);
-var readJSON3 = /* @__PURE__ */ readJSON(readForeignDeviceCodeResp);
-var pure9 = /* @__PURE__ */ pure(applicativeAff);
-var show12 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
-var show22 = /* @__PURE__ */ show(showInt);
-var writeJSON1 = /* @__PURE__ */ writeJSON(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons({
-  reflectSymbol: function() {
-    return "client_id";
-  }
-})(writeForeignClientID)(/* @__PURE__ */ writeForeignFieldsCons({
-  reflectSymbol: function() {
-    return "device_code";
-  }
-})(writeForeignDeviceCode)(/* @__PURE__ */ writeForeignFieldsCons({
-  reflectSymbol: function() {
-    return "grant_type";
-  }
-})(writeForeignGrantType)(writeForeignFieldsNilRowR)()()())()()())()()()));
-var alt6 = /* @__PURE__ */ alt(altEither);
-var bimap2 = /* @__PURE__ */ bimap(bifunctorEither);
-var readForeignRecord4 = /* @__PURE__ */ readForeignRecord();
-var readJSON1 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord4(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "error";
-  }
-})(readForeignString)(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "error_description";
-  }
-})(readForeignString)(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "error_uri";
-  }
-})(readForeignString)(readForeignFieldsNilRowRo)()())()())()()));
-var readJSON22 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord4(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "access_token";
-  }
-})(readForeignAccessToken)(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "scope";
-  }
-})(readForeignScopeList)(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "token_type";
-  }
-})(readForeignTokenType)(readForeignFieldsNilRowRo)()())()())()()));
-var attemptString = function(aff) {
-  return mapFlipped2(attempt(aff))(function() {
-    var $89 = lmap2(show7);
-    return function($90) {
-      return join2($89($90));
-    };
-  }());
-};
-var getDeviceCode = function(fetch3) {
-  return attemptString(bind8(fetch3()("https://github.com/login/device/code")({
-    method: postMethod,
-    headers: fromHomogeneous3({
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    }),
-    body: writeJSON2({
-      client_id: clientID,
-      scope: scopes
-    })
-  }))(function(res) {
-    var v = statusCode(res);
-    if (v === 200) {
-      return bind8(mapFlipped2(text(res))(readJSON3))(function(errorOrBody) {
-        return pure9(lmap2(show12)(errorOrBody));
-      });
-    }
-    ;
-    return mapFlipped2(text(res))(function($91) {
-      return Left.create(function(v1) {
-        return show22(v) + v1;
-      }($91));
-    });
-  }));
-};
-var pollAccessToken = function(fetch3) {
-  var fetch1 = fetch3();
-  return function(device_code) {
-    return attemptString(bind8(fetch1("https://github.com/login/oauth/access_token")({
-      method: postMethod,
-      headers: fromHomogeneous3({
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }),
-      body: writeJSON1({
-        client_id: clientID,
-        device_code,
-        grant_type: "urn:ietf:params:oauth:grant-type:device_code"
-      })
-    }))(function(res) {
-      var v = statusCode(res);
-      if (v === 200) {
-        return bind8(text(res))(function(stringBody) {
-          return pure9(alt6(bimap2(show12)(Left.create)(readJSON1(stringBody)))(bimap2(show12)(Right.create)(readJSON22(stringBody))));
-        });
-      }
-      ;
-      return mapFlipped2(text(res))(function($92) {
-        return Left.create(function(v1) {
-          return show22(v) + v1;
-        }($92));
-      });
-    }));
-  };
-};
-
-// output/Effect.Console/foreign.js
-var error2 = function(s2) {
-  return function() {
-    console.error(s2);
-  };
-};
-var info = function(s2) {
-  return function() {
-    console.info(s2);
-  };
-};
-
-// output/Effect.Class.Console/index.js
-var info2 = function(dictMonadEffect) {
-  var $55 = liftEffect(dictMonadEffect);
-  return function($56) {
-    return $55(info($56));
-  };
-};
-var error3 = function(dictMonadEffect) {
-  var $59 = liftEffect(dictMonadEffect);
-  return function($60) {
-    return $59(error2($60));
-  };
-};
-
-// output/Electron/foreign.js
-var import_electron = require("electron");
-var whenReadyImpl = () => import_electron.app.whenReady();
-var newBrowserWindow = (config) => () => new import_electron.BrowserWindow(config);
-var loadFileImpl = (name2) => (browserWindow) => () => browserWindow.loadFile(name2);
-var onIPCMainMessage = (listener) => (channel) => () => {
-  import_electron.ipcMain.on(channel, listener);
-};
-var showOpenDialogImpl = (options) => (window2) => () => import_electron.dialog.showOpenDialog(window2, options);
-var sendToWebContentsImpl = (message2) => (channel) => (win) => () => {
-  win.webContents.send(channel, message2);
-};
-var getUserDataDirectory = () => import_electron.app.getPath("userData");
-var isDefaultProtocolClient = (protocol) => () => import_electron.app.isDefaultProtocolClient(protocol);
-var setAsDefaultProtocolClient = (protocol) => () => import_electron.app.setAsDefaultProtocolClient(protocol);
-var setWindowOpenHandlerToExternal = (win) => () => {
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith("https:")) {
-      import_electron.shell.openExternal(url);
-    }
-    return { action: "deny" };
-  });
-};
-var encryptStringImpl = (just, nothing, plainText) => {
-  try {
-    const res = import_electron.safeStorage.encryptString(plainText);
-    return just(res);
-  } catch {
-    return nothing;
-  }
-};
-var decryptStringImpl = (just, nothing, buffer) => {
-  try {
-    const res = import_electron.safeStorage.decryptString(buffer);
-    return just(res);
-  } catch {
-    return nothing;
-  }
-};
-var copyToClipboard = (text2) => () => import_electron.clipboard.writeText(text2);
-var getClipboardText = () => import_electron.clipboard.readText();
-var showWhenReadyToShow = (win) => () => {
-  win.once("ready-to-show", () => win.show());
-};
-var appendSwitch = (name2) => (value) => () => import_electron.app.commandLine.appendSwitch(name2, value);
-
-// output/Untagged.Castable/index.js
-var cast = function() {
-  return unsafeCoerce2;
-};
-
-// output/Electron/index.js
-var cast2 = /* @__PURE__ */ cast();
-var waitUntilAppReady = /* @__PURE__ */ toAffE(whenReadyImpl);
-var showOpenDialog = function() {
-  return function(options) {
-    return function(win) {
-      return toAffE(showOpenDialogImpl(cast2(options))(win));
-    };
-  };
-};
-var sendToWebContents = function(dictWriteForeign) {
-  var write9 = write3(dictWriteForeign);
-  return function(msg) {
-    return function(channel) {
-      return function(window2) {
-        return sendToWebContentsImpl(write9(msg))(channel)(window2);
-      };
-    };
-  };
-};
-var openDirectory = "openDirectory";
-var loadFile = function(s2) {
-  return function(bw) {
-    return toAffE(loadFileImpl(s2)(bw));
-  };
-};
-var encryptString = /* @__PURE__ */ function() {
-  return runEffectFn3(encryptStringImpl)(Just.create)(Nothing.value);
-}();
-var decryptString = /* @__PURE__ */ function() {
-  return runEffectFn3(decryptStringImpl)(Just.create)(Nothing.value);
-}();
-
 // output/Biz.IPC.MessageToMainHandler.Github/index.js
-var bind9 = /* @__PURE__ */ bind(bindAff);
-var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
-var pure10 = /* @__PURE__ */ pure(applicativeAff);
-var bindFlipped5 = /* @__PURE__ */ bindFlipped(bindMaybe);
+var bind10 = /* @__PURE__ */ bind(bindAff);
+var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var pure11 = /* @__PURE__ */ pure(applicativeAff);
+var bindFlipped6 = /* @__PURE__ */ bindFlipped(bindMaybe);
 var access_tokenIsSymbol2 = {
   reflectSymbol: function() {
     return "access_token";
@@ -33044,47 +34876,47 @@ var token_typeIsSymbol2 = {
   }
 };
 var readJSON_2 = /* @__PURE__ */ readJSON_(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons(access_tokenIsSymbol2)(readForeignAccessToken)(/* @__PURE__ */ readForeignFieldsCons(scopeIsSymbol2)(readForeignScopeList)(/* @__PURE__ */ readForeignFieldsCons(token_typeIsSymbol2)(readForeignTokenType)(readForeignFieldsNilRowRo)()())()())()()));
-var map20 = /* @__PURE__ */ map(functorAff);
+var map23 = /* @__PURE__ */ map(functorAff);
 var writeJSON3 = /* @__PURE__ */ writeJSON(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons(access_tokenIsSymbol2)(writeForeignAccessToken)(/* @__PURE__ */ writeForeignFieldsCons(scopeIsSymbol2)(writeForeignScopeList)(/* @__PURE__ */ writeForeignFieldsCons(token_typeIsSymbol2)(writeForeignTokenType)(writeForeignFieldsNilRowR)()()())()()())()()()));
-var error4 = /* @__PURE__ */ error3(monadEffectAff);
-var discard3 = /* @__PURE__ */ discard(discardUnit)(bindAff);
+var error5 = /* @__PURE__ */ error3(monadEffectAff);
+var discard4 = /* @__PURE__ */ discard(discardUnit)(bindAff);
 var info3 = /* @__PURE__ */ info2(monadEffectAff);
-var map110 = /* @__PURE__ */ map(functorEither);
+var map111 = /* @__PURE__ */ map(functorEither);
 var githubTokenFile = "github-token";
-var readStoredGithubAccessToken = /* @__PURE__ */ bind9(/* @__PURE__ */ liftEffect5(getUserDataDirectory))(function(dir) {
+var readStoredGithubAccessToken = /* @__PURE__ */ bind10(/* @__PURE__ */ liftEffect6(getUserDataDirectory))(function(dir) {
   var path2 = concat5([dir, githubTokenFile]);
-  return bind9(liftEffect5(exists(path2)))(function(pathExists) {
+  return bind10(liftEffect6(exists(path2)))(function(pathExists) {
     var $54 = !pathExists;
     if ($54) {
-      return pure10(Nothing.value);
+      return pure11(Nothing.value);
     }
     ;
-    return bind9(readFile3(path2))(function(buf) {
-      return bind9(liftEffect5(decryptString(buf)))(function(str\u0294) {
-        return pure10(bindFlipped5(readJSON_2)(str\u0294));
+    return bind10(readFile3(path2))(function(buf) {
+      return bind10(liftEffect6(decryptString(buf)))(function(str\u0294) {
+        return pure11(bindFlipped6(readJSON_2)(str\u0294));
       });
     });
   });
 });
 var queryGithubGraphQL = function(query) {
-  return map20(GithubGraphQLResult.create)(bind9(readStoredGithubAccessToken)(function(token\u0294) {
+  return map23(GithubGraphQLResult.create)(bind10(readStoredGithubAccessToken)(function(token\u0294) {
     if (token\u0294 instanceof Just) {
-      return map20(Succeeded.create)(sendRequest(token\u0294.value0)(query));
+      return map23(Succeeded.create)(sendRequest(token\u0294.value0)(query));
     }
     ;
     if (token\u0294 instanceof Nothing) {
-      return pure10(new Failed(NoGithubToken.value));
+      return pure11(new Failed(NoGithubToken.value));
     }
     ;
     throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler.Github (line 29, column 3 - line 31, column 42): " + [token\u0294.constructor.name]);
   }));
 };
 var storeGithubAccessToken = function(token) {
-  return bind9(liftEffect5(getUserDataDirectory))(function(dir) {
+  return bind10(liftEffect6(getUserDataDirectory))(function(dir) {
     var path2 = concat5([dir, githubTokenFile]);
-    return bind9(liftEffect5(encryptString(writeJSON3(token))))(function(encryptedBuf\u0294) {
+    return bind10(liftEffect6(encryptString(writeJSON3(token))))(function(encryptedBuf\u0294) {
       if (encryptedBuf\u0294 instanceof Nothing) {
-        return error4("Failed to encrypt token");
+        return error5("Failed to encrypt token");
       }
       ;
       if (encryptedBuf\u0294 instanceof Just) {
@@ -33096,24 +34928,24 @@ var storeGithubAccessToken = function(token) {
   });
 };
 var pollGithubAccessToken = function(deviceCode) {
-  return bind9(pollAccessToken(fetch(fetch2))(deviceCode))(function(response) {
-    return discard3(function() {
+  return bind10(pollAccessToken(fetch(fetch2))(deviceCode))(function(response) {
+    return discard4(function() {
       if (response instanceof Right && response.value0 instanceof Right) {
-        return discard3(info3("Stored Github Access Token"))(function() {
+        return discard4(info3("Stored Github Access Token"))(function() {
           return storeGithubAccessToken(response.value0.value0);
         });
       }
       ;
-      return pure10(unit);
+      return pure11(unit);
     }())(function() {
-      return pure10(GithubPollAccessTokenResult.create(failedOrFromEither(map110(failedOrFromEither)(response))));
+      return pure11(GithubPollAccessTokenResult.create(failedOrFromEither(map111(failedOrFromEither)(response))));
     });
   });
 };
-var getIsLoggedIntoGithub = /* @__PURE__ */ map20(function($62) {
+var getIsLoggedIntoGithub = /* @__PURE__ */ map23(function($62) {
   return GetIsLoggedIntoGithubResult.create(isJust($62));
 })(readStoredGithubAccessToken);
-var getGithubDeviceCode = /* @__PURE__ */ map20(function($63) {
+var getGithubDeviceCode = /* @__PURE__ */ map23(function($63) {
   return GithubLoginGetDeviceCodeResult.create(failedOrFromEither($63));
 })(/* @__PURE__ */ getDeviceCode(/* @__PURE__ */ fetch(fetch2)));
 
@@ -33125,7 +34957,7 @@ var inj1 = /* @__PURE__ */ inj2({
   }
 });
 var intercalate8 = /* @__PURE__ */ intercalate2(foldableNonEmptyList)(monoidString);
-var map21 = /* @__PURE__ */ map(functorNonEmptyList);
+var map24 = /* @__PURE__ */ map(functorNonEmptyList);
 var validSpagoDhallKey = /* @__PURE__ */ function() {
   return $$Proxy.value;
 }();
@@ -33154,7 +34986,7 @@ var invalidSpagoDhallKey = /* @__PURE__ */ function() {
   return $$Proxy.value;
 }();
 var invalidSpagoDhall = function(errs) {
-  return inj1(invalidSpagoDhallKey)(intercalate8("\n")(map21(renderForeignError)(errs)));
+  return inj1(invalidSpagoDhallKey)(intercalate8("\n")(map24(renderForeignError)(errs)));
 };
 
 // output/Biz.Preferences.Types/index.js
@@ -33166,9 +34998,9 @@ var defaultAppPreferences = /* @__PURE__ */ function() {
 }();
 
 // output/Biz.Preferences/index.js
-var map23 = /* @__PURE__ */ map(functorEffect);
-var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectEffect);
-var bind10 = /* @__PURE__ */ bind(bindAff);
+var map25 = /* @__PURE__ */ map(functorEffect);
+var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectEffect);
+var bind11 = /* @__PURE__ */ bind(bindAff);
 var githubPersonalAccessTokenIsSymbol = {
   reflectSymbol: function() {
     return "githubPersonalAccessToken";
@@ -33181,34 +35013,34 @@ var solutionsIsSymbol = {
 };
 var writeJSON4 = /* @__PURE__ */ writeJSON(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons(githubPersonalAccessTokenIsSymbol)(/* @__PURE__ */ writeForeignMaybe(writeForeignPersonalAcces))(/* @__PURE__ */ writeForeignFieldsCons(solutionsIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignString))(writeForeignFieldsNilRowR)()()())()()()));
 var liftEffect1 = /* @__PURE__ */ liftEffect(monadEffectAff);
-var discard4 = /* @__PURE__ */ discard(discardUnit)(bindAff);
+var discard5 = /* @__PURE__ */ discard(discardUnit)(bindAff);
 var when3 = /* @__PURE__ */ when(applicativeAff);
 var readJSON4 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons(githubPersonalAccessTokenIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignPersonalAccess))(/* @__PURE__ */ readForeignFieldsCons(solutionsIsSymbol)(/* @__PURE__ */ readForeignArray(readForeignString))(readForeignFieldsNilRowRo)()())()()));
-var throwError3 = /* @__PURE__ */ throwError(monadThrowAff);
+var throwError4 = /* @__PURE__ */ throwError(monadThrowAff);
 var show8 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
-var pure11 = /* @__PURE__ */ pure(applicativeAff);
+var pure14 = /* @__PURE__ */ pure(applicativeAff);
 var getPreferencesFilePath = function(dictMonadEffect) {
-  return liftEffect(dictMonadEffect)(map23(function(v) {
+  return liftEffect(dictMonadEffect)(map25(function(v) {
     return concat5([v, "settings.json"]);
-  })(liftEffect6(getUserDataDirectory)));
+  })(liftEffect7(getUserDataDirectory)));
 };
 var getPreferencesFilePath1 = /* @__PURE__ */ getPreferencesFilePath(monadEffectAff);
 var writeAppPreferences = function(settings) {
-  return bind10(getPreferencesFilePath1)(function(settingsFilePath) {
+  return bind11(getPreferencesFilePath1)(function(settingsFilePath) {
     return writeTextFile2(UTF8.value)(settingsFilePath)(writeJSON4(settings));
   });
 };
-var readAppPreferences = /* @__PURE__ */ bind10(getPreferencesFilePath1)(function(settingsFilePath) {
-  return bind10(liftEffect1(exists(settingsFilePath)))(function(settingsFileExists) {
-    return discard4(when3(!settingsFileExists)(writeAppPreferences(defaultAppPreferences)))(function() {
-      return bind10(readTextFile2(UTF8.value)(settingsFilePath))(function(textContent) {
+var readAppPreferences = /* @__PURE__ */ bind11(getPreferencesFilePath1)(function(settingsFilePath) {
+  return bind11(liftEffect1(exists(settingsFilePath)))(function(settingsFileExists) {
+    return discard5(when3(!settingsFileExists)(writeAppPreferences(defaultAppPreferences)))(function() {
+      return bind11(readTextFile2(UTF8.value)(settingsFilePath))(function(textContent) {
         var v = readJSON4(textContent);
         if (v instanceof Left) {
-          return throwError3(error(show8(v.value0)));
+          return throwError4(error(show8(v.value0)));
         }
         ;
         if (v instanceof Right) {
-          return pure11(v.value0);
+          return pure14(v.value0);
         }
         ;
         throw new Error("Failed pattern match at Biz.Preferences (line 34, column 3 - line 36, column 35): " + [v.constructor.name]);
@@ -33218,8 +35050,8 @@ var readAppPreferences = /* @__PURE__ */ bind10(getPreferencesFilePath1)(functio
 });
 
 // output/Biz.Tool/index.js
-var bind11 = /* @__PURE__ */ bind(bindAff);
-var pure13 = /* @__PURE__ */ pure(applicativeAff);
+var bind12 = /* @__PURE__ */ bind(bindAff);
+var pure15 = /* @__PURE__ */ pure(applicativeAff);
 var show9 = /* @__PURE__ */ show(showInt);
 var show13 = /* @__PURE__ */ show(showSignal);
 var runToolAndGetStdout = function(args) {
@@ -33231,8 +35063,8 @@ var runToolAndGetStdout = function(args) {
         stdin: Nothing.value
       })(defaultSpawnOptions);
     };
-    return bind11(spawnCmd(spagoPath))(function(v) {
-      return pure13(function() {
+    return bind12(spawnCmd(spagoPath))(function(v) {
+      return pure15(function() {
         if (v.exit instanceof Normally && v.exit.value0 === 0) {
           return new Right(trim(v.stdout));
         }
@@ -33252,10 +35084,10 @@ var runToolAndGetStdout = function(args) {
 };
 
 // output/Biz.Spago.Service/index.js
-var map24 = /* @__PURE__ */ map(functorEither);
+var map26 = /* @__PURE__ */ map(functorEither);
 var getGlobalCacheDir = /* @__PURE__ */ function() {
   var $4 = map(functorAff)(function(v) {
-    return map24(SpagoGlobalCacheDir)(v);
+    return map26(SpagoGlobalCacheDir)(v);
   });
   var $5 = runToolAndGetStdout(["path", "global-cache"]);
   return function($6) {
@@ -33268,39 +35100,12 @@ var toString6 = function(v) {
   return v;
 };
 
-// output/Debug/foreign.js
-var req = typeof module === "undefined" ? void 0 : module.require;
-var util = function() {
-  try {
-    return req === void 0 ? void 0 : req("util");
-  } catch (e2) {
-    return void 0;
-  }
-}();
-var _spy = function(tag, x2) {
-  if (util !== void 0) {
-    console.log(tag + ":", util.inspect(x2, { depth: null, colors: true }));
-  } else {
-    console.log(tag + ":", x2);
-  }
-  return x2;
-};
-
-// output/Debug/index.js
-var spy = function() {
-  return function(tag) {
-    return function(a) {
-      return _spy(tag, a);
-    };
-  };
-};
-
 // output/Biz.IPC.MessageToMainHandler/index.js
-var bind12 = /* @__PURE__ */ bind(bindAff);
+var bind13 = /* @__PURE__ */ bind(bindAff);
 var showOpenDialog1 = /* @__PURE__ */ showOpenDialog();
-var map25 = /* @__PURE__ */ map(functorAff);
-var pure14 = /* @__PURE__ */ pure(applicativeAff);
-var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var map27 = /* @__PURE__ */ map(functorAff);
+var pure16 = /* @__PURE__ */ pure(applicativeAff);
+var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var readForeignRecord5 = /* @__PURE__ */ readForeignRecord();
 var readForeignFieldsCons3 = /* @__PURE__ */ readForeignFieldsCons({
   reflectSymbol: function() {
@@ -33334,14 +35139,13 @@ var readJSON5 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord5(/* @
 })(/* @__PURE__ */ readForeignArray(readForeignSourceGlob))(readForeignFieldsNilRowRo)()())()())()())()())()()));
 var bind1 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadAff));
 var except2 = /* @__PURE__ */ except(applicativeAff);
-var mapFlipped3 = /* @__PURE__ */ mapFlipped(functorAff);
+var mapFlipped4 = /* @__PURE__ */ mapFlipped(functorAff);
 var bind22 = /* @__PURE__ */ bind(bindMaybe);
-var eq2 = /* @__PURE__ */ eq(eqTool);
+var eq3 = /* @__PURE__ */ eq(eqTool);
 var $$for2 = /* @__PURE__ */ $$for(applicativeAff)(traversableArray);
-var map111 = /* @__PURE__ */ map(functorEffect);
+var map112 = /* @__PURE__ */ map(functorEffect);
 var voidRight3 = /* @__PURE__ */ voidRight(functorEffect);
-var spy2 = /* @__PURE__ */ spy();
-var writeForeignRecord5 = /* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons({
+var sendToWebContents2 = /* @__PURE__ */ sendToWebContents(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons({
   reflectSymbol: function() {
     return "response";
   }
@@ -33349,20 +35153,18 @@ var writeForeignRecord5 = /* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ w
   reflectSymbol: function() {
     return "response_for_message_id";
   }
-})(writeForeignString)(writeForeignFieldsNilRowR)()()())()()());
-var write8 = /* @__PURE__ */ write3(writeForeignRecord5);
-var sendToWebContents2 = /* @__PURE__ */ sendToWebContents(writeForeignRecord5);
+})(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()));
 var showOpenDialog2 = function(window2) {
-  return bind12(showOpenDialog1({
+  return bind13(showOpenDialog1({
     properties: [openDirectory]
   })(window2))(function(result) {
-    return map25(UserSelectedFile.create)(function() {
+    return map27(UserSelectedFile.create)(function() {
       var v = function(v1) {
-        return pure14(Nothing.value);
+        return pure16(Nothing.value);
       };
       if (!result.canceled) {
         if (result.filePaths.length === 1) {
-          return map25(Just.create)(readTextFile2(UTF8.value)(result["filePaths"][0]));
+          return map27(Just.create)(readTextFile2(UTF8.value)(result["filePaths"][0]));
         }
         ;
         return v(true);
@@ -33373,32 +35175,32 @@ var showOpenDialog2 = function(window2) {
   });
 };
 var showFolderSelector = function(window2) {
-  return bind12(showOpenDialog1({
+  return bind13(showOpenDialog1({
     properties: [openDirectory]
   })(window2))(function(result) {
-    return bind12(function() {
+    return bind13(function() {
       var v = function(v1) {
-        return pure14(nothingSelected);
+        return pure16(nothingSelected);
       };
       if (!result.canceled) {
-        var $108 = fromArray(result.filePaths);
-        if ($108 instanceof Just) {
-          var spagoPath = concat5([head2($108.value0), "spago.dhall"]);
-          return bind12(liftEffect7(exists(spagoPath)))(function(pathExists\u0294) {
-            var packagesPath = concat5([head2($108.value0), "packages.dhall"]);
-            return bind12(liftEffect7(exists(packagesPath)))(function(path2Exists\u0294) {
-              var $109 = !pathExists\u0294 || !path2Exists\u0294;
-              if ($109) {
-                return pure14(noSpagoDhall);
+        var $105 = fromArray(result.filePaths);
+        if ($105 instanceof Just) {
+          var spagoPath = concat5([head2($105.value0), "spago.dhall"]);
+          return bind13(liftEffect8(exists(spagoPath)))(function(pathExists\u0294) {
+            var packagesPath = concat5([head2($105.value0), "packages.dhall"]);
+            return bind13(liftEffect8(exists(packagesPath)))(function(path2Exists\u0294) {
+              var $106 = !pathExists\u0294 || !path2Exists\u0294;
+              if ($106) {
+                return pure16(noSpagoDhall);
               }
               ;
-              return bind12(readTextFile2(UTF8.value)(spagoPath))(function(spagoDhall) {
-                return bind12(spawn3({
+              return bind13(readTextFile2(UTF8.value)(spagoPath))(function(spagoDhall) {
+                return bind13(spawn3({
                   cmd: "dhall-to-json",
                   args: [],
                   stdin: new Just(spagoDhall)
                 })(defaultSpawnOptions))(function(v1) {
-                  return pure14(either(invalidSpagoDhall)(validSpagoDhall)(readJSON5(v1.stdout)));
+                  return pure16(either(invalidSpagoDhall)(validSpagoDhall)(readJSON5(v1.stdout)));
                 });
               });
             });
@@ -33410,39 +35212,39 @@ var showFolderSelector = function(window2) {
       ;
       return v(true);
     }())(function(v) {
-      return pure14(new ShowFolderSelectorResponse(v));
+      return pure16(new ShowFolderSelectorResponse(v));
     });
   });
 };
-var getSpagoGlobalCache = /* @__PURE__ */ map25(function($122) {
-  return GetSpagoGlobalCacheResult.create(failedOrFromEither($122));
+var getSpagoGlobalCache = /* @__PURE__ */ map27(function($119) {
+  return GetSpagoGlobalCacheResult.create(failedOrFromEither($119));
 })(/* @__PURE__ */ runExceptT(/* @__PURE__ */ bind1(/* @__PURE__ */ except2(/* @__PURE__ */ note("Unsupported OS")(operatingSystem\u0294)))(function(os) {
-  return bind1(mapFlipped3(getToolsWithPaths(os))(Right.create))(function(tools) {
-    return bind1(except2(note("Spago is not installed")(bind22(find2(function($123) {
+  return bind1(mapFlipped4(getToolsWithPaths(os))(Right.create))(function(tools) {
+    return bind1(except2(note("Spago is not installed")(bind22(find2(function($120) {
       return function(v) {
-        return eq2(v)(Spago.value);
-      }(fst($123));
+        return eq3(v)(Spago.value);
+      }(fst($120));
     })(tools))(snd))))(function(spagoPath) {
       return getGlobalCacheDir(spagoPath);
     });
   });
 })));
-var getProjectDefinitions = /* @__PURE__ */ bind12(readAppPreferences)(function(prefs) {
-  return bind12($$for2(prefs.solutions)(function(fp) {
-    return map25(function(v) {
+var getProjectDefinitions = /* @__PURE__ */ bind13(readAppPreferences)(function(prefs) {
+  return bind13($$for2(prefs.solutions)(function(fp) {
+    return map27(function(v) {
       return new Tuple(fp, v);
     })(readSolutionDefinition(fp));
   }))(function(projects) {
-    return pure14(new GetPureScriptSolutionDefinitionsResponse(projects));
+    return pure16(new GetPureScriptSolutionDefinitionsResponse(projects));
   });
 });
 var getInstalledTools = /* @__PURE__ */ function() {
-  return map25(GetInstalledToolsResponse.create)(maybe(pure14(UnsupportedOperatingSystem.value))(map25(ToolsResult.create))(mapFlipped(functorMaybe)(operatingSystem\u0294)(getToolsWithPaths)));
+  return map27(GetInstalledToolsResponse.create)(maybe(pure16(UnsupportedOperatingSystem.value))(map27(ToolsResult.create))(mapFlipped(functorMaybe)(operatingSystem\u0294)(getToolsWithPaths)));
 }();
 var handleMessageToMain = function(window2) {
   return function(message_id) {
     return function(message2) {
-      return bind12(function() {
+      return bind13(function() {
         if (message2 instanceof ShowFolderSelector) {
           return showFolderSelector(window2);
         }
@@ -33476,11 +35278,11 @@ var handleMessageToMain = function(window2) {
         }
         ;
         if (message2 instanceof GetClipboardText) {
-          return liftEffect7(map111(GetClipboardTextResult.create)(getClipboardText));
+          return liftEffect8(map112(GetClipboardTextResult.create)(getClipboardText));
         }
         ;
         if (message2 instanceof CopyToClipboard) {
-          return liftEffect7(voidRight3(new CopyToClipboardResult(message2.value0))(copyToClipboard(message2.value0)));
+          return liftEffect8(voidRight3(new CopyToClipboardResult(message2.value0))(copyToClipboard(message2.value0)));
         }
         ;
         if (message2 instanceof GetSpagoGlobalCache) {
@@ -33489,12 +35291,11 @@ var handleMessageToMain = function(window2) {
         ;
         throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 43, column 34 - line 56, column 46): " + [message2.constructor.name]);
       }())(function(v) {
-        return liftEffect7(function() {
+        return liftEffect8(function() {
           var responsePayload = {
             response_for_message_id: toString6(message_id),
             response: v
           };
-          var v1 = spy2("Responding with")(write8(responsePayload));
           return sendToWebContents2(responsePayload)("ipc")(window2);
         }());
       });
@@ -33503,16 +35304,14 @@ var handleMessageToMain = function(window2) {
 };
 
 // output/Backend.IPC.Handler/index.js
-var spy3 = /* @__PURE__ */ spy();
 var show10 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
-var identity12 = /* @__PURE__ */ identity(categoryFn);
+var identity13 = /* @__PURE__ */ identity(categoryFn);
 var read8 = /* @__PURE__ */ read3(readForeignMessageToMain);
 var registerHandler = function(handle) {
   var listener = function(_ev, fgn) {
-    var v = spy3("fgn")(fgn);
-    var message2 = either(function($7) {
-      return unsafeCrashWith(show10($7));
-    })(identity12)(read8(fgn.data.payload));
+    var message2 = either(function($5) {
+      return unsafeCrashWith(show10($5));
+    })(identity13)(read8(fgn.data.payload));
     return launchAff_(handle(fgn.data.message_id)(message2))();
   };
   return onIPCMainMessage(listener)("ipc");
@@ -33543,9 +35342,9 @@ var registerProtocol = function __do() {
 };
 
 // output/Main/index.js
-var discard5 = /* @__PURE__ */ discard(discardUnit)(bindAff);
-var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
-var bind13 = /* @__PURE__ */ bind(bindAff);
+var discard6 = /* @__PURE__ */ discard(discardUnit)(bindAff);
+var liftEffect9 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var bind14 = /* @__PURE__ */ bind(bindAff);
 var mkOptions = /* @__PURE__ */ map(functorEffect)(function(v) {
   return {
     width: 800,
@@ -33561,15 +35360,17 @@ var mkOptions = /* @__PURE__ */ map(functorEffect)(function(v) {
     }
   };
 })(dirnameImpl);
-var main = /* @__PURE__ */ launchAff_(/* @__PURE__ */ discard5(waitUntilAppReady)(function() {
-  return discard5(liftEffect8(appendSwitch("enable-features")("CSSContainerQueries")))(function() {
-    return discard5(liftEffect8(registerProtocol))(function() {
-      return bind13(liftEffect8(mkOptions))(function(options) {
-        return bind13(liftEffect8(newBrowserWindow(options)))(function(window2) {
-          return discard5(liftEffect8(setWindowOpenHandlerToExternal(window2)))(function() {
-            return discard5(liftEffect8(registerAllHandlers(window2)))(function() {
-              return discard5(liftEffect8(showWhenReadyToShow(window2)))(function() {
-                return loadFile("index.html")(window2);
+var main = /* @__PURE__ */ launchAff_(/* @__PURE__ */ discard6(waitUntilAppReady)(function() {
+  return discard6(liftEffect9(openHttpsInBrowserAndBlockOtherURLs))(function() {
+    return discard6(liftEffect9(appendSwitch("enable-features")("CSSContainerQueries")))(function() {
+      return discard6(liftEffect9(registerProtocol))(function() {
+        return bind14(liftEffect9(mkOptions))(function(options) {
+          return bind14(liftEffect9(newBrowserWindow(options)))(function(window2) {
+            return discard6(liftEffect9(registerAllHandlers(window2)))(function() {
+              return discard6(liftEffect9(showWhenReadyToShow(window2)))(function() {
+                return discard6(loadFile("index.html")(window2))(function() {
+                  return liftEffect9(setWindowOpenHandlerToExternal(window2));
+                });
               });
             });
           });

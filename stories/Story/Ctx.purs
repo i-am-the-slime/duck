@@ -10,26 +10,30 @@ import Data.Array (foldMap, singleton, foldl)
 import Data.Array as Array
 import Data.Either (either)
 import Data.Foldable (for_, traverse_)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isNothing)
 import Data.Time.Duration (Seconds(..))
 import Data.UUID (UUID)
 import Data.UUID as UUID
+import Debug (spy)
 import Effect (Effect)
+import Effect.Class.Console as Console
 import Effect.Ref as Ref
-import Effect.Uncurried (EffectFn2, runEffectFn2)
+import Effect.Uncurried (EffectFn1, EffectFn2, runEffectFn1, runEffectFn2)
 import Electron.Types (Channel(..))
 import ElectronAPI (ElectronListener)
 import Foreign (Foreign)
+import Foreign.Internal.Stringify (unsafeStringify)
 import Partial.Unsafe (unsafeCrashWith)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
-import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockRegistry, getMockSolutionDefinition)
+import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockReadme, getMockRegistry, getMockSolutionDefinition)
 import Story.Ctx.Types (OnMessage)
 import Story.Util.NotificationCentre (storyNotificationCentre)
-import UI.Component (Ctx)
+import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Unsafe.Coerce (unsafeCoerce)
 import Unsafe.Reference (unsafeRefEq)
+import Yoga.JSON (writeJSON)
 import Yoga.JSON as JSON
 
 defaultOnMessage ∷ OnMessage
@@ -39,16 +43,24 @@ defaultOnMessage msg = tryAllOf
   , getMockIsLoggedIntoGithub
   , getMockGithubUserQuery
   , getMockRegistry
+  , getMockReadme
+  -- This stays last
+  , logUnhandled
   ]
   where
   tryAllOf =
     foldl
-      ( \acc fn → ado
-          res ← fn msg
+      ( \acc fn → do
           accRes ← acc
-          in (accRes <|> res)
+          case accRes of
+            Just _ → pure accRes
+            Nothing → fn msg
       )
       (pure Nothing)
+  logUnhandled = \m → ado
+    Console.error ("Unhandled message")
+    Console.error (unsafeCoerce (JSON.write m))
+    in Nothing
 
 mkStoryCtx ∷ OnMessage → Effect Ctx
 mkStoryCtx onMessage = do
@@ -56,8 +68,7 @@ mkStoryCtx onMessage = do
   let
     registerListener listener = do
       listenersRef # Ref.modify_ (Array.cons listener)
-    removeListener listener = do
-      listenersRef # Ref.modify_ (Array.filter (unsafeRefEq listener))
+      pure (listenersRef # Ref.modify_ (Array.filter (unsafeRefEq listener)))
 
     postMessage ∷ UUID → MessageToMain → Effect Unit
     postMessage uuid payload = do
@@ -71,9 +82,9 @@ mkStoryCtx onMessage = do
           traverse_
             ( \elecList → do
                 let
-                  listener ∷ EffectFn2 Channel Foreign Unit
+                  listener ∷ EffectFn1 Foreign Unit
                   listener = unsafeCoerce elecList
-                runEffectFn2 listener (Channel "ipc")
+                runEffectFn1 listener
                   ( JSON.write
                       { response_for_message_id: UUID.toString uuid
                       , response: responseMessage
@@ -83,7 +94,6 @@ mkStoryCtx onMessage = do
 
   pure
     { registerListener
-    , removeListener
     , postMessage
     , notificationCentre: storyNotificationCentre
     , githubAuth:

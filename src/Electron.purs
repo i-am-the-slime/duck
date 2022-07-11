@@ -129,6 +129,8 @@ foreign import close ∷ BrowserWindow → Effect Unit
 
 foreign import setWindowOpenHandlerToExternal ∷ BrowserWindow → Effect Unit
 
+foreign import openHttpsInBrowserAndBlockOtherURLs ∷ Effect Unit
+
 foreign import encryptStringImpl ∷
   ∀ a. EffectFn3 (a → Maybe a) (Maybe a) String (Maybe Buffer)
 

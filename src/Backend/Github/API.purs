@@ -2,10 +2,22 @@ module Backend.Github.API where
 
 import Prelude
 
+import Affjax as AX
+import Affjax as Affjax
+import Affjax.Node as AN
+import Affjax.RequestBody as RequestBody
+import Affjax.RequestHeader (RequestHeader(..))
+import Affjax.ResponseFormat as ResponseFormat
 import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..), unGithubGraphQLQuery)
 import Biz.OAuth.Types (AccessToken(..), GithubAccessToken, TokenType(..))
+import Data.Argonaut.Core as J
+import Data.Either (Either(..))
+import Data.HTTP.Method (Method(..))
+import Data.Maybe (Maybe(..))
 import Data.Newtype (un)
-import Effect.Aff (Aff)
+import Effect.Aff (Aff, attempt, throwError)
+import Effect.Aff as Aff
+import Effect.Class.Console as Console
 import Foreign.Object as Object
 import Yoga.Fetch (postMethod)
 import Yoga.Fetch as F
@@ -13,14 +25,22 @@ import Yoga.Fetch.Impl.Node (nodeFetch)
 
 sendRequest ∷ GithubAccessToken → GithubGraphQLQuery → Aff GithubGraphQLResponse
 sendRequest { access_token, token_type } query = do
-  response ← F.fetch nodeFetch (F.URL "https://api.github.com/graphql")
-    { method: postMethod
-    , headers: Object.fromHomogeneous
-        { "Authorization": un TokenType token_type <> " " <> un AccessToken
-            access_token
-        , "Content-Type": "application/json"
+  errorOrResponse ← AN.request
+    ( AX.defaultRequest
+        { url = "https://api.github.com/graphql"
+        , method = Left POST
+        , responseFormat = ResponseFormat.string
+        , headers =
+            [ RequestHeader "Authorization" $ un TokenType token_type <> " "
+                <> un AccessToken
+                  access_token
+            ]
+        , content = (Just (RequestBody.string (unGithubGraphQLQuery query)))
         }
-    , body: unGithubGraphQLQuery query
-    }
-  body ← F.text response
-  pure (GithubGraphQLResponse body)
+    )
+  case errorOrResponse of
+    Left err → do
+      Console.error (AX.printError err)
+      throwError (Aff.error $ AX.printError err)
+    Right response → do
+      pure (GithubGraphQLResponse $ response.body)

@@ -23,7 +23,7 @@ registerHandler handle = do
   let
     listener = mkEffectFn2 \_ev fgn → do
       let
-        _ = spy "fgn" fgn
+        -- _ = spy "fgn" fgn
 
         msg ∷ { data ∷ { message_id ∷ UUID, payload ∷ Foreign } }
         msg = unsafeCoerce fgn

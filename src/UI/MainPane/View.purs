@@ -7,9 +7,9 @@ import UI.Component as UI
 import UI.Navigation.Router (useRouter)
 import UI.Navigation.Router.Types (Route(..))
 import UI.OpenProject as OpenProject
-import UI.Solutions as Solutions
-import UI.Registry as Registry
 import UI.Preferences as Preferences
+import UI.Registry as Registry
+import UI.Solutions as Solutions
 
 mkView ∷ UI.Component Unit
 mkView = do

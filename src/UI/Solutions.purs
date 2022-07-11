@@ -13,7 +13,8 @@ import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Block.Card (clickableCard)
-import UI.Component (Component, Ctx, component)
+import UI.Component (Component, component)
+import UI.Ctx.Types (Ctx)
 import UI.FilePath (renderFilePath)
 import UI.Hook.UseIPCMessage (useIPCMessage)
 import Yoga.Block as Block

@@ -61,7 +61,7 @@ handleMessageToMain window = \message_id message → do
         { response_for_message_id: UUID.toString message_id
         , response
         }
-    let _ = spy "Responding with" (JSON.write responsePayload)
+    -- let _ = spy "Responding with" (JSON.write responsePayload)
     window # sendToWebContents responsePayload (Channel "ipc")
 
 getInstalledTools ∷ Aff MessageToRenderer

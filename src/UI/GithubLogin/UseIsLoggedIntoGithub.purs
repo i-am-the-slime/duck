@@ -7,7 +7,7 @@ import Data.Newtype (class Newtype)
 import Network.RemoteData as RD
 import Partial.Unsafe (unsafePartial)
 import React.Basic.Hooks as React
-import UI.Component (Ctx)
+import UI.Ctx.Types (Ctx)
 import UI.Hook.UseIPCMessage (UseIPCMessage, useIPCMessage)
 
 newtype UseIsLoggedIntoGithub hook =

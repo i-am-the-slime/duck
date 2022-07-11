@@ -7,6 +7,7 @@ import Data.Maybe (isNothing)
 import Fahrtwind (active, background', border, borderBottom, borderCol', divideY, fontMedium, fontSemibold, hover, mT, overflowHidden, rounded2xl, roundedDefault, roundedFull, roundedLg, shadowXxl, textCol', textDefault, textSm, textXs, transform, widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Fahrtwind.Style.Divide (divideCol')
+import Image (setFallbackImgSrc)
 import Network.RemoteData as RD
 import Plumage.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
 import Plumage.Atom.PopOver.Types as Place
@@ -103,6 +104,7 @@ mkGithubAvatarPresentational = do
                           { width: "32"
                           , height: "32"
                           , src: "https://github.com/" <> name <> ".png"
+                          , onError: handler target (setFallbackImgSrc duckImage)
                           }
                       ]
                   , P.div_ (widthAndHeight 14) [ Heroicon.chevronDown ]
@@ -134,3 +136,6 @@ mkGithubAvatarPresentational = do
                 ]
           )
       ]
+
+foreign import duckImage :: String
+foreign import notFoundImage :: String

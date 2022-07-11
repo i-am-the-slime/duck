@@ -14,17 +14,7 @@ import React.Basic.Hooks as React
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Uncurried.ReaderT (ReaderT, runReaderT)
 import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre)
-
-type Ctx =
-  { registerListener ∷ ElectronListener → Effect Unit
-  , removeListener ∷ ElectronListener → Effect Unit
-  , postMessage ∷ UUID → MessageToMain → Effect Unit
-  , notificationCentre ∷ NotificationCentre
-  , githubAuth ∷
-      { getDeviceCode ∷ GetDeviceCode
-      , pollAccessToken ∷ PollAccessToken
-      }
-  }
+import UI.Ctx.Types (Ctx)
 
 type ComponentM = ReaderT Ctx Effect
 type Component props = ReaderT Ctx Effect (props → JSX)

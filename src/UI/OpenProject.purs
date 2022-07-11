@@ -7,7 +7,8 @@ import Data.Variant (match)
 import Network.RemoteData (RemoteData(..))
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
-import UI.Component (Component, Ctx, component)
+import UI.Component (Component, component)
+import UI.Ctx.Types (Ctx)
 import UI.Hook.UseIPCMessage (useIPCMessage)
 import UI.Project as Project
 import Yoga.Block as Block

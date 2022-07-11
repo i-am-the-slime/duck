@@ -10,7 +10,6 @@ import Data.Newtype (class Newtype)
 import Data.Tuple.Nested (type (/\), (/\))
 import Data.UUID (UUID, genUUID)
 import Data.UUID as UUID
-import Debug (spy)
 import Effect (Effect)
 import Effect.Class.Console as Console
 import Effect.Ref (Ref)
@@ -22,7 +21,7 @@ import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
 import React.Basic.Hooks (Hook, UseEffect, UseState, coerceHook, useEffectOnce)
 import React.Basic.Hooks as React
-import UI.Component (Ctx)
+import UI.Ctx.Types (Ctx)
 import Yoga.JSON as JSON
 
 useIPCMessage ∷
@@ -33,7 +32,7 @@ useIPCMessage ∷
         /\ Effect Unit
     )
 useIPCMessage
-  { registerListener, removeListener, postMessage } = coerceHook $ React.do
+  { registerListener, postMessage } = coerceHook $ React.do
   result /\ setResult ← React.useState' NotAsked
   inFlightMessageIDRef /\ _ ← React.useState'
     (unsafePerformEffect (Ref.new Nothing))
@@ -42,13 +41,12 @@ useIPCMessage
       Ref.write Nothing inFlightMessageIDRef
       setResult NotAsked
   useEffectOnce do
-    listener ← ElectronAPI.mkListener $ \_ foreignMessage → do
-      let _ = spy "foreignmessage" foreignMessage
+    listener ← ElectronAPI.mkListener $ \foreignMessage → do
+      -- let _ = spy "foreignmessage" foreignMessage
       currentMessageIDʔ ← Ref.read inFlightMessageIDRef
       for_ currentMessageIDʔ \id → do
         let
           expectedID = UUID.toString id
-          _ = spy "expected id" id
 
           messageOrError ∷
             _ _
@@ -63,7 +61,6 @@ useIPCMessage
                 (setResult $ RD.Success response)
           _ → mempty
     registerListener listener
-    pure $ removeListener listener
   let
     send msg = do
       setResult Loading

@@ -531,8 +531,8 @@ in  upstream
       , "web-file"
       , "web-html"
       ]
-    , repo = "https://github.com/i-am-the-slime/purescript-react-basic-dom.git"
-    , version = "patch-3"
+    , repo = "https://github.com/lumihq/purescript-react-basic-dom.git"
+    , version = "4633ad95b47a5806ca559dfb3b16b5339564f0ad"
     }
   with react-basic-emotion =
     { dependencies =
@@ -669,70 +669,7 @@ in  upstream
     , repo = "https://github.com/natefaubion/purescript-variant.git"
     , version = "master"
     }
-  with ry-blocks =
-    { repo = "https://github.com/rowtype-yoga/ry-blocks.git"
-    , version = "c0d4f508800c173389e716353268556ab0108bb7"
-    , dependencies =
-      [ "aff"
-      , "aff-promise"
-      , "arrays"
-      , "colors"
-      , "console"
-      , "control"
-      , "datetime"
-      , "debug"
-      , "effect"
-      , "either"
-      , "enums"
-      , "exceptions"
-      , "foldable-traversable"
-      , "foreign"
-      , "foreign-generic"
-      , "foreign-object"
-      , "framer-motion"
-      , "free"
-      , "functions"
-      , "heterogeneous"
-      , "integers"
-      , "interpolate"
-      , "lists"
-      , "literals"
-      , "maybe"
-      , "newtype"
-      , "nullable"
-      , "numbers"
-      , "ordered-collections"
-      , "partial"
-      , "prelude"
-      , "profunctor-lenses"
-      , "psci-support"
-      , "random"
-      , "react-basic"
-      , "react-basic-dom"
-      , "react-basic-emotion"
-      , "react-basic-hooks"
-      , "react-testing-library"
-      , "record"
-      , "record-extra"
-      , "routing"
-      , "routing-duplex"
-      , "spec"
-      , "spec-discovery"
-      , "strings"
-      , "tailrec"
-      , "transformers"
-      , "tuples"
-      , "two-or-more"
-      , "typelevel-peano"
-      , "typelevel-prelude"
-      , "unsafe-coerce"
-      , "untagged-union"
-      , "web-dom"
-      , "web-events"
-      , "web-html"
-      , "web-uievents"
-      ]
-    }
+  with ry-blocks = ../ry-blocks/spago.dhall as Location
   with heterogeneous =
     { dependencies =
       [ "either", "functors", "prelude", "record", "tuples", "variant" ]
@@ -865,3 +802,4 @@ in  upstream
     , repo = "https://github.com/rowtype-yoga/purescript-react-virtuoso.git"
     , version = "5be142c5a651509e9e9a68582ed1807c029ba1b5"
     }
+  with datetime.version = "master"

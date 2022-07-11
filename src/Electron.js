@@ -1,7 +1,8 @@
-import { app, BrowserWindow
+import {
+  app, BrowserWindow
   , ipcMain, ipcRenderer, dialog, shell, safeStorage
   , clipboard
- } from "electron"
+} from "electron"
 
 export const whenReadyImpl = () => app.whenReady()
 export const newBrowserWindow = (config) => () => new BrowserWindow(config)
@@ -48,22 +49,56 @@ export const close = (win) => () => win.close()
 
 
 export const onLocalhostRedirect = (urlCallback) => (win) => () => {
-      win.webContents.on('will-redirect',
-        async (e, url) => {
-      if(url.startsWith("http://127.0.0.1")) {
-         urlCallback(url)()
-         e.preventDefault()
+  win.webContents.on('will-redirect',
+    async (e, url) => {
+      if (url.startsWith("http://127.0.0.1")) {
+        urlCallback(url)()
+        e.preventDefault()
       }
-  });
+    });
 }
 export const setWindowOpenHandlerToExternal = win => () => {
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:')) {
-        shell.openExternal(url);
+      shell.openExternal(url);
     }
     return { action: 'deny' };
-});
+  });
 }
+
+
+export const openHttpsInBrowserAndBlockOtherURLs = () => {
+  app.on('web-contents-created', (createEvent, contents) => {
+
+    contents.on('new-window', newEvent => {
+      console.log("Blocked by 'new-window'")
+      newEvent.preventDefault();
+    });
+
+    contents.on('will-navigate', (newEvent, url) => {
+      console.log("will-navigate", url)
+      console.log("Blocked by 'will-navigate'")
+      newEvent.preventDefault()
+      if (url.startsWith('https:') || url.startsWith('http:')) {
+        shell.openExternal(url);
+      }
+    });
+
+    contents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith("https://doyensec.com/")) {
+        setImmediate(() => {
+          shell.openExternal(url);
+        });
+        return { action: 'allow' }
+      } else {
+        console.log("Blocked by 'setWindowOpenHandler'")
+        return { action: 'deny' }
+      }
+    })
+
+  });
+}
+
 
 export const isEncryptionAvailable = () => {
   return safeStorage.isEncryptionAvailable()

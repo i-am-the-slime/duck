@@ -7,22 +7,23 @@ import Backend.Protocol (registerProtocol)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
-import Electron (BrowserWindowConfig, appendSwitch, loadFile, newBrowserWindow, setWindowOpenHandlerToExternal, showWhenReadyToShow, waitUntilAppReady)
+import Electron (BrowserWindowConfig, appendSwitch, loadFile, newBrowserWindow, openHttpsInBrowserAndBlockOtherURLs, setWindowOpenHandlerToExternal, showWhenReadyToShow, waitUntilAppReady)
 import Node.Path (FilePath)
 import Node.Path as Path
 
 main ∷ Effect Unit
 main = launchAff_ do
   waitUntilAppReady
+  openHttpsInBrowserAndBlockOtherURLs # liftEffect
   appendSwitch "enable-features" "CSSContainerQueries" # liftEffect
   registerProtocol # liftEffect
   options ← mkOptions # liftEffect
   window ← newBrowserWindow options # liftEffect
-  window # setWindowOpenHandlerToExternal # liftEffect
   -- Set up inter-process communication
   window # registerAllHandlers # liftEffect
   window # showWhenReadyToShow # liftEffect
   window # loadFile "index.html"
+  window # setWindowOpenHandlerToExternal # liftEffect
 
 foreign import dirnameImpl ∷ Effect FilePath
 

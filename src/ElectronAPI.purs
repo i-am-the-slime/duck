@@ -3,7 +3,7 @@ module ElectronAPI where
 import Prelude
 
 import Effect (Effect)
-import Effect.Uncurried (mkEffectFn2)
+import Effect.Uncurried (mkEffectFn1)
 import Electron.Types (Channel)
 import Foreign (Foreign)
 import Unsafe.Coerce (unsafeCoerce)
@@ -20,8 +20,7 @@ foreign import data IpcRendererEvent ∷ Type
 foreign import data ElectronListener ∷ Type
 
 mkListener ∷
-  (IpcRendererEvent → Foreign → Effect Unit) → Effect ElectronListener
-mkListener callback = pure $ unsafeCoerce $ mkEffectFn2 callback
+  (Foreign → Effect Unit) → Effect ElectronListener
+mkListener callback = pure $ unsafeCoerce $ mkEffectFn1 callback
 
-foreign import on ∷ Channel → ElectronListener → Effect Unit
-foreign import removeListener ∷ Channel → ElectronListener → Effect Unit
+foreign import on ∷ Channel → ElectronListener → Effect (Effect Unit)

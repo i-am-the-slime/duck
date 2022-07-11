@@ -13,7 +13,7 @@ cardContainerStyle =
       <> pX 24
       <> pT 16
       <> pB 24
-      <> shadowLg
+      <> shadowMd
       <> overflowHidden
       <> positionRelative
       <> userSelectNone

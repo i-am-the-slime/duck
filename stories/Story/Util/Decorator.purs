@@ -5,10 +5,12 @@ import Prelude
 import Story.Util.NotificationCentre (storyNotificationCentre)
 import Storybook as Storybook
 import Storybook.Types (Decorator)
-import UI.Container (mkContainer)
+import UI.Container (mkContainer, ourGlobalStyle)
 import UI.MainPane.View as MainPaine
+import UI.Navigation.ThemeSwitcher (mkThemeProvider)
 
 containerDecorator ∷ Decorator
 containerDecorator = Storybook.decorator \x → ado
+  themeProvider ← mkThemeProvider ourGlobalStyle
   container ← mkContainer storyNotificationCentre
-  in container [ x ]
+  in themeProvider $ container [ x ]
