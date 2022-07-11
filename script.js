@@ -33606,15 +33606,16 @@ var openHttpsInBrowserAndBlockOtherURLs = () => {
       newEvent.preventDefault();
     });
     contents.on("will-navigate", (newEvent, url) => {
-      console.log("will-navigate", url);
+      if (url.startsWith("https:") || url.startsWith("http:")) {
+        setImmediate(() => {
+          import_electron.shell.openExternal(url);
+        });
+      }
       console.log("Blocked by 'will-navigate'");
       newEvent.preventDefault();
-      if (url.startsWith("https:") || url.startsWith("http:")) {
-        import_electron.shell.openExternal(url);
-      }
     });
     contents.setWindowOpenHandler(({ url }) => {
-      if (url.startsWith("https://doyensec.com/")) {
+      if (url.startsWith("https:") || url.startsWith("http:")) {
         setImmediate(() => {
           import_electron.shell.openExternal(url);
         });
