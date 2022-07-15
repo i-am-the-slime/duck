@@ -20,6 +20,5 @@ registry = do
   storyCtx ← mkStoryCtx defaultOnMessage
   compo ← runComponent storyCtx Registry.mkView
   pure $ R.div
-    { style: R.css { height: "10000px", overflow: "scroll" }
-    , children: [ compo unit ]
+    { children: [ compo unit ]
     }

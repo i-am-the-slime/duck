@@ -51,6 +51,7 @@ export const close = (win) => () => win.close()
 export const onLocalhostRedirect = (urlCallback) => (win) => () => {
   win.webContents.on('will-redirect',
     async (e, url) => {
+      console.log("will-redirect", url);
       if (url.startsWith("http://127.0.0.1")) {
         urlCallback(url)()
         e.preventDefault()

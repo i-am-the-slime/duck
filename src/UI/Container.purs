@@ -2,7 +2,7 @@ module UI.Container where
 
 import Yoga.Prelude.View
 
-import Fahrtwind (background, background', height, heightFull, heightScreen, hover, ignoreClicks, overflowHidden, overflowVisible, positionAbsolute, positionFixed, width, widthFull, widthScreen)
+import Fahrtwind (background, background', borderCol, borderCol', borderLeft, height, heightFull, heightScreen, hover, ignoreClicks, opacity, overflowHidden, overflowVisible, positionAbsolute, positionFixed, width, widthFull, widthScreen)
 import Fahrtwind as F
 import Plumage.Prelude.Style (Style)
 import React.Basic.DOM as R
@@ -51,7 +51,6 @@ mkContainer notificationCentre = do
         { id
         , css: fullScreenLayerStyle zIndex
             <> positionAbsolute
-            <> overflowVisible
             <> heightFull
             <> widthFull
             <> overflowHidden
@@ -77,11 +76,13 @@ ourGlobalStyle = E.css
   , body: E.nested $ (background' col.backgroundLayer1)
       <> E.css
         { "--mono-font": E.str "'Jetbrains Mono', monospace"
-        , scrollbarGutter: E.str "stable"
+        -- , scrollbarGutter: E.str "stable"
         }
-  , "*": E.nested $ E.css
+  , ".duck-scrollbar": E.nested $ E.css
       { "&::-webkit-scrollbar":
-          E.nested $ width 12 <> height 6
+          E.nested $ width 12 <> height 6 <> opacity 4
+            <> borderLeft 1
+            <> borderCol' col.highlight
       , "&::-webkit-scrollbar-track": E.nested
           $ background' col.backgroundBright3
       , "&::-webkit-scrollbar-thumb": E.nested
@@ -92,15 +93,16 @@ ourGlobalStyle = E.css
               --     ( "1px solid " <> colour.backgroundLayer1
               --     )
               }
+          <> borderLeft 2
 
           <> hover
             (background' col.textPaler4)
 
       , "&::-webkit-scrollbar-corner": E.nested
           $ background' col.backgroundLayer2
-      , a: E.nested $ E.css
-          { textDecoration: E.none
-          , fontWeight: E.str "normal"
-          }
+      }
+  , a: E.nested $ E.css
+      { textDecoration: E.none
+      , fontWeight: E.str "normal"
       }
   }

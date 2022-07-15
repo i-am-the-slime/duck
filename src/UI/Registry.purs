@@ -1,9 +1,12 @@
 module UI.Registry where
 
+import Yoga.Prelude.View
+
 import Biz.GraphQL (GraphQL(..))
 import Biz.Spago.Types (ProjectName(..), Repository(..))
 import Control.Monad.ST (run, while) as ST
 import Control.Monad.ST.Ref (modify, new, read) as ST
+import Data.Array (any)
 import Data.Array as Array
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NonEmptyArray
@@ -28,9 +31,10 @@ import Effect.Aff as Aff
 import Effect.Class.Console as Console
 import Effect.Now as Instant
 import Effect.Unsafe (unsafePerformEffect)
-import Fahrtwind (background', borderBottom, borderCol', cursorPointer, displayNone, flexCol, flexGrow, flexRow, focusWithin, fontMedium, full, height', heightFull, hover, lineHeight, mXAuto, mXY, maxHeight', maxWidth, overflowHidden, overflowYScroll, pX', pY', roundedLg, roundedMd, roundedNone, roundedXl, screenMd, screenXl, textCol', textDefault, textLg, textXs, transition, width, width', widthAndHeight, widthFull)
+import Fahrtwind (background', borderBottom, borderCol', cursorPointer, displayNone, flexCol, flexGrow, flexRow, focusWithin, fontMedium, full, height, height', heightFull, hover, lineHeight, mXAuto, mXY, maxHeight', maxWidth, minHeight', overflowHidden, overflowXHidden, overflowYScroll, pX', pY', roundedDefault, roundedLg, roundedMd, roundedNone, roundedXl, screenMd, screenXl, textCol', textDefault, textLg, textOverflowEllipsis, textXs, transition, width, width', widthAndHeight, widthAndHeight', widthFull, zIndex)
 import Fahrtwind.Icon.Heroicons as Heroicon
-import Foreign (MultipleErrors)
+import Foreign (Foreign, MultipleErrors)
+import Foreign.Object as Object
 import Image (setFallbackImgSrc)
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
@@ -45,11 +49,14 @@ import UI.Block.Card (styledCard, styledClickableCard)
 import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
 import UI.Ctx.Types (Ctx)
+import UI.Editor (useMonaco)
+import UI.Editor as Editor
 import UI.FilePath (GithubRepo, renderFilePath, renderGithubRepo)
 import UI.GithubLogin.UseGithubGraphQL (UseGithubGraphQL, useDynamicGithubGraphQL)
 import UI.Hook.UseGetFileInRepo (GetFileInRepoInput, useGetTextFileInRepo)
 import UI.MainPane.Style (mainViewHeight)
 import UI.Navigation.HeaderBar.GithubAvatar (notFoundImage)
+import UI.Repository.FileTree.View as FileTree
 import UI.Repository.View as Repository
 import Yoga.Block as Block
 import Yoga.Block.Atom.Input.Hook.UseTypingPlaceholders (useTypingPlaceholders)
@@ -57,16 +64,19 @@ import Yoga.Block.Container.Style (col, colour)
 import Yoga.Block.Hook.UseMediaQuery (useMediaQuery)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
 import Yoga.Block.Molecule.Sheet as Sheet
+import Yoga.Block.Quark.Skeleton.Style (skeletonBox)
 import Yoga.JSON as JSON
-import Yoga.Prelude.View (type (/\), Effect, Hook, JSX, Maybe(..), Unit, bind, const, discard, foldMap, foldMapWithIndex, for_, fragment, fromMaybe, getHTMLElementFromRef, guard, handler, handler_, isJust, liftEffect, map, maybe, mempty, not, note, pure, show, target, targetValue, traverse_, unit, useEffect, useEffectOnce, (#), ($), (*), (+), (/), (/=), (/>), (/\), (<), (<#>), (<$), (</*), (</*>), (</>), (<<<), (<>), (<|>), (==), (>), (>=), (>>=), (>>>), (||))
 import Yoga.Prelude.View as HTMLElement
+
+type RepoInfo = { defaultBranch ∷ String, lastCommit ∷ JSDate }
 
 mkView ∷ UI.Component Unit
 mkView = do
   repoFilter ← mkRepositoryFilter # liftEffect
   repoView ← Repository.mkView
+  fileTree ← FileTree.mkView
   repoList ← mkRepoList # liftEffect
-  now ← Instant.now # liftEffect
+  fileEditor ← mkFileEditor
   UI.component "Registry" \ctx _ → React.do
     bowerPackagesRD /\ sendBowerPackagesQuery ← useGetPackagesFileInRepo ctx
     newPackagesRD /\ sendNewPackagesQuery ← useGetPackagesFileInRepo ctx
@@ -74,6 +84,7 @@ mkView = do
     repoInfo /\ getRepoInfo ← useGetGithubRepoInfo ctx
     filteredReposʔ /\ setFilteredRepos ← useStateEq' Nothing
     selectedRepoʔ /\ setSelectedRepo ← useStateEq' Nothing
+    selectedFileʔ /\ setSelectedFile ← useStateEq' Nothing
 
     screenIsAtLeastMedium ← useMediaQuery "(min-width: 768px)"
 
@@ -84,7 +95,14 @@ mkView = do
     useEffect (bowerPackagesRD /\ newPackagesRD) do
       case bowerPackagesRD, newPackagesRD of
         Success bowerRepos, Success newRepos → do
-          let allRepos = bowerRepos <> newRepos
+          let
+            allRepos = (bowerRepos <> newRepos) # Map.filter
+              ( \(Repository r) →
+                  not
+                    ( deadRepos # Array.any
+                        (\repo → r # String.contains (Pattern repo))
+                    )
+              )
           setRepos $ Just allRepos
           setFilteredRepos $ Just allRepos
           getRepoInfo
@@ -118,9 +136,8 @@ mkView = do
                       <>
                         ( screenMd $
                             E.css
-                              { ".virtualised-registry-entries": E.nested
-                                  $ width 360
-                                  <> maxWidth 360
+                              { ".virtualised-registry-entries":
+                                  E.nested $ width 360 <> maxWidth 360
                               }
                         )
                       <>
@@ -132,32 +149,57 @@ mkView = do
                   )
                   [ P.div_
                       ( displayNone
+                          <> heightFull
                           <> screenMd
                             ( E.css { display: E.str "block" }
-                                <> overflowYScroll
+                                <> E.css { overflowY: E.str "overlay" }
                                 <> heightFull
+                                <> minHeight' full
                                 <> maxHeight' full
                                 <> width' (E.str "calc(100% - 360px)")
                             )
                       )
-                      [ selectedRepoʔ # foldMap
-                          ( styledCard
-                              ( mXY 24
-                                  <> pX' (E.var "--s2")
-                                  <> pY' (E.var "--s2")
-                                  <> roundedLg
-                                  <>
-                                    ( screenXl
-                                        ( width 800 <> mXAuto
-                                            <> roundedXl
-                                            <> pX' (E.var "--s4")
-                                            <> pY' (E.var "--s3")
-                                        )
+                      [ selectedRepoʔ # foldMap \repo →
+                          P.div_ (flexRow <> heightFull)
+                            [ P.div_ (width 200)
+                                [ fileTree
+                                    { repo
+                                    , defaultBranch:
+                                        ( repoInfo # Map.lookup repo >>=
+                                            RD.toMaybe
+                                        ) # maybe "master" _.defaultBranch
+                                    , setSelectedFile
+                                    , selectedFileʔ
+                                    }
+                                ]
+                            , Block.box { css: widthFull <> heightFull }
+                                [ styledCard
+                                    ( pX' (E.var "--s2")
+                                        <> pY' (E.var "--s2")
+                                        <> heightFull
+                                        <> roundedNone
+                                        <>
+                                          ( screenXl
+                                              ( width 800 <> mXAuto
+                                                  <> roundedXl
+                                                  <> pX' (E.var "--s4")
+                                                  <> pY' (E.var "--s3")
+                                              )
+                                          )
                                     )
-                              )
-                              <<< pure
-                              <<< repoView
-                          )
+                                    [ fold ado
+                                        githubRepo ← selectedRepoʔ
+                                        filePath ← selectedFileʔ
+                                        let
+                                          onChange = \x → do
+                                            let _ = spy "onChange" x
+                                            pure unit
+                                        in
+                                          fileEditor
+                                            { filePath, githubRepo, onChange }
+                                    ]
+                                ]
+                            ]
                       ]
                   , repoList
                       { repoInfo
@@ -234,7 +276,7 @@ mkRepositoryFilter = do
       ]
 
 type ListProps =
-  { repoInfo ∷ Map GithubRepo (RemoteData String JSDate)
+  { repoInfo ∷ Map GithubRepo (RemoteData String RepoInfo)
   , selectedRepoʔ ∷ Maybe GithubRepo
   , setSelectedRepo ∷ Maybe GithubRepo → Effect Unit
   , repos ∷ Map ProjectName Repository
@@ -252,7 +294,10 @@ mkRepoList = do
         { useWindowScroll: false
         , overscan: 100.0
         , className: "virtualised-registry-entries"
-        , style: R.css { height: "100%", background: colour.backgroundLayer4 }
+        , style: R.css
+            { height: "100%"
+            , background: colour.backgroundLayer4
+            }
         , context: { props, now }
         , data: Map.toUnfoldable repos ∷ Array (ProjectName /\ Repository)
         , itemContent
@@ -270,7 +315,7 @@ mkRepoList = do
       let lastCommitRD = githubRepoʔ >>= \ghr → Map.lookup ghr repoInfo
       let
         cardStyle = roundedNone <> borderBottom 1
-          <> borderCol' col.backgroundLayer2
+          <> borderCol' col.backgroundBright4
           <> hover (background' col.backgroundLayer3)
       let
         theCard = githubRepoʔ # maybe
@@ -290,7 +335,13 @@ mkRepoList = do
                 , onError: handler target (setFallbackImgSrc notFoundImage)
                 }
             , Block.stack { space: E.str "0" }
-                [ P.div_ (textDefault <> fontMedium <> lineHeight "1em")
+                [ P.div_
+                    ( textDefault <> fontMedium <> lineHeight "1.2em"
+                        <> E.css { whiteSpace: E.str "nowrap" }
+                        <> textOverflowEllipsis
+                        <> overflowXHidden
+                        <> maxWidth 224
+                    )
                     [ R.text
                         ( un ProjectName name # \n →
                             stripPrefix
@@ -299,15 +350,27 @@ mkRepoList = do
                         )
                     ]
                 , P.span_ (textXs <> textCol' col.textPaler4)
-                    [ lastCommitRD # R.text <<< case _ of
-                        Nothing → "(Only works for Github repos)"
-                        Just (RD.NotAsked) → "-"
-                        Just (RD.Loading) → "Loading last commit age"
-                        Just (RD.Failure e) → String.take 24 e
-                        Just (RD.Success s) → JSDate.toInstant s # foldMap
-                          \start →
-                            approximateHumanReadableTimeInThePast
-                              { start, end: now }
+                    [ lastCommitRD # case _ of
+                        Nothing → R.text "???"
+                        Just (RD.NotAsked) → R.div'
+                          </*
+                            { css: (skeletonBox <> roundedDefault <> width 140)
+                            , _data: Object.singleton "animated" "true"
+                            }
+                          /> []
+                        Just (RD.Loading) → R.div'
+                          </*
+                            { css: (skeletonBox <> roundedDefault <> width 140)
+                            , _data: Object.singleton "animated" "true"
+                            }
+                          /> []
+                        Just (RD.Failure e) → R.text (String.take 24 e)
+                        Just (RD.Success { lastCommit }) →
+                          R.text $ JSDate.toInstant lastCommit #
+                            foldMap
+                              \start →
+                                approximateHumanReadableTimeInThePast
+                                  { start, end: now }
 
                     ]
                 , case githubRepoʔ of
@@ -368,21 +431,17 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
   remainingChunks /\ setRemainingChunks ← React.useState
     ([] ∷ (Array (NonEmptyArray GithubRepo)))
   results /\ setResults ← React.useState
-    (Map.empty ∷ _ GithubRepo (RemoteData String JSDate))
+    (Map.empty ∷ _ GithubRepo (RemoteData String RepoInfo))
   resultsRef ← React.useRef
-    (Map.empty ∷ _ GithubRepo (RemoteData String JSDate))
+    (Map.empty ∷ _ GithubRepo (RemoteData String RepoInfo))
   useEffect remainingChunks do
     chunkResults ← React.readRef resultsRef
     setResults (Map.union chunkResults)
-    case (Array.head remainingChunks) of
+    case Array.head remainingChunks of
       Nothing → mempty
       Just chunk → do
         setResults
-          ( Map.union
-              ( chunk <#> (\repo → repo /\ Loading)
-                  # Map.fromFoldable
-              )
-          )
+          (Map.union (chunk <#> (_ /\ Loading) # Map.fromFoldable))
         get (mkGetRepoInfo chunk) {}
     -- [TODO] set results
     mempty
@@ -407,7 +466,14 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
                                 ( x.defaultBranchRef.target.history.edges
                                     # Array.head
                                     >>= _.node.pushedDate
-                                    <#> (unsafePerformEffect <<< JSDate.parse)
+                                    <#>
+                                      ( \s →
+                                          { lastCommit: unsafePerformEffect
+                                              (JSDate.parse s)
+                                          , defaultBranch:
+                                              x.defaultBranchRef.name
+                                          }
+                                      )
                                     # note "null result from API"
                                     # RD.fromEither
                                 )
@@ -420,18 +486,12 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = React.do
     mempty
   let
     result ∷
-      (Map GithubRepo (RemoteData String JSDate)) /\
+      (Map GithubRepo (RemoteData String RepoInfo)) /\
         (Array GithubRepo → Effect Unit)
     result =
       results /\ \repos → do
         let chunks = chunked 200 repos
-        setResults
-          ( const
-              ( Map.fromFoldable
-                  ( repos <#> (\repo → (repo /\ NotAsked))
-                  )
-              )
-          )
+        setResults $ const $ Map.fromFoldable $ repos <#> (_ /\ NotAsked)
         setRemainingChunks (const (chunks))
 
   pure result
@@ -519,3 +579,73 @@ approximateHumanReadableTimeInThePast { start, end } = do
     if intMinutes == 0 then "just now"
     else if intMinutes == 1 then "a minute ago"
     else show intMinutes <> " minutes ago"
+
+type FileEditorProps =
+  { githubRepo ∷ GithubRepo
+  , filePath ∷ String
+  , onChange ∷ { originalContent ∷ String, content ∷ String } → Effect Unit
+  }
+
+mkFileEditor = do
+  UI.component "FileEditor"
+    \ctx ({ githubRepo, filePath, onChange } ∷ FileEditorProps) → React.do
+      fileContentRD /\ loadFile ← useGetTextFileInRepo ctx
+      { ref, setValue } ← useMonaco ""
+        \s → for_ fileContentRD \originalContent →
+          onChange { originalContent, content: s }
+      useEffect (githubRepo /\ filePath) do
+        loadFile
+          { revision_and_file: "HEAD:" <> filePath
+          , name: githubRepo.repoName
+          , owner: githubRepo.owner
+          }
+        mempty
+      useEffect fileContentRD do
+        for_ fileContentRD \fileContent → do
+          setValue fileContent
+        mempty
+      div ← React.useMemo unit \_ → R.div'
+        </*>
+          { className: "duck-file-editor"
+          , css: widthFull <> heightFull
+          , ref
+          }
+      pure div
+
+deadRepos ∷ Array String
+deadRepos =
+  [ "purescript/purescript-arb-instances"
+  , "athanclark/purescript-big-integer"
+  , "michael-swan/purescript-chosen"
+  , "michael-swan/purescript-chosen-halogen"
+  , "awkure/purescript-combinators"
+  , "raduom/purescript-constraint-kanren"
+  , "alexknvl/purescript-datareify"
+  , "raduom/purescript-dynamic"
+  , "KolesnichenkoDS/purescript-flux-store"
+  , "mbid/purescript-focus-ui"
+  , "garyb/purescript-fussy"
+  , "nsaunders/purescript-globals-safe"
+  , "paf31/purescript-hashable"
+  , "mcoffin/purescript-hubot"
+  , "piq9117/purescript-mailgun"
+  , "askasp/purescript-mdcss"
+  , "purescript/purescript-node-args"
+  , "i-am-tom/purescript-node-readline-question"
+  , "plippe/purescript-nunjucks"
+  , "birdgg/purescript-org"
+  , "cxfreeio/purescript-phantomjs"
+  , "slamdata/purescript-photons"
+  , "piq9117/purescript-plaid-node"
+  , "fehrenbach/purescript-pouchdb-ffi"
+  , "alvart/purescript-pux-router"
+  , "purescript/purescript-reactive"
+  , "purescript/purescript-reactive-jquery"
+  , "saksdirect/purescript-slack"
+  , "alexknvl/purescript-stablename"
+  , "rightfold/purescript-stm"
+  , "rightfold/purescript-subtype"
+  , "dbushenko/purescript-toastr"
+  , "f-o-a-m/purescript-uport"
+  , "CapillarySoftware/purescript-yaml"
+  ]

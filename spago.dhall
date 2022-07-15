@@ -55,6 +55,7 @@ to generate this file without the comments in this block.
   , "now"
   , "nullable"
   , "ordered-collections"
+  , "parallel"
   , "partial"
   , "plumage"
   , "posix-types"

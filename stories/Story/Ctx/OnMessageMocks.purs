@@ -94,18 +94,34 @@ getMockRegistry = case _ of
     { data:
         { repository:
             { object:
-                { text: writeJSON $
-                    Map.fromFoldable
-                      ( replicate 300
-                          ( "purescript-beer" /\ "jack"
-                          ) # mapWithIndex \i (name /\ user) →
-                          ( (name <> "-" <> show i) /\
-                              ( "https://github.com/"
-                                  <> (user <> show i)
-                                  <> "/purescript-beer.git"
+                { text: writeJSON
+                    $ Map.union
+                        ( Map.fromFoldable
+                            [ ( "purescript-framer-motion" /\
+                                  "https://github.com/i-am-the-slime/purescript-framer-motion.git"
                               )
-                          )
-                      )
+                            , ( "purescript-bigints" /\
+                                  "https://github.com/purescript-contrib/purescript-bigints.git"
+                              )
+                            , ( "purescript-extremely-long-name-because-its-good-for-testing"
+                                  /\
+                                    "https://github.com/purescript-contrib/purescript-bigints.git"
+                              )
+
+                            ]
+                        )
+                    $
+                      Map.fromFoldable
+                        ( replicate 300
+                            ( "purescript-z-fake" /\ "jack"
+                            ) # mapWithIndex \i (name /\ user) →
+                            ( (name <> "-" <> show i) /\
+                                ( "https://github.com/"
+                                    <> (user <> show i)
+                                    <> "/purescript-beer.git"
+                                )
+                            )
+                        )
                 }
             }
         }
@@ -119,7 +135,7 @@ getMockRegistry = case _ of
                 { text: writeJSON $
                     Map.fromFoldable
                       ( replicate 100
-                          ( "purescript-bower" /\ "jack"
+                          ( "purescript-z-fake-bower" /\ "jack"
                           ) # mapWithIndex \i (name /\ user) →
                           ( (name <> "-" <> show i) /\
                               ( "https://github.com/"

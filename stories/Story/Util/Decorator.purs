@@ -6,7 +6,6 @@ import Story.Util.NotificationCentre (storyNotificationCentre)
 import Storybook as Storybook
 import Storybook.Types (Decorator)
 import UI.Container (mkContainer, ourGlobalStyle)
-import UI.MainPane.View as MainPaine
 import UI.Navigation.ThemeSwitcher (mkThemeProvider)
 
 containerDecorator ∷ Decorator

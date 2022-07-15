@@ -36,10 +36,17 @@ mkOptions = ado
     , backgroundColor: "#000000"
     , show: false
     , webPreferences:
-        { preload: Path.concat [ dirName, "preload.js" ]
-        , nodeIntegration: false
-        , enableRemoteModule: false
+        { preload: Path.concat [ dirName, "..", "preload.js" ]
+        , nodeIntegration: true
+        , enableRemoteModule: true
         , contextIsolation: true
-        , sandbox: true
+        , sandbox: false
+        , nodeIntegrationInWorker: true
+        -- , nodeIntegration: false
+        -- , enableRemoteModule: true
+        -- , contextIsolation: true
+        -- , sandbox: true
+        -- , nodeIntegrationInWorker: false
+        , worldSafeExecuteJavaScript: true
         }
     }

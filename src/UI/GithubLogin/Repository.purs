@@ -1,6 +1,6 @@
 module UI.GithubLogin.Repository where
 
-import Yoga.Prelude.View (Either(..), bind, join, pure, show, (#), ($), (<#>), (<>), (<|>), (>>>))
+import Yoga.Prelude.View
 
 import Biz.Github (clientID, scopes)
 import Biz.Github.Types (AccessTokenRequest, DeviceCode, DeviceCodeRequest(..), DeviceCodeResponse, DeviceTokenError, GrantType(..))

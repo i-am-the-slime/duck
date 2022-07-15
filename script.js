@@ -4464,11 +4464,8 @@ var init_fetch_blob = __esm({
           } else {
             part = encoder.encode(`${element}`);
           }
-          const size5 = ArrayBuffer.isView(part) ? part.byteLength : part.size;
-          if (size5) {
-            this.#size += size5;
-            this.#parts.push(part);
-          }
+          this.#size += ArrayBuffer.isView(part) ? part.byteLength : part.size;
+          this.#parts.push(part);
         }
         this.#endings = `${options.endings === void 0 ? "transparent" : options.endings}`;
         const type = options.type === void 0 ? "" : String(options.type);
@@ -4737,20 +4734,18 @@ var init_from = __esm({
         this.#start = options.start;
         this.size = options.size;
         this.lastModified = options.lastModified;
-        this.originalSize = options.originalSize === void 0 ? options.size : options.originalSize;
       }
       slice(start, end2) {
         return new BlobDataItem({
           path: this.#path,
           lastModified: this.lastModified,
-          originalSize: this.originalSize,
           size: end2 - start,
           start: this.#start + start
         });
       }
       async *stream() {
-        const { mtimeMs, size: size5 } = await stat3(this.#path);
-        if (mtimeMs > this.lastModified || this.originalSize !== size5) {
+        const { mtimeMs } = await stat3(this.#path);
+        if (mtimeMs > this.lastModified) {
           throw new import_node_domexception.default("The requested file could not be read, typically due to permission problems that have occurred after a reference to a file was acquired.", "NotReadableError");
         }
         yield* (0, import_node_fs.createReadStream)(this.#path, {
@@ -5681,11 +5676,11 @@ var composeKleisliFlipped = function(dictBind) {
   };
 };
 var composeKleisli = function(dictBind) {
-  var bind15 = bind(dictBind);
+  var bind14 = bind(dictBind);
   return function(f3) {
     return function(g) {
       return function(a) {
-        return bind15(f3(a))(g);
+        return bind14(f3(a))(g);
       };
     };
   };
@@ -5696,9 +5691,9 @@ var discardUnit = {
   }
 };
 var join = function(dictBind) {
-  var bind15 = bind(dictBind);
+  var bind14 = bind(dictBind);
   return function(m2) {
-    return bind15(m2)(identity3);
+    return bind14(m2)(identity3);
   };
 };
 
@@ -6037,12 +6032,12 @@ var bindE = function(a) {
 
 // output/Control.Monad/index.js
 var ap = function(dictMonad) {
-  var bind15 = bind(dictMonad.Bind1());
+  var bind14 = bind(dictMonad.Bind1());
   var pure17 = pure(dictMonad.Applicative0());
   return function(f3) {
     return function(a) {
-      return bind15(f3)(function(f$prime) {
-        return bind15(a)(function(a$prime) {
+      return bind14(f3)(function(f$prime) {
+        return bind14(a)(function(a$prime) {
           return pure17(f$prime(a$prime));
         });
       });
@@ -6479,12 +6474,12 @@ var monadExceptT = function(dictMonad) {
   };
 };
 var bindExceptT = function(dictMonad) {
-  var bind15 = bind(dictMonad.Bind1());
+  var bind14 = bind(dictMonad.Bind1());
   var pure17 = pure(dictMonad.Applicative0());
   return {
     bind: function(v) {
       return function(k) {
-        return bind15(v)(either(function($187) {
+        return bind14(v)(either(function($187) {
           return pure17(Left.create($187));
         })(function(a) {
           var v1 = k(a);
@@ -6537,19 +6532,19 @@ var altExceptT = function(dictSemigroup) {
   var append2 = append(dictSemigroup);
   return function(dictMonad) {
     var Bind1 = dictMonad.Bind1();
-    var bind15 = bind(Bind1);
+    var bind14 = bind(Bind1);
     var pure17 = pure(dictMonad.Applicative0());
     var functorExceptT1 = functorExceptT(Bind1.Apply0().Functor0());
     return {
       alt: function(v) {
         return function(v1) {
-          return bind15(v)(function(rm) {
+          return bind14(v)(function(rm) {
             if (rm instanceof Right) {
               return pure17(new Right(rm.value0));
             }
             ;
             if (rm instanceof Left) {
-              return bind15(v1)(function(rn) {
+              return bind14(v1)(function(rn) {
                 if (rn instanceof Right) {
                   return pure17(new Right(rn.value0));
                 }
@@ -8394,7 +8389,7 @@ function _mapWithKey(m0, f3) {
   }
   return m2;
 }
-function _foldM(bind15) {
+function _foldM(bind14) {
   return function(f3) {
     return function(mz) {
       return function(m2) {
@@ -8406,7 +8401,7 @@ function _foldM(bind15) {
         }
         for (var k in m2) {
           if (hasOwnProperty.call(m2, k)) {
-            acc = bind15(acc)(g(k));
+            acc = bind14(acc)(g(k));
           }
         }
         return acc;
@@ -33125,7 +33120,7 @@ var request = function(driver2) {
         return $$const(req.responseFormat.value0(pure8(unit)));
       }
       ;
-      throw new Error("Failed pattern match at Affjax (line 326, column 18 - line 335, column 56): " + [req.responseFormat.constructor.name]);
+      throw new Error("Failed pattern match at Affjax (line 274, column 18 - line 283, column 57): " + [req.responseFormat.constructor.name]);
     }();
     var extractContent = function(v2) {
       if (v2 instanceof ArrayView) {
@@ -33156,7 +33151,7 @@ var request = function(driver2) {
         return new Right(unsafeToForeign(stringify(v2.value0)));
       }
       ;
-      throw new Error("Failed pattern match at Affjax (line 285, column 20 - line 301, column 67): " + [v2.constructor.name]);
+      throw new Error("Failed pattern match at Affjax (line 235, column 20 - line 250, column 69): " + [v2.constructor.name]);
     };
     var addHeader = function(mh) {
       return function(hs) {
@@ -33207,7 +33202,7 @@ var request = function(driver2) {
             });
           }
           ;
-          throw new Error("Failed pattern match at Affjax (line 257, column 9 - line 259, column 51): " + [v1.constructor.name]);
+          throw new Error("Failed pattern match at Affjax (line 209, column 9 - line 211, column 52): " + [v1.constructor.name]);
         }
         ;
         if (v2 instanceof Left) {
@@ -33227,7 +33222,7 @@ var request = function(driver2) {
           }());
         }
         ;
-        throw new Error("Failed pattern match at Affjax (line 255, column 13 - line 267, column 28): " + [v2.constructor.name]);
+        throw new Error("Failed pattern match at Affjax (line 207, column 144 - line 219, column 28): " + [v2.constructor.name]);
       });
     };
     if (req.content instanceof Nothing) {
@@ -33244,10 +33239,10 @@ var request = function(driver2) {
         return pure13(new Left(new RequestContentError(v.value0)));
       }
       ;
-      throw new Error("Failed pattern match at Affjax (line 240, column 7 - line 244, column 48): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Affjax (line 199, column 7 - line 203, column 48): " + [v.constructor.name]);
     }
     ;
-    throw new Error("Failed pattern match at Affjax (line 236, column 3 - line 244, column 48): " + [req.content.constructor.name]);
+    throw new Error("Failed pattern match at Affjax (line 195, column 3 - line 203, column 48): " + [req.content.constructor.name]);
   };
 };
 var printError = function(v) {
@@ -33365,7 +33360,7 @@ var sendRequest = function(v) {
         return pure9(errorOrResponse.value0.body);
       }
       ;
-      throw new Error("Failed pattern match at Backend.Github.API (line 41, column 3 - line 46, column 51): " + [errorOrResponse.constructor.name]);
+      throw new Error("Failed pattern match at Backend.Github.API (line 45, column 3 - line 55, column 51): " + [errorOrResponse.constructor.name]);
     });
   };
 };
@@ -33424,19 +33419,9 @@ var toAffE = function(f3) {
   return bind7(liftEffect4(f3))(toAff4);
 };
 
-// output/Foreign.Internal.Stringify/foreign.js
-var unsafeStringify = JSON.stringify;
-
 // output/Yoga.Fetch/index.js
-var bind8 = /* @__PURE__ */ bind(bindAff);
-var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var text = function(res) {
-  var toAffE$prime = function(f3) {
-    return bind8(liftEffect5(f3))(toAff$prime(function($14) {
-      return error(unsafeStringify($14));
-    }));
-  };
-  return toAffE$prime(textImpl(res));
+  return toAffE(textImpl(res));
 };
 var statusCode = function(response) {
   return response.status;
@@ -33446,12 +33431,7 @@ var fetch = function(impl) {
   return function() {
     return function(url$prime) {
       return function(opts) {
-        var toAffE$prime = function(f3) {
-          return bind8(liftEffect5(f3))(toAff$prime(function($15) {
-            return error(unsafeStringify($15));
-          }));
-        };
-        return toAffE$prime(_fetch(impl)(url$prime)(opts));
+        return toAffE(_fetch(impl)(url$prime)(opts));
       };
     };
   };
@@ -33462,7 +33442,7 @@ var mapFlipped3 = /* @__PURE__ */ mapFlipped(functorAff);
 var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
 var show7 = /* @__PURE__ */ show(showError);
 var join2 = /* @__PURE__ */ join(bindEither);
-var bind9 = /* @__PURE__ */ bind(bindAff);
+var bind8 = /* @__PURE__ */ bind(bindAff);
 var fromHomogeneous2 = /* @__PURE__ */ fromHomogeneous();
 var writeJSON2 = /* @__PURE__ */ writeJSON(writeForeignDeviceCodeReq);
 var readJSON3 = /* @__PURE__ */ readJSON(readForeignDeviceCodeResp);
@@ -33520,7 +33500,7 @@ var attemptString = function(aff) {
   }());
 };
 var getDeviceCode = function(fetch3) {
-  return attemptString(bind9(fetch3()("https://github.com/login/device/code")({
+  return attemptString(bind8(fetch3()("https://github.com/login/device/code")({
     method: postMethod,
     headers: fromHomogeneous2({
       Accept: "application/json",
@@ -33533,7 +33513,7 @@ var getDeviceCode = function(fetch3) {
   }))(function(res) {
     var v = statusCode(res);
     if (v === 200) {
-      return bind9(mapFlipped3(text(res))(readJSON3))(function(errorOrBody) {
+      return bind8(mapFlipped3(text(res))(readJSON3))(function(errorOrBody) {
         return pure10(lmap2(show12)(errorOrBody));
       });
     }
@@ -33548,7 +33528,7 @@ var getDeviceCode = function(fetch3) {
 var pollAccessToken = function(fetch3) {
   var fetch1 = fetch3();
   return function(device_code) {
-    return attemptString(bind9(fetch1("https://github.com/login/oauth/access_token")({
+    return attemptString(bind8(fetch1("https://github.com/login/oauth/access_token")({
       method: postMethod,
       headers: fromHomogeneous2({
         Accept: "application/json",
@@ -33562,7 +33542,7 @@ var pollAccessToken = function(fetch3) {
     }))(function(res) {
       var v = statusCode(res);
       if (v === 200) {
-        return bind9(text(res))(function(stringBody) {
+        return bind8(text(res))(function(stringBody) {
           return pure10(alt7(bimap2(show12)(Left.create)(readJSON1(stringBody)))(bimap2(show12)(Right.create)(readJSON22(stringBody))));
         });
       }
@@ -34427,7 +34407,7 @@ var Request = class extends Body {
     if (/^(delete|get|head|options|post|put)$/i.test(method)) {
       method = method.toUpperCase();
     }
-    if ("data" in init3) {
+    if (!isRequest(init3) && "data" in init3) {
       doBadDataWarn();
     }
     if ((init3.body != null || isRequest(input) && input.body !== null) && (method === "GET" || method === "HEAD")) {
@@ -34857,8 +34837,8 @@ function fixResponseChunkedTransferBadEnding(request3, errorCallback) {
 }
 
 // output/Biz.IPC.MessageToMainHandler.Github/index.js
-var bind10 = /* @__PURE__ */ bind(bindAff);
-var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var bind9 = /* @__PURE__ */ bind(bindAff);
+var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var pure11 = /* @__PURE__ */ pure(applicativeAff);
 var bindFlipped6 = /* @__PURE__ */ bindFlipped(bindMaybe);
 var access_tokenIsSymbol2 = {
@@ -34884,23 +34864,23 @@ var discard4 = /* @__PURE__ */ discard(discardUnit)(bindAff);
 var info3 = /* @__PURE__ */ info2(monadEffectAff);
 var map111 = /* @__PURE__ */ map(functorEither);
 var githubTokenFile = "github-token";
-var readStoredGithubAccessToken = /* @__PURE__ */ bind10(/* @__PURE__ */ liftEffect6(getUserDataDirectory))(function(dir) {
+var readStoredGithubAccessToken = /* @__PURE__ */ bind9(/* @__PURE__ */ liftEffect5(getUserDataDirectory))(function(dir) {
   var path2 = concat5([dir, githubTokenFile]);
-  return bind10(liftEffect6(exists(path2)))(function(pathExists) {
+  return bind9(liftEffect5(exists(path2)))(function(pathExists) {
     var $54 = !pathExists;
     if ($54) {
       return pure11(Nothing.value);
     }
     ;
-    return bind10(readFile3(path2))(function(buf) {
-      return bind10(liftEffect6(decryptString(buf)))(function(str\u0294) {
+    return bind9(readFile3(path2))(function(buf) {
+      return bind9(liftEffect5(decryptString(buf)))(function(str\u0294) {
         return pure11(bindFlipped6(readJSON_2)(str\u0294));
       });
     });
   });
 });
 var queryGithubGraphQL = function(query) {
-  return map23(GithubGraphQLResult.create)(bind10(readStoredGithubAccessToken)(function(token\u0294) {
+  return map23(GithubGraphQLResult.create)(bind9(readStoredGithubAccessToken)(function(token\u0294) {
     if (token\u0294 instanceof Just) {
       return map23(Succeeded.create)(sendRequest(token\u0294.value0)(query));
     }
@@ -34913,9 +34893,9 @@ var queryGithubGraphQL = function(query) {
   }));
 };
 var storeGithubAccessToken = function(token) {
-  return bind10(liftEffect6(getUserDataDirectory))(function(dir) {
+  return bind9(liftEffect5(getUserDataDirectory))(function(dir) {
     var path2 = concat5([dir, githubTokenFile]);
-    return bind10(liftEffect6(encryptString(writeJSON3(token))))(function(encryptedBuf\u0294) {
+    return bind9(liftEffect5(encryptString(writeJSON3(token))))(function(encryptedBuf\u0294) {
       if (encryptedBuf\u0294 instanceof Nothing) {
         return error5("Failed to encrypt token");
       }
@@ -34929,7 +34909,7 @@ var storeGithubAccessToken = function(token) {
   });
 };
 var pollGithubAccessToken = function(deviceCode) {
-  return bind10(pollAccessToken(fetch(fetch2))(deviceCode))(function(response) {
+  return bind9(pollAccessToken(fetch(fetch2))(deviceCode))(function(response) {
     return discard4(function() {
       if (response instanceof Right && response.value0 instanceof Right) {
         return discard4(info3("Stored Github Access Token"))(function() {
@@ -35000,8 +34980,8 @@ var defaultAppPreferences = /* @__PURE__ */ function() {
 
 // output/Biz.Preferences/index.js
 var map25 = /* @__PURE__ */ map(functorEffect);
-var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectEffect);
-var bind11 = /* @__PURE__ */ bind(bindAff);
+var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectEffect);
+var bind10 = /* @__PURE__ */ bind(bindAff);
 var githubPersonalAccessTokenIsSymbol = {
   reflectSymbol: function() {
     return "githubPersonalAccessToken";
@@ -35023,18 +35003,18 @@ var pure14 = /* @__PURE__ */ pure(applicativeAff);
 var getPreferencesFilePath = function(dictMonadEffect) {
   return liftEffect(dictMonadEffect)(map25(function(v) {
     return concat5([v, "settings.json"]);
-  })(liftEffect7(getUserDataDirectory)));
+  })(liftEffect6(getUserDataDirectory)));
 };
 var getPreferencesFilePath1 = /* @__PURE__ */ getPreferencesFilePath(monadEffectAff);
 var writeAppPreferences = function(settings) {
-  return bind11(getPreferencesFilePath1)(function(settingsFilePath) {
+  return bind10(getPreferencesFilePath1)(function(settingsFilePath) {
     return writeTextFile2(UTF8.value)(settingsFilePath)(writeJSON4(settings));
   });
 };
-var readAppPreferences = /* @__PURE__ */ bind11(getPreferencesFilePath1)(function(settingsFilePath) {
-  return bind11(liftEffect1(exists(settingsFilePath)))(function(settingsFileExists) {
+var readAppPreferences = /* @__PURE__ */ bind10(getPreferencesFilePath1)(function(settingsFilePath) {
+  return bind10(liftEffect1(exists(settingsFilePath)))(function(settingsFileExists) {
     return discard5(when3(!settingsFileExists)(writeAppPreferences(defaultAppPreferences)))(function() {
-      return bind11(readTextFile2(UTF8.value)(settingsFilePath))(function(textContent) {
+      return bind10(readTextFile2(UTF8.value)(settingsFilePath))(function(textContent) {
         var v = readJSON4(textContent);
         if (v instanceof Left) {
           return throwError4(error(show8(v.value0)));
@@ -35051,7 +35031,7 @@ var readAppPreferences = /* @__PURE__ */ bind11(getPreferencesFilePath1)(functio
 });
 
 // output/Biz.Tool/index.js
-var bind12 = /* @__PURE__ */ bind(bindAff);
+var bind11 = /* @__PURE__ */ bind(bindAff);
 var pure15 = /* @__PURE__ */ pure(applicativeAff);
 var show9 = /* @__PURE__ */ show(showInt);
 var show13 = /* @__PURE__ */ show(showSignal);
@@ -35064,7 +35044,7 @@ var runToolAndGetStdout = function(args) {
         stdin: Nothing.value
       })(defaultSpawnOptions);
     };
-    return bind12(spawnCmd(spagoPath))(function(v) {
+    return bind11(spawnCmd(spagoPath))(function(v) {
       return pure15(function() {
         if (v.exit instanceof Normally && v.exit.value0 === 0) {
           return new Right(trim(v.stdout));
@@ -35102,11 +35082,11 @@ var toString6 = function(v) {
 };
 
 // output/Biz.IPC.MessageToMainHandler/index.js
-var bind13 = /* @__PURE__ */ bind(bindAff);
+var bind12 = /* @__PURE__ */ bind(bindAff);
 var showOpenDialog1 = /* @__PURE__ */ showOpenDialog();
 var map27 = /* @__PURE__ */ map(functorAff);
 var pure16 = /* @__PURE__ */ pure(applicativeAff);
-var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var readForeignRecord5 = /* @__PURE__ */ readForeignRecord();
 var readForeignFieldsCons3 = /* @__PURE__ */ readForeignFieldsCons({
   reflectSymbol: function() {
@@ -35156,7 +35136,7 @@ var sendToWebContents2 = /* @__PURE__ */ sendToWebContents(/* @__PURE__ */ write
   }
 })(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()));
 var showOpenDialog2 = function(window2) {
-  return bind13(showOpenDialog1({
+  return bind12(showOpenDialog1({
     properties: [openDirectory]
   })(window2))(function(result) {
     return map27(UserSelectedFile.create)(function() {
@@ -35176,10 +35156,10 @@ var showOpenDialog2 = function(window2) {
   });
 };
 var showFolderSelector = function(window2) {
-  return bind13(showOpenDialog1({
+  return bind12(showOpenDialog1({
     properties: [openDirectory]
   })(window2))(function(result) {
-    return bind13(function() {
+    return bind12(function() {
       var v = function(v1) {
         return pure16(nothingSelected);
       };
@@ -35187,16 +35167,16 @@ var showFolderSelector = function(window2) {
         var $105 = fromArray(result.filePaths);
         if ($105 instanceof Just) {
           var spagoPath = concat5([head2($105.value0), "spago.dhall"]);
-          return bind13(liftEffect8(exists(spagoPath)))(function(pathExists\u0294) {
+          return bind12(liftEffect7(exists(spagoPath)))(function(pathExists\u0294) {
             var packagesPath = concat5([head2($105.value0), "packages.dhall"]);
-            return bind13(liftEffect8(exists(packagesPath)))(function(path2Exists\u0294) {
+            return bind12(liftEffect7(exists(packagesPath)))(function(path2Exists\u0294) {
               var $106 = !pathExists\u0294 || !path2Exists\u0294;
               if ($106) {
                 return pure16(noSpagoDhall);
               }
               ;
-              return bind13(readTextFile2(UTF8.value)(spagoPath))(function(spagoDhall) {
-                return bind13(spawn3({
+              return bind12(readTextFile2(UTF8.value)(spagoPath))(function(spagoDhall) {
+                return bind12(spawn3({
                   cmd: "dhall-to-json",
                   args: [],
                   stdin: new Just(spagoDhall)
@@ -35230,8 +35210,8 @@ var getSpagoGlobalCache = /* @__PURE__ */ map27(function($119) {
     });
   });
 })));
-var getProjectDefinitions = /* @__PURE__ */ bind13(readAppPreferences)(function(prefs) {
-  return bind13($$for2(prefs.solutions)(function(fp) {
+var getProjectDefinitions = /* @__PURE__ */ bind12(readAppPreferences)(function(prefs) {
+  return bind12($$for2(prefs.solutions)(function(fp) {
     return map27(function(v) {
       return new Tuple(fp, v);
     })(readSolutionDefinition(fp));
@@ -35245,7 +35225,7 @@ var getInstalledTools = /* @__PURE__ */ function() {
 var handleMessageToMain = function(window2) {
   return function(message_id) {
     return function(message2) {
-      return bind13(function() {
+      return bind12(function() {
         if (message2 instanceof ShowFolderSelector) {
           return showFolderSelector(window2);
         }
@@ -35279,11 +35259,11 @@ var handleMessageToMain = function(window2) {
         }
         ;
         if (message2 instanceof GetClipboardText) {
-          return liftEffect8(map112(GetClipboardTextResult.create)(getClipboardText));
+          return liftEffect7(map112(GetClipboardTextResult.create)(getClipboardText));
         }
         ;
         if (message2 instanceof CopyToClipboard) {
-          return liftEffect8(voidRight3(new CopyToClipboardResult(message2.value0))(copyToClipboard(message2.value0)));
+          return liftEffect7(voidRight3(new CopyToClipboardResult(message2.value0))(copyToClipboard(message2.value0)));
         }
         ;
         if (message2 instanceof GetSpagoGlobalCache) {
@@ -35292,7 +35272,7 @@ var handleMessageToMain = function(window2) {
         ;
         throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 43, column 34 - line 56, column 46): " + [message2.constructor.name]);
       }())(function(v) {
-        return liftEffect8(function() {
+        return liftEffect7(function() {
           var responsePayload = {
             response_for_message_id: toString6(message_id),
             response: v
@@ -35344,8 +35324,8 @@ var registerProtocol = function __do() {
 
 // output/Main/index.js
 var discard6 = /* @__PURE__ */ discard(discardUnit)(bindAff);
-var liftEffect9 = /* @__PURE__ */ liftEffect(monadEffectAff);
-var bind14 = /* @__PURE__ */ bind(bindAff);
+var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var bind13 = /* @__PURE__ */ bind(bindAff);
 var mkOptions = /* @__PURE__ */ map(functorEffect)(function(v) {
   return {
     width: 800,
@@ -35353,24 +35333,26 @@ var mkOptions = /* @__PURE__ */ map(functorEffect)(function(v) {
     backgroundColor: "#000000",
     show: false,
     webPreferences: {
-      preload: concat5([v, "preload.js"]),
-      nodeIntegration: false,
-      enableRemoteModule: false,
+      preload: concat5([v, "..", "preload.js"]),
+      nodeIntegration: true,
+      enableRemoteModule: true,
       contextIsolation: true,
-      sandbox: true
+      sandbox: false,
+      nodeIntegrationInWorker: true,
+      worldSafeExecuteJavaScript: true
     }
   };
 })(dirnameImpl);
 var main = /* @__PURE__ */ launchAff_(/* @__PURE__ */ discard6(waitUntilAppReady)(function() {
-  return discard6(liftEffect9(openHttpsInBrowserAndBlockOtherURLs))(function() {
-    return discard6(liftEffect9(appendSwitch("enable-features")("CSSContainerQueries")))(function() {
-      return discard6(liftEffect9(registerProtocol))(function() {
-        return bind14(liftEffect9(mkOptions))(function(options) {
-          return bind14(liftEffect9(newBrowserWindow(options)))(function(window2) {
-            return discard6(liftEffect9(registerAllHandlers(window2)))(function() {
-              return discard6(liftEffect9(showWhenReadyToShow(window2)))(function() {
+  return discard6(liftEffect8(openHttpsInBrowserAndBlockOtherURLs))(function() {
+    return discard6(liftEffect8(appendSwitch("enable-features")("CSSContainerQueries")))(function() {
+      return discard6(liftEffect8(registerProtocol))(function() {
+        return bind13(liftEffect8(mkOptions))(function(options) {
+          return bind13(liftEffect8(newBrowserWindow(options)))(function(window2) {
+            return discard6(liftEffect8(registerAllHandlers(window2)))(function() {
+              return discard6(liftEffect8(showWhenReadyToShow(window2)))(function() {
                 return discard6(loadFile("index.html")(window2))(function() {
-                  return liftEffect9(setWindowOpenHandlerToExternal(window2));
+                  return liftEffect8(setWindowOpenHandlerToExternal(window2));
                 });
               });
             });
@@ -35381,7 +35363,7 @@ var main = /* @__PURE__ */ launchAff_(/* @__PURE__ */ discard6(waitUntilAppReady
   });
 }));
 
-// main.mjs
+// script.mjs
 main();
 /*! fetch-blob. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
 /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */

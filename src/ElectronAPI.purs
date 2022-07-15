@@ -10,10 +10,10 @@ import Unsafe.Coerce (unsafeCoerce)
 import Yoga.JSON (class WriteForeign)
 import Yoga.JSON as JSON
 
-foreign import sendToMainImpl ∷ Foreign → Channel → Effect Unit
+foreign import sendToMainImpl ∷ Foreign → Effect Unit
 
-sendToMain ∷ ∀ a. WriteForeign a ⇒ a → Channel → Effect Unit
-sendToMain msg = sendToMainImpl (JSON.write msg)
+sendToMain ∷ ∀ msg. WriteForeign msg ⇒ msg → Effect Unit
+sendToMain = JSON.write >>> sendToMainImpl
 
 foreign import data IpcRendererEvent ∷ Type
 

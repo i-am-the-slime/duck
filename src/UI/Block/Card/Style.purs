@@ -2,7 +2,7 @@ module UI.Block.Card.Style where
 
 import Yoga.Prelude.Style
 
-import Fahrtwind (active, background', border, borderCol', cursorPointer, overflowHidden, pB, pT, pX, pY, positionRelative, rounded2xl, roundedXl, shadowLg, shadowMd, textCol', transform, transition, userSelectNone)
+import Fahrtwind (active, background', border, borderCol', cursorPointer, heightFull, overflowHidden, pB, pT, pX, pY, positionRelative, rounded2xl, roundedXl, shadowLg, shadowMd, textCol', transform, transition, userSelectNone, widthFull)
 import Yoga.Block.Container.Style (col)
 
 cardContainerStyle ∷ Style
@@ -17,7 +17,16 @@ cardContainerStyle =
       <> overflowHidden
       <> positionRelative
       <> userSelectNone
+      <> widthFull
+      <> heightFull
   )
+
+cardContentStyle ∷ Style
+cardContentStyle =
+  transform "translateZ(1px)"
+    <> css { backfaceVisibility: str "hidden" }
+    <> widthFull
+    <> heightFull
 
 clickableCardContainerStyle ∷ Style
 clickableCardContainerStyle =

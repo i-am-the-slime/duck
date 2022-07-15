@@ -32,6 +32,8 @@ type BrowserWindowConfig =
       , nodeIntegration ∷ Boolean
       , preload ∷ String
       , sandbox ∷ Boolean
+      , nodeIntegrationInWorker ∷ Boolean
+      , worldSafeExecuteJavaScript ∷ Boolean
       }
   }
 

@@ -4,13 +4,14 @@ import Yoga.Prelude.View
 
 import Effect.Aff.Compat (runEffectFn1)
 import Effect.Unsafe (unsafePerformEffect)
+import Fahrtwind (heightFull, widthFull)
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import Record (disjointUnion)
 import Record.Extra (pick)
-import UI.Block.Card.Style (cardContainerStyle, clickableCardContainerStyle)
-import Yoga.Block.Container.Style (colour)
+import UI.Block.Card.Style (cardContainerStyle, cardContentStyle, clickableCardContainerStyle)
+import Yoga.Block.Container.Style (colour, colourWithAlpha)
 import Yoga.Block.Hook.UseDrip (useDrip)
 import Yoga.Block.Quark.Drip.View as Drip
 
@@ -29,7 +30,7 @@ rawCard = unsafePerformEffect $ React.component "Card"
         drip = Drip.component </>
           ( pick $
               { className: "card-drip"
-              , colour: colour.backgroundBright4
+              , colour: colourWithAlpha.backgroundBright5 0.5
               } `disjointUnion` dripProps
           )
         onClick =
@@ -50,12 +51,9 @@ rawCard = unsafePerformEffect $ React.component "Card"
         />
           [ drip
           , R.div'
-              </
-                { style:
-                    R.css
-                      { transform: "translateZ(1px)"
-                      , backfaceVisibility: "hidden"
-                      }
+              </*
+                { css:
+                    cardContentStyle
                 }
               />
                 children
