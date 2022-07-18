@@ -53,7 +53,7 @@ useIPCMessage
               { response_for_message_id ∷ String, response ∷ MessageToRenderer }
           messageOrError = JSON.read foreignMessage
         case messageOrError of
-          Left err →
+          Left _ →
             Console.error $ "Failed decoding IPC message: " <> unsafeStringify
               foreignMessage
           Right { response_for_message_id, response }

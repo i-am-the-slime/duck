@@ -2,9 +2,10 @@ module Story.Project (default, openProject, project) where
 
 import Prelude
 
+import Biz.Github.Types (Repository(..))
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, validSpagoDhall)
-import Biz.Spago.Types (ProjectConfig, ProjectName(..), Repository(..), SourceGlob(..), Version(..))
+import Biz.Spago.Types (ProjectConfig, ProjectName(..), SourceGlob(..), Version(..))
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Foreign.Object as Object

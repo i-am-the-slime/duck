@@ -2,8 +2,9 @@ module UI.GithubLogin where
 
 import Yoga.Prelude.View
 
-import Biz.Github.Types (DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
+import Biz.Github.Auth.Types (DeviceCode, DeviceCodeResponse(..), DeviceTokenError, UserCode(..), VerificationURI(..))
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), failedOrToEither)
+import Biz.OAuth.Types (GithubAccessToken)
 import Color (cssStringRGBA)
 import Control.Monad.Rec.Class (forever)
 import Data.Array (intersperse)
@@ -28,8 +29,9 @@ import React.Basic.Hooks.Aff (useAff)
 import Record (disjointUnion)
 import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
+import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.GithubLogo (githubLogo)
-import UI.Hook.UseIPCMessage (useIPCMessage)
+import UI.Hook.UseIPCMessage (UseIPCMessage, useIPCMessage)
 import UI.Modal (mkModalView)
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (sendNotification)
@@ -42,6 +44,10 @@ type Props =
   { onComplete ∷ Effect Unit
   }
 
+useGetDeviceCode ∷
+  Ctx →
+  Hook UseIPCMessage
+    (RemoteData String DeviceCodeResponse /\ (Effect Unit) /\ (Effect Unit))
 useGetDeviceCode ctx = React.do
   response /\ send /\ reset ← useIPCMessage ctx
   let
@@ -49,6 +55,14 @@ useGetDeviceCode ctx = React.do
       GithubLoginGetDeviceCodeResult v → RD.fromEither (failedOrToEither v)
   pure (res /\ (send GithubLoginGetDeviceCode) /\ reset)
 
+usePollAccessToken ∷
+  Ctx →
+  Hook UseIPCMessage
+    ( ( RemoteData Void
+          (Either String (Either DeviceTokenError GithubAccessToken))
+      ) /\
+        ((DeviceCode → Effect Unit) /\ (Effect Unit))
+    )
 usePollAccessToken ctx = React.do
   response /\ send /\ reset ← useIPCMessage ctx
   let
@@ -90,8 +104,7 @@ mkGithubLogin = do
                 Right (Left { error }) | error == "authorization_pending" →
                   pollAccessToken device_code # liftEffect
                 Right (Left error) → notifyError (show error)
-                Right (Right token) → do
-                  resetCode
+                Right (Right _) → resetCode
             )
 
     useEffect code do

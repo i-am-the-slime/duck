@@ -5,7 +5,7 @@ import Prelude
 import Backend.Github.API as GithubGraphQL
 import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..))
 import Biz.Github.API.Auth as Auth
-import Biz.Github.Types (DeviceCode)
+import Biz.Github.Auth.Types (DeviceCode)
 import Biz.IPC.Message.Types (FailedOr(..), MessageToRenderer(..), NoGithubToken(..), failedOrFromEither)
 import Biz.OAuth.Types (GithubAccessToken)
 import Data.Either (Either(..))

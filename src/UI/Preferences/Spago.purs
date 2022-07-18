@@ -16,13 +16,13 @@ import Yoga.JSON (writeJSON)
 
 mkView ∷ UI.Component Unit
 mkView = do
-  UI.component "SpagoInfo" \ctx@{ notificationCentre } _ → React.do
+  UI.component "SpagoInfo" \ctx _ → React.do
     cacheDirʔ ← useGetSpagoGlobalCache ctx
     pure $ cacheDirʔ # foldMap \(SpagoGlobalCacheDir dir) → R.text dir
 
   where
   useGetSpagoGlobalCache ctx = React.do
-    result /\ query /\ reset ← useIPCMessage ctx
+    result /\ query /\ _reset ← useIPCMessage ctx
     pathʔ /\ setPath ← useStateEq' Nothing
     React.useEffectAlways do
       case result of

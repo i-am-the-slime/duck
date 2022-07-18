@@ -41,7 +41,7 @@ handleMessageToMain ∷
   BrowserWindow → (UUID → MessageToMain → Aff Unit)
 handleMessageToMain window = \message_id message → do
   response ∷ MessageToRenderer ← case message of
-    ShowFolderSelector → showFolderSelector window
+    LoadSpagoProject → LoadSpagoProject window
     ShowOpenDialog _ → showOpenDialog window
     GetInstalledTools → getInstalledTools
     GetPureScriptSolutionDefinitions → getProjectDefinitions
@@ -79,8 +79,8 @@ showOpenDialog window = do
         Just <$> readTextFile UTF8 path
       _ → pure Nothing
 
-showFolderSelector ∷ BrowserWindow → Aff MessageToRenderer
-showFolderSelector window = do
+LoadSpagoProject ∷ BrowserWindow → Aff MessageToRenderer
+LoadSpagoProject window = do
   result ← window # Electron.showOpenDialog { properties: [ openDirectory ] }
   selectionResult ∷ SelectedFolderData ← case result of
     { canceled: false, filePaths } | Just paths ← NEA.fromArray filePaths →
@@ -105,7 +105,7 @@ showFolderSelector window = do
             defaultSpawnOptions
           pure $ either invalidSpagoDhall validSpagoDhall (readJSON spagoJSON)
     _ → pure nothingSelected
-  pure $ ShowFolderSelectorResponse selectionResult
+  pure $ LoadSpagoProjectResponse selectionResult
 
 getProjectDefinitions ∷ Aff MessageToRenderer
 getProjectDefinitions = do

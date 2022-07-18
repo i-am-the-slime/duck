@@ -20,6 +20,10 @@ default = story { title: "Editor", decorators: [ containerDecorator ] }
 editor ∷ Effect JSX
 editor = do
   mkStoryWrapper $ React.do
-    text /\ setText ← React.useState' ""
-    { ref, setValue } ← Editor.useMonaco "hey" setText
-    pure $ R.div' </*> { className: "eddy", css: widthFull <> heightFull, ref }
+    _text /\ setText ← React.useState' ""
+    { ref, setValue: _setValue } ← Editor.useMonaco "hey" setText
+    pure $ R.div' </*>
+      { className: "eddy"
+      , css: widthFull <> heightFull
+      , ref
+      }

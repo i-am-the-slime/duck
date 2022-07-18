@@ -4,7 +4,7 @@ import Prelude
 
 import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse)
 import Backend.Tool.Spago.Types (SpagoGlobalCacheDir)
-import Biz.Github.Types (DeviceCode, DeviceCodeResponse, DeviceTokenError)
+import Biz.Github.Auth.Types (DeviceCode, DeviceCodeResponse, DeviceTokenError)
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult)
 import Biz.IPC.Message.OpenDialog.Types as OpenDialog
 import Biz.IPC.SelectFolder.Types (SelectedFolderData)
@@ -19,7 +19,7 @@ import Yoga.JSON (class ReadForeign, class WriteForeign, writeImpl)
 import Yoga.JSON.Generics (defaultOptions, genericReadForeignTaggedSum, genericWriteForeignTaggedSum)
 
 data MessageToMain
-  = ShowFolderSelector
+  = LoadSpagoProject
   | ShowOpenDialog OpenDialog.Args
   | GetInstalledTools
   | GetPureScriptSolutionDefinitions
@@ -32,7 +32,7 @@ data MessageToMain
   | GetSpagoGlobalCache
 
 data MessageToRenderer
-  = ShowFolderSelectorResponse SelectedFolderData
+  = LoadSpagoProjectResponse SelectedFolderData
   | UserSelectedFile (Maybe FilePath)
   | GetInstalledToolsResponse GetInstalledToolsResult
   | GetPureScriptSolutionDefinitionsResponse

@@ -2,20 +2,18 @@ module UI.Navigation.HeaderBar where
 
 import Yoga.Prelude.View
 
+import Biz.Github.Types (Owner(..), Repository(..))
 import Data.Array as Array
 import Fahrtwind (border, borderBottom, borderCol', flexRow, fontSemiMedium, gap, height, heightFull, hover, itemsCenter, justifyBetween, mL, mR, overflowHidden, overflowVisible, pL, pR, pX, pY, positionRelative, textCol', textSm, widthAndHeight)
 import Framer.Motion as M
-import Plumage.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
-import Plumage.Atom.PopOver.Types as Place
-import Plumage.Hooks.UsePopOver (usePopOver)
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Component as UI
-import UI.Container (popOverId)
 import UI.Navigation.HeaderBar.GithubAvatar as GithubAvatar
 import UI.Navigation.Router (printRoute, useRouter)
+import UI.Navigation.Router.Page.Github as Github
 import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
 import UI.Style (toolbarBackground, toolbarBorderCol)
@@ -33,18 +31,6 @@ mkPresentationalView ∷
   React.Component { route ∷ Route, topRight ∷ Maybe JSX }
 mkPresentationalView = do
   React.component "HeaderBarPresentational" \{ route, topRight } → React.do
-    popOverContainerRef ← React.useRef null
-    { hidePopOver
-    , renderInPopOver
-    , targetRef
-    , showPopOver
-    , isVisible
-    } ← usePopOver
-      { dismissBehaviourʔ: Just
-          (DismissPopOverOnClickOutsideTargetAnd [ popOverContainerRef ])
-      , containerId: popOverId
-      , placement: Placement Place.Below Place.End
-      }
     React.do
       pure $
         P.div "header-bar"
@@ -120,6 +106,12 @@ renderRoute route =
       Home → [ link "Home" ]
       Solutions → [ link "Solutions" ]
       Registry → [ link "Registry" ]
+      Github subRoute → case subRoute of
+        Github.Root → [ link "Github" ]
+        Github.Repository (Owner owner) (Repository repo) →
+          [ linkTo (Github Github.Root) "Github"
+          , link $ owner <> "/" <> repo
+          ]
       Preferences subRoute → case subRoute of
         Preferences.Root → [ link "Preferences" ]
         Preferences.Spago →

@@ -9035,7 +9035,7 @@ var Seconds = function(x2) {
   return x2;
 };
 
-// output/Biz.Github.Types/index.js
+// output/Biz.Github.Auth.Types/index.js
 var writeForeignRecord2 = /* @__PURE__ */ writeForeignRecord();
 var writeImpl3 = /* @__PURE__ */ writeImpl(/* @__PURE__ */ writeForeignRecord2(/* @__PURE__ */ writeForeignFieldsCons({
   reflectSymbol: function() {
@@ -9117,6 +9117,10 @@ var readForeignDeviceCodeResp = {
     })(readImpl2(fgn));
   }
 };
+
+// output/Biz.Github.Types/index.js
+var writeForeignRepository = writeForeignString;
+var readForeignRepository = readForeignString;
 
 // output/Data.Bounded.Generic/index.js
 var genericTopNoArguments = /* @__PURE__ */ function() {
@@ -28700,11 +28704,9 @@ var pureScriptSolutionFileName = ".purescript-solution.json";
 // output/Biz.Spago.Types/index.js
 var writeForeignVersion = writeForeignString;
 var writeForeignSourceGlob = writeForeignString;
-var writeForeignRepository = writeForeignString;
 var writeForeignProjectName = writeForeignString;
 var readForeignVersion = readForeignString;
 var readForeignSourceGlob = readForeignString;
-var readForeignRepository = readForeignString;
 var readForeignProjectName = readForeignString;
 
 // output/Biz.IPC.Message.Types/index.js

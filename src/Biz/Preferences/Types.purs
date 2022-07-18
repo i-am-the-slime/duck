@@ -1,6 +1,6 @@
 module Biz.Preferences.Types where
 
-import Biz.Github.Types as Github
+import Biz.Github.Auth.Types as Github
 import Data.Maybe (Maybe(..))
 import Node.Path (FilePath)
 

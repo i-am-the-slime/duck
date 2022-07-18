@@ -59,7 +59,7 @@ tag = unsafePerformEffect $ React.component "Tag" \{ col, p } → React.do
     /> [ R.text p ]
 
 renderGithubRepo ∷ GithubRepo → JSX
-renderGithubRepo { owner, repoName } =
+renderGithubRepo { owner } =
   Block.cluster { space: "8px" }
     [ tag { col: (toTailwindCol owner), p: owner }
     -- , R.text repoName

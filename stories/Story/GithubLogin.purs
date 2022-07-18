@@ -2,17 +2,14 @@ module Story.GithubLogin (default, githubLogin, instructions) where
 
 import Prelude
 
-import Biz.Github.Types (UserCode(..), VerificationURI(..))
-import Data.Tuple.Nested ((/\))
+import Biz.Github.Auth.Types (UserCode(..), VerificationURI(..))
 import Effect (Effect)
 import React.Basic (JSX)
-import React.Basic.Hooks as React
 import Story.Ctx (defaultOnMessage, mkStoryCtx)
 import Story.Util.Decorator (containerDecorator)
 import Storybook (story)
 import Storybook.Types (Story)
 import UI.Component (runComponent)
-import UI.Component as UI
 import UI.GithubLogin (renderInstructions)
 import UI.GithubLogin as GithubLogin
 

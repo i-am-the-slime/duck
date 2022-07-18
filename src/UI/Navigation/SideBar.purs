@@ -10,7 +10,9 @@ import Prelude as Bounded
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Component as UI
+import UI.GithubLogin.GithubLogo (githubLogo)
 import UI.Navigation.Router (useRouter)
+import UI.Navigation.Router.Page.Github as Github
 import UI.Navigation.Router.Page.Preferences as PreferencesRoute
 import UI.Navigation.Router.Types (Route(..), TopLevelRoute(..), toTopLevelRoute)
 import UI.Style (toolbarBackground, toolbarBorderCol, toolbarButtonStyle, toolbarRippleCol)
@@ -28,7 +30,7 @@ mkPresentationalView =
   React.component "HeaderBarPresentational" \props → React.do
     pure $ Block.stack
       { space: E.str "16px"
-      , splitAfter: 3
+      , splitAfter: 4
       , css:
           toolbarBackground <> borderRight 1
             <> toolbarBorderCol
@@ -58,5 +60,6 @@ renderLinks (currentRoute /\ setRoute) =
     TopLevelHome → iconButton tlr Home Heroicon.home
     TopLevelSolutions → iconButton tlr Solutions Heroicon.code
     TopLevelRegistry → iconButton tlr Registry Heroicon.identification
+    TopLevelGithub → iconButton tlr (Github Github.Root) githubLogo
     TopLevelPreferences → iconButton tlr (Preferences PreferencesRoute.Root)
       Heroicon.cog

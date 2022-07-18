@@ -2,32 +2,19 @@ module UI.Navigation.ThemeSwitcher where
 
 import Yoga.Prelude.View hiding ((/))
 
-import Data.Either (Either, fromRight)
-import Data.Maybe (fromMaybe)
 import Data.Newtype (class Newtype)
-import Data.Tuple.Nested ((/\))
-import Effect (Effect)
-import Effect.Ref as Ref
 import Effect.Unsafe (unsafePerformEffect)
-import Fahrtwind.Style.Global (globalStyles) as FW
-import React.Basic.DOM (CSS)
 import React.Basic.Emotion (Style)
-import React.Basic.Hooks (JSX, UseContext, Hook)
 import React.Basic.Hooks as React
 import Routing.Duplex (RouteDuplex')
 import Routing.Duplex as R
 import Routing.Duplex.Generic as RG
 import Routing.Duplex.Generic.Syntax ((/))
-import Routing.Duplex.Parser (RouteError)
-import Routing.Hash (getHash)
+import UI.Navigation.Router.Page.Github as Github
 import UI.Navigation.Router.Page.Preferences as Preferences
-import UI.Navigation.Router.Types (Route(..))
-import Web.Router (RouterState(..))
-import Web.Router as Router
-import Web.Router.Driver.Hash as Hash
+import UI.Navigation.Router.Types (Route)
 import Yoga.Block as Block
-import Yoga.Block.Container.Style (DarkOrLightMode(..), getDarkOrLightMode, mkGlobal)
-import Yoga.Block.Container.Style as Yoga
+import Yoga.Block.Container.Style (DarkOrLightMode(..), getDarkOrLightMode)
 
 type ThemeSwitcher =
   { theme ∷ DarkOrLightMode
@@ -74,5 +61,6 @@ appRoute =
         { "Home": RG.noArgs
         , "Solutions": "projects" / RG.noArgs
         , "Registry": "registry" / RG.noArgs
+        , "Github": "github" / Github.subRoute
         , "Preferences": "preferences" / Preferences.subRoute
         }

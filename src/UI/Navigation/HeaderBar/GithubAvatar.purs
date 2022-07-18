@@ -4,10 +4,9 @@ import Yoga.Prelude.View
 
 import Biz.GraphQL (GraphQL(..))
 import Data.Maybe (isNothing)
-import Fahrtwind (active, background', border, borderBottom, borderCol', divideY, fontMedium, fontSemibold, hover, mT, overflowHidden, rounded2xl, roundedDefault, roundedFull, roundedLg, shadowXxl, textCol', textDefault, textSm, textXs, transform, widthAndHeight)
+import Fahrtwind (active, background', border, borderBottom, borderCol', divideY, fontMedium, hover, mT, overflowHidden, roundedDefault, roundedFull, roundedLg, shadowXxl, textXs, transform, widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Fahrtwind.Style.Divide (divideCol')
-import Image (setFallbackImgSrc)
 import Network.RemoteData as RD
 import Plumage.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
 import Plumage.Atom.PopOver.Types as Place
@@ -47,6 +46,7 @@ mkView = do
       else
         githubLogin { onComplete: checkIsLoggedIn }
 
+type UserInfoQueryVariables :: forall k. Row k
 type UserInfoQueryVariables = ()
 type UserInfoQueryResult =
   (data ∷ { viewer ∷ { login ∷ String } })
@@ -100,11 +100,11 @@ mkGithubAvatarPresentational = do
                   [ P.div_
                       ( widthAndHeight 32 <> roundedFull <> overflowHidden
                       )
-                      [ R.img
-                          { width: "32"
-                          , height: "32"
+                      [ Block.image
+                          { width: 32
+                          , height: 32
                           , src: "https://github.com/" <> name <> ".png"
-                          , onError: handler target (setFallbackImgSrc duckImage)
+                          , fallbackSrc: duckImage
                           }
                       ]
                   , P.div_ (widthAndHeight 14) [ Heroicon.chevronDown ]

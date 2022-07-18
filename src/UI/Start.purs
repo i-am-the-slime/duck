@@ -3,7 +3,7 @@ module UI.Start where
 import Yoga.Prelude.View
 
 import Control.Monad.Reader.Class (ask)
-import Fahrtwind (background, background', flexCol, flexGrow, full, globalStyles, green, height, height', heightFull, mL, mT, minHeight', overflowHidden, pT, pink, positionAbsolute, positionFixed, screenHeight, width')
+import Fahrtwind (height, height', heightFull, mL, mT, overflowHidden, positionFixed, width')
 import Fahrtwind as F
 import Plumage.Util.HTML as P
 import React.Basic.Emotion as E

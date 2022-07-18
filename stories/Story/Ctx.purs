@@ -2,7 +2,7 @@ module Story.Ctx where
 
 import Prelude
 
-import Biz.Github.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
+import Biz.Github.Auth.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
 import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
 import Biz.OAuth.Types (AccessToken(..), ScopeList(..), TokenType(..))
 import Control.Alt (alt, (<|>))

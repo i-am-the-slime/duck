@@ -6,21 +6,21 @@ import Data.Maybe (Maybe(..))
 import Data.Tree.Zipper as Loc
 import Data.Tuple.Nested ((/\))
 import Effect (Effect)
-import Fahrtwind (heightFull, heightScreen)
+import Fahrtwind (heightScreen)
 import Plumage.Util.HTML as P
 import React.Basic (JSX)
-import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import Story.Util.Decorator (containerDecorator)
 import Storybook (story)
 import Storybook.Types (Story)
-import UI.Navigation.HeaderBar as HeaderBar
-import UI.Navigation.Router.Types (Route(..))
+import UI.Github.Repo.Biz.UseGetAllFiles.Types (RESTFileInfo, AllFilesAPIResult)
 import UI.Repository.FileTree.View as TreeView
 
 default ∷ Story
 default = story { title: "TreeView", decorators: [ containerDecorator ] }
 
+folder ∷
+  String → RESTFileInfo
 folder path =
   { path
   , size: Nothing
@@ -28,6 +28,8 @@ folder path =
   , url: "egal"
   }
 
+file ∷
+  String → RESTFileInfo
 file path =
   { path
   , size: Nothing
@@ -35,10 +37,21 @@ file path =
   , url: "egal"
   }
 
+fakeResult ∷ AllFilesAPIResult
 fakeResult =
   { tree:
       [ folder "src"
+      , folder "049340950349580498530985039485093485"
       , folder "src/More"
+      , folder "src/in"
+      , folder "src/in/the"
+      , folder "src/in/the/midnight"
+      , folder "src/in/the/midnight/hour"
+      , folder "src/in/the/midnight/hour/she"
+      , folder "src/in/the/midnight/hour/she/cried"
+      , folder "src/in/the/midnight/hour/she/cried/more"
+      , folder "src/in/the/midnight/hour/she/cried/more/more"
+      , folder "src/in/the/midnight/hour/she/cried/more/more/more"
       , folder "test"
       , file "src/Main.purs"
       , file "src/More/File.purs"
@@ -78,5 +91,7 @@ storyCompo = do
   treeViewC ← TreeView.mkPresentationalView
   React.component "Helper" \_ → React.do
     loc /\ setLoc ← React.useState' (Loc.fromTree filetree)
+    selectedʔ /\ setSelected ← React.useState'
+      (Just "049340950349580498530985039485093485")
     pure $ P.div_ (heightScreen)
-      [ treeViewC { loc, setLoc, selectedʔ: Nothing, setSelected: mempty } ]
+      [ treeViewC { loc, setLoc, selectedʔ, setSelected } ]

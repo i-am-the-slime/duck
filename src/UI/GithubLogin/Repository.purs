@@ -3,7 +3,7 @@ module UI.GithubLogin.Repository where
 import Yoga.Prelude.View
 
 import Biz.Github (clientID, scopes)
-import Biz.Github.Types (AccessTokenRequest, DeviceCode, DeviceCodeRequest(..), DeviceCodeResponse, DeviceTokenError, GrantType(..))
+import Biz.Github.Auth.Types (AccessTokenRequest, DeviceCode, DeviceCodeRequest(..), DeviceCodeResponse, DeviceTokenError, GrantType(..))
 import Biz.OAuth.Types (GithubAccessToken)
 import Data.Bifunctor (bimap, lmap)
 import Effect.Aff (Aff, attempt)

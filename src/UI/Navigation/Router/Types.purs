@@ -7,12 +7,14 @@ import Data.Enum (class BoundedEnum, class Enum)
 import Data.Enum.Generic (genericCardinality, genericFromEnum, genericPred, genericSucc, genericToEnum)
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
+import UI.Navigation.Router.Page.Github as Github
 import UI.Navigation.Router.Page.Preferences as Preferences
 
 data Route
   = Home
   | Solutions
   | Registry
+  | Github Github.Route
   | Preferences Preferences.Route
 
 toTopLevelRoute ∷ Route → TopLevelRoute
@@ -20,6 +22,7 @@ toTopLevelRoute = case _ of
   Home → TopLevelHome
   Solutions → TopLevelSolutions
   Registry → TopLevelRegistry
+  Github _ → TopLevelGithub
   Preferences _ → TopLevelPreferences
 
 derive instance Eq Route
@@ -31,6 +34,7 @@ data TopLevelRoute
   = TopLevelHome
   | TopLevelSolutions
   | TopLevelRegistry
+  | TopLevelGithub
   | TopLevelPreferences
 
 derive instance Generic TopLevelRoute _

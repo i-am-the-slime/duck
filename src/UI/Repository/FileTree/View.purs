@@ -1,6 +1,5 @@
 module UI.Repository.FileTree.View where
 
-import Prelude
 import Yoga.Prelude.View
 
 import Control.Parallel (parallel)
@@ -16,16 +15,16 @@ import Data.Tree (Tree, mkLeaf)
 import Data.Tree.Zipper (Loc)
 import Data.Tree.Zipper as Loc
 import Data.Tuple (fst, snd)
-import Effect.Aff (Aff, attempt, error, sequential)
-import Fahrtwind (background, background', borderBottom, borderCol, borderCol', disabled, flexCol, flexGrow, flexRow, full, gap, height, height', heightFull, hover, invisible, itemsCenter, justifyBetween, justifyCenter, mB, mL, mR, mX, mY, maxHeight', minHeight, minHeight', minWidth, opacity, overflowHidden, overflowVisible, overflowXHidden, overflowYHidden, overflowYScroll, pL, pR, pT, pX, pY, positionAbsolute, positionRelative, roundedDefault, textSm, transition, userSelectNone, widthAndHeight, widthFull)
+import Effect.Aff (Aff, sequential)
+import Fahrtwind (background', borderBottom, borderCol', cursorDefault, disabled, flexCol, flexGrow, flexRow, flexShrink, gap, height, heightFull, hover, invisible, itemsCenter, justifyBetween, mL, mY, maxWidth, minWidth, overflowHidden, overflowYScroll, pL, pR, pX, pY, positionAbsolute, positionRelative, roundedDefault, textCol', textOverflowEllipsis, textSm, userSelectNone, widthAndHeight, widthFull)
 import Fahrtwind as FW
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Foreign.Object as Object
 import Framer.Motion as M
 import Framer.Motion.Hook (useSpringWithMotionValue)
-import MotionValue (MotionValue, useMotionValue)
+import MotionValue (useMotionValue)
 import MotionValue as MotionValue
-import Plumage.Prelude.Style (Style, width)
+import Plumage.Prelude.Style (Style)
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
@@ -33,12 +32,13 @@ import React.Basic.Hooks as React
 import UI.Component as UI
 import UI.FilePath (GithubRepo)
 import UI.Hook.UseRemoteData (useRemoteData)
-import Unsafe.Coerce (unsafeCoerce)
+import Web.DOM.ResizeObserver (resizeObserver)
+import Web.DOM.ResizeObserver as ResizeObserver
+import Web.HTML.HTMLElement as HTMLElement
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
-import Yoga.Block.Container.Style (col, colourWithAlpha, colourWithDarkLightAlpha)
+import Yoga.Block.Container.Style (col, colourWithDarkLightAlpha)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
-import Yoga.Block.Internal.CSS (transparent)
 import Yoga.Fetch (fetch)
 import Yoga.Fetch as F
 import Yoga.Fetch.Impl.Window (windowFetch)
@@ -51,8 +51,8 @@ type Props =
   , selectedFileʔ ∷ Maybe String
   }
 
-getAllFiles ∷ Props → Aff (Either String AllFilesAPIResult)
-getAllFiles { defaultBranch, repo } = do
+getAllFiles ∷ GithubRepo → Aff (Either String AllFilesAPIResult)
+getAllFiles repo = do
   response ← sequential ado
     r1 ← parallel $ mkRequest "main" <#> notFoundToLeft
     r2 ← parallel $ mkRequest "master" <#> notFoundToLeft
@@ -78,20 +78,18 @@ getAllFiles { defaultBranch, repo } = do
 mkView ∷ UI.Component Props
 mkView = do
   treeView ← mkPresentationalView # liftEffect
-  UI.component "FileTree" \ctx props → React.do
-    let { repo, defaultBranch } = props
+  UI.component "FileTree" \_ctx props → React.do
+    let { repo } = props
     allFiles ← useRemoteData getAllFiles
     locʔ /\ setLoc ← React.useState' Nothing
 
     useEffect repo do
-      allFiles.load props
+      allFiles.load props.repo
       mempty
 
     useEffect allFiles.data do
       for_ allFiles.data
-        ( \d → d # toTree # Loc.fromTree # \loc → setLoc
-            (Just $ loc)
-        )
+        (toTree >>> Loc.fromTree >>> Just >>> setLoc)
       mempty
 
     pure $ case locʔ of
@@ -103,13 +101,14 @@ mkView = do
         , setSelected: props.setSelectedFile
         }
 
-mkPresentationalView ∷
-  React.Component
-    { loc ∷ Loc RESTFileInfo
-    , setLoc ∷ Loc RESTFileInfo → Effect Unit
-    , selectedʔ ∷ Maybe String
-    , setSelected ∷ (Maybe String) → Effect Unit
-    }
+type PresentationalProps =
+  { loc ∷ Loc RESTFileInfo
+  , setLoc ∷ Loc RESTFileInfo → Effect Unit
+  , selectedʔ ∷ Maybe String
+  , setSelected ∷ (Maybe String) → Effect Unit
+  }
+
+mkPresentationalView ∷ React.Component PresentationalProps
 mkPresentationalView = React.component "Tree" \props → React.do
   let { loc, setLoc, setSelected, selectedʔ } = props
   xPos ← useMotionValue 0.0
@@ -118,26 +117,40 @@ mkPresentationalView = React.component "Tree" \props → React.do
   ref ← React.useRef null
   theWidth /\ setTheWidth ← useStateEq' 0.0
 
+  let
+    calcWidth = do
+      getBoundingBoxFromRef ref >>= traverse_ (setTheWidth <<< _.width)
+
   useEffectAlways do
-    when (theWidth == 0.0) do
-      bbʔ ← getBoundingBoxFromRef ref
-      for_ bbʔ \bb → do
-        setTheWidth $ bb.width
+    when (theWidth == 0.0) calcWidth
     mempty
 
+  useEffectOnce do
+    htmlElementʔ ← getHTMLElementFromRef ref
+    case htmlElementʔ of
+      Just htmlElement → do
+        observer ← resizeObserver \_ _ → do
+          calcWidth
+        let element = HTMLElement.toElement htmlElement
+        ResizeObserver.observe element ResizeObserver.ContentBox observer
+        pure $ ResizeObserver.unobserve element observer
+      Nothing → mempty
+
   animatedXPos ← useSpringWithMotionValue xPos {}
+
   animatedTmpXPos ← useSpringWithMotionValue tmpXPos {}
 
-  useEffectOnce do
-    animatedTmpXPos # MotionValue.onChange \v →
+  useEffect (tmpLocʔ /\ theWidth) do
+    animatedTmpXPos # MotionValue.onChange \v → do
       when (tmpLocʔ # isJust) do
         when (v == theWidth || v == (-theWidth)) do
           setTmpLoc Nothing
+          mempty
 
-  useEffect tmpLocʔ do
+  useEffect (theWidth /\ tmpLocʔ) do
     case tmpLocʔ of
       -- Move in from right
-      Just tmpLoc | tmpLocʔ == Loc.up loc → do
+      Just _tmpLoc | tmpLocʔ == Loc.up loc → do
 
         tmpXPos # MotionValue.setButDoNotRender (0.0)
         animatedTmpXPos # MotionValue.setButDoNotRender (0.0)
@@ -162,28 +175,42 @@ mkPresentationalView = React.component "Tree" \props → React.do
         mempty
     mempty
 
-  let numChildren = Loc.children loc # Array.length
-  let numTmpChildren = Loc.children <$> tmpLocʔ <#> Array.length # fromMaybe 0
   let
+    numChildren = Loc.children loc # Array.length
+
+    numTmpChildren = Loc.children <$> tmpLocʔ <#> Array.length # fromMaybe 0
+
     children = (0 .. (numChildren - 1)) # traverse (\i → Loc.childAt i loc)
       # fromMaybe []
-  let
+
     tmpChildren = (0 .. (numTmpChildren - 1))
       # traverse (\i → tmpLocʔ >>= Loc.childAt i)
       # fromMaybe []
-  let parentʔ = Loc.up loc
+
+    parentʔ = Loc.up loc
+
   pure $ R.div'
     </*
       { ref
       , css: flexCol <> heightFull <> background' col.backgroundBright3
+          <> widthFull
       }
     />
       [ P.div_ (borderBottom 1 <> borderCol' col.backgroundBright5)
           [ Block.button
               { disabled: parentʔ # isNothing
-              , css: pL 8 <> pR 16 <> pY 3 <> mY 4 <> (disabled invisible)
+              , css: pL 8 <> pR 16 <> pY 3 <> mY 4
+                  <>
+                    ( disabled
+                        ( E.css
+                            { "& > div > svg:first-of-type": E.nested invisible
+                            }
+                        )
+                    )
+                  <> cursorDefault
                   <> height 28
-                  <> mL 8
+                  <> overflowHidden
+                  <> mL 16
               , buttonShape: Button.Flat
               , onClick: handler_
                   ( for_ parentʔ
@@ -193,15 +220,28 @@ mkPresentationalView = React.component "Tree" \props → React.do
                       )
                   )
               }
-              [ P.div_ (flexRow <> gap 4 <> itemsCenter)
+              [ P.div_
+                  ( flexRow <> gap 4 <> itemsCenter
+                      <> maxWidth (Int.round theWidth - 50)
+
+                  )
                   [ P.div_
-                      ( widthAndHeight 12 <> E.css
+                      ( widthAndHeight 12 <> flexShrink 0 <> E.css
                           { "& > svg > path": E.nested $ E.css
                               { strokeWidth: E.str "3px" }
                           }
                       )
                       [ Heroicon.chevronLeft ]
-                  , R.div_
+                  , P.div_
+                      ( minWidth 5
+                          <> overflowHidden
+                          <> flexShrink 2
+                          <> textOverflowEllipsis
+                          <> E.css
+                            { whiteSpace: E.nowrap
+                            , direction: E.str "rtl"
+                            }
+                      )
                       [ R.text $ "/" <> ((Loc.value loc).path) ]
                   ]
               ]
@@ -212,6 +252,7 @@ mkPresentationalView = React.component "Tree" \props → React.do
             { css: positionRelative
                 <> widthFull
                 <> heightFull
+                <> pL 16
                 <> overflowHidden
                 <> flexGrow 2
             }
@@ -253,32 +294,40 @@ renderFile ∷
   JSX
 renderFile selectedʔ loc onClick = do
   let { path, type: fileType } = Loc.value loc
-  P.div_ (pX 4 <> widthFull)
-    [ R.div'
-        </*
-          { css: fileEntryStyle
-          , _aria:
-              if Just path == selectedʔ then Object.singleton "selected" "true"
-              else mempty
-          , onClick: handler_ $ onClick
-          }
-        />
-          [ P.div_ (widthAndHeight 16)
-              [ if fileType == "tree" then Heroicon.folder
-                else Heroicon.document
-              ]
-          , P.div_ (flexRow <> itemsCenter <> justifyBetween <> flexGrow 2)
+  R.div'
+    </*
+      { css: fileEntryStyle
+      , _aria:
+          if Just path == selectedʔ then Object.singleton "selected" "true"
+          else mempty
+      , onClick: handler_ $ onClick
+      }
+    />
+      [ P.div_ (widthAndHeight 16 <> flexShrink 0 <> flexGrow 0)
+          [ if fileType == "tree" then Heroicon.folder
+            else Heroicon.document
+          ]
+      , P.div_
+          ( flexRow <> itemsCenter <> justifyBetween <> flexGrow 1
+              <> flexShrink 2
+              <> overflowHidden
+          )
+          [ P.div_
+              ( overflowHidden
+                  <> E.css { whiteSpace: E.nowrap }
+                  <> textOverflowEllipsis
+              )
               [ R.text
                   ( String.split (Pattern "/") path # Array.last # fromMaybe
                       path
                   )
-              , guard (fileType == "tree") $
-                  P.div_ (widthAndHeight 16)
-                    [ Heroicon.chevronRight
-                    ]
               ]
+          , guard (fileType == "tree") $
+              P.div_ (widthAndHeight 16 <> flexShrink 0 <> flexGrow 0)
+                [ Heroicon.chevronRight
+                ]
           ]
-    ]
+      ]
 
 fileEntryStyle ∷ Style
 fileEntryStyle =
@@ -292,18 +341,19 @@ fileEntryStyle =
     <> textSm
     <> userSelectNone
     <> widthFull
-    <>
-      ( E.css
-          { """&[aria-selected="true"]""": E.nested
-              (background' $ col.highlight)
-          }
-      )
+    <> roundedDefault
     <> hover
       ( background'
           ( E.str $ colourWithDarkLightAlpha.text
               { lightAlpha: 0.05, darkAlpha: 0.14 }
           )
-          <> roundedDefault
+      )
+    <>
+      ( E.css
+          { """&[aria-selected="true"]""": E.nested
+              $ background' col.highlight
+              <> textCol' col.highlightText
+          }
       )
 
 type AllFilesAPIResult =

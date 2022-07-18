@@ -69,7 +69,7 @@ useMonaco initialValue onChange = coerceHook React.do
           , renderLineHighlightOnlyWhenFocus: true
           , scrollbar: { alwaysConsumeMouseWheel: false }
           , renderLineHighlight: "none"
-          , wordWrap: "off"
+          , wordWrap: "on"
           }
           htmlElement
 

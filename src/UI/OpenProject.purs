@@ -24,7 +24,7 @@ mkView = do
       selectButton disabled = Block.centre_
         [ Block.button
             { onClick: handler preventDefault \_ → do
-                openFolder ShowFolderSelector
+                openFolder LoadSpagoProject
             , buttonType: Primary
             , disabled
             }
@@ -38,7 +38,7 @@ mkView = do
           Loading → selectButton true
           Failure _ → fragment
             [ selectButton false ]
-          Success (ShowFolderSelectorResponse success) →
+          Success (LoadSpagoProjectResponse success) →
             success # match
               { noSpagoDhall:
                   \_ → Block.stack_

@@ -16,6 +16,7 @@ import Routing.Duplex.Generic as RG
 import Routing.Duplex.Generic.Syntax ((/))
 import Routing.Duplex.Parser (RouteError)
 import Routing.Hash (getHash)
+import UI.Navigation.Router.Page.Github as Github
 import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
 import Web.Router (RouterState(..))
@@ -84,5 +85,6 @@ appRoute =
         { "Home": RG.noArgs
         , "Solutions": "projects" / RG.noArgs
         , "Registry": "registry" / RG.noArgs
+        , "Github": "github" / Github.subRoute
         , "Preferences": "preferences" / Preferences.subRoute
         }

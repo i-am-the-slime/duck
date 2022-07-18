@@ -4,6 +4,7 @@ import Yoga.Prelude.View
 
 import React.Basic.Hooks as React
 import UI.Component as UI
+import UI.Github as Github
 import UI.Navigation.Router (useRouter)
 import UI.Navigation.Router.Types (Route(..))
 import UI.OpenProject as OpenProject
@@ -16,6 +17,7 @@ mkView = do
   openProjectView ← OpenProject.mkView
   solutionsView ← Solutions.mkView
   registry ← Registry.mkView
+  github ← Github.mkView
   preferences ← Preferences.mkView
   UI.component "MainPane" \_ _ → React.do
     { route } ← useRouter
@@ -23,4 +25,5 @@ mkView = do
       Home → openProjectView unit
       Solutions → solutionsView unit
       Registry → registry unit
+      Github subRoute → github subRoute
       Preferences subRoute → preferences subRoute

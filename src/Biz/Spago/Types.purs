@@ -5,6 +5,7 @@ import Prelude
 import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype)
 import Foreign.Object (Object)
+import Biz.Github.Types (Repository)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 
 type ProjectConfig =
@@ -37,16 +38,6 @@ derive newtype instance Eq SourceGlob
 derive newtype instance Ord SourceGlob
 derive newtype instance WriteForeign SourceGlob
 derive newtype instance ReadForeign SourceGlob
-
-newtype Repository = Repository String
-
-derive instance Newtype Repository _
-derive newtype instance Show Repository
-derive newtype instance Eq Repository
-derive newtype instance Ord Repository
-derive newtype instance Semigroup Repository
-derive newtype instance WriteForeign Repository
-derive newtype instance ReadForeign Repository
 
 newtype Version = Version String
 

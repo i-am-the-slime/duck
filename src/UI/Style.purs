@@ -1,7 +1,7 @@
 module UI.Style where
 
-import Fahrtwind
 import Yoga.Prelude.Style
+import Fahrtwind (background, background', borderCol', flexRow, gap, hover, itemsCenter, mXY, pX, pY, roundedDefault, textCol', textSm, transition, userSelectNone)
 import Yoga.Block.Container.Style (col, colour)
 
 toolbarBackground ∷ Style

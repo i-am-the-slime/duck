@@ -78,9 +78,9 @@ ourGlobalStyle = E.css
         { "--mono-font": E.str "'Jetbrains Mono', monospace"
         -- , scrollbarGutter: E.str "stable"
         }
-  , ".duck-scrollbar": E.nested $ E.css
+  , "div": E.nested $ E.css
       { "&::-webkit-scrollbar":
-          E.nested $ width 12 <> height 6 <> opacity 4
+          E.nested $ width 8 <> height 6 <> opacity 4
             <> borderLeft 1
             <> borderCol' col.highlight
       , "&::-webkit-scrollbar-track": E.nested

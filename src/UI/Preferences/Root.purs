@@ -2,13 +2,10 @@ module UI.Preferences.Root where
 
 import Yoga.Prelude.View
 
-import Backend.Tool.Types (Tool(..), ToolPath(..), ToolWithPath)
+import Backend.Tool.Types (Tool(..), ToolPath(..))
 import Backend.Tool.Types as Tool
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
-import Data.Foldable (for_)
-import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds(..))
 import Fahrtwind (background, border, borderCol, flexCol, green, mB, roundedFull, textCol', textLg, textSm, widthAndHeight, yellow)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..)) as RD
@@ -17,7 +14,6 @@ import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Block.Card (card, clickableCard)
-import UI.Component (ComponentM)
 import UI.Component as UI
 import UI.FilePath (renderFilePath)
 import UI.Hook.UseIPCMessage (useIPCMessage)
@@ -26,22 +22,20 @@ import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (sendNotification)
-import UI.Tool.Spago as Spago
 import UI.Tooltip (withTextTooltip)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col)
-import Yoga.Block.Hook.UseStateEq (useStateEq, useStateEq')
-import Yoga.Block.Organism.NotificationCentre.Notification.View (autoHideNotification)
-import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre(..))
+import Yoga.Block.Hook.UseStateEq (useStateEq')
 import Yoga.JSON (writeJSON) as JSON
 
+rootView ∷ JSX
 rootView = mempty
 
 mkView ∷ UI.Component Unit
 mkView = do
   toolView ← mkToolView
-  UI.component "PreferencesRoot" \ctx@{ notificationCentre } route → React.do
+  UI.component "PreferencesRoot" \ctx _ → React.do
     toolsʔ ← useGetTools ctx
     pure $ toolsʔ # foldMap \tools → Block.stack { space: E.px 8 }
       (tools <#> toolView)
@@ -125,6 +119,3 @@ mkToolView = do
               ]
           ]
       ]
-
--- toolInfoTooltip ∷ Tool → JSX
--- toolInfoTooltip = Tool

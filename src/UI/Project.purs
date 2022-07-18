@@ -2,7 +2,9 @@ module UI.Project where
 
 import Prelude
 
-import Biz.Spago.Types (Repository(..), Version(..))
+import Biz.Github.Types (Repository(..))
+import Biz.Github.Types as Github
+import Biz.Spago.Types (Version(..))
 import Biz.Spago.Types as Spago
 import Data.Maybe (Maybe(..))
 import Fahrtwind (background', borderBottom, borderCol', divideY, hover, mL, mT, mXY, pXY, pY', roundedDefault, roundedLg, textCol', textSm, textXl, transition, underline, widthAndHeight)
@@ -44,7 +46,7 @@ mkView = do
         [ Block.stack { space: var "--s2" }
             [ Block.stack_
                 [ projectName name
-                , repository # foldMap \(Spago.Repository repo) → R.h3_
+                , repository # foldMap \(Github.Repository repo) → R.h3_
                     [ R.text repo ]
                 ]
             , Block.stack { space: E.var "--s0" }
