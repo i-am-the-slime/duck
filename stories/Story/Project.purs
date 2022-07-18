@@ -57,8 +57,8 @@ openProject = do
 
 exampleOnMessage ∷ OnMessage
 exampleOnMessage = case _ of
-  ShowFolderSelector → do
-    pure <<< Just $ ShowFolderSelectorResponse response
+  LoadSpagoProject → do
+    pure <<< Just $ LoadSpagoProjectResponse response
   _ → pure Nothing
 
   where

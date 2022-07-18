@@ -22,7 +22,6 @@ import Data.Tuple (fst, snd)
 import Data.Tuple.Nested ((/\))
 import Data.UUID (UUID)
 import Data.UUID as UUID
-import Debug (spy)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Electron (BrowserWindow, copyToClipboard, getClipboardText, openDirectory, sendToWebContents)
@@ -35,13 +34,12 @@ import Node.FS.Sync (exists)
 import Node.Path as Path
 import Sunde (spawn)
 import Yoga.JSON (readJSON)
-import Yoga.JSON as JSON
 
 handleMessageToMain ∷
   BrowserWindow → (UUID → MessageToMain → Aff Unit)
 handleMessageToMain window = \message_id message → do
   response ∷ MessageToRenderer ← case message of
-    LoadSpagoProject → LoadSpagoProject window
+    LoadSpagoProject → loadSpagoProject window
     ShowOpenDialog _ → showOpenDialog window
     GetInstalledTools → getInstalledTools
     GetPureScriptSolutionDefinitions → getProjectDefinitions
@@ -79,8 +77,8 @@ showOpenDialog window = do
         Just <$> readTextFile UTF8 path
       _ → pure Nothing
 
-LoadSpagoProject ∷ BrowserWindow → Aff MessageToRenderer
-LoadSpagoProject window = do
+loadSpagoProject ∷ BrowserWindow → Aff MessageToRenderer
+loadSpagoProject window = do
   result ← window # Electron.showOpenDialog { properties: [ openDirectory ] }
   selectionResult ∷ SelectedFolderData ← case result of
     { canceled: false, filePaths } | Just paths ← NEA.fromArray filePaths →

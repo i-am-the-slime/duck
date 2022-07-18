@@ -2,7 +2,7 @@ module Story.Ctx.OnMessageMocks where
 
 import Prelude
 
-import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..), unGithubGraphQLQuery)
+import Backend.Github.API.Types (GithubGraphQLResponse(..), unGithubGraphQLQuery)
 import Backend.Tool.Types (Tool(..), ToolPath(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
 import Biz.IPC.Message.Types (FailedOr(..), MessageToMain(..), MessageToRenderer(..))

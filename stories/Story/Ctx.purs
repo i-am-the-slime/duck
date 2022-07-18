@@ -3,26 +3,22 @@ module Story.Ctx where
 import Prelude
 
 import Biz.Github.Auth.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
-import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
+import Biz.IPC.Message.Types (MessageToMain)
 import Biz.OAuth.Types (AccessToken(..), ScopeList(..), TokenType(..))
-import Control.Alt (alt, (<|>))
-import Data.Array (foldMap, singleton, foldl)
+import Data.Array (foldl, singleton)
 import Data.Array as Array
 import Data.Either (either)
 import Data.Foldable (for_, traverse_)
-import Data.Maybe (Maybe(..), isNothing)
+import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Seconds(..))
 import Data.UUID (UUID)
 import Data.UUID as UUID
-import Debug (spy)
 import Effect (Effect)
 import Effect.Class.Console as Console
 import Effect.Ref as Ref
-import Effect.Uncurried (EffectFn1, EffectFn2, runEffectFn1, runEffectFn2)
-import Electron.Types (Channel(..))
+import Effect.Uncurried (EffectFn1, runEffectFn1)
 import ElectronAPI (ElectronListener)
 import Foreign (Foreign)
-import Foreign.Internal.Stringify (unsafeStringify)
 import Partial.Unsafe (unsafeCrashWith)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
@@ -33,7 +29,6 @@ import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Unsafe.Coerce (unsafeCoerce)
 import Unsafe.Reference (unsafeRefEq)
-import Yoga.JSON (writeJSON)
 import Yoga.JSON as JSON
 
 defaultOnMessage ∷ OnMessage
