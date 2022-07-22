@@ -2,18 +2,17 @@ module Biz.Github.Types where
 
 import Prelude
 
-import Data.Monoid (class Semigroup)
 import Data.Newtype (class Newtype)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 
-newtype Owner = Owner String
+newtype Login = Login String
 
-derive instance Newtype Owner _
-derive instance Eq Owner
-derive instance Ord Owner
-derive newtype instance Show Owner
-derive newtype instance WriteForeign Owner
-derive newtype instance ReadForeign Owner
+derive instance Newtype Login _
+derive instance Eq Login
+derive instance Ord Login
+derive newtype instance Show Login
+derive newtype instance WriteForeign Login
+derive newtype instance ReadForeign Login
 
 newtype Repository = Repository String
 

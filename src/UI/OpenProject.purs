@@ -18,7 +18,7 @@ mkView ∷ Component Unit
 mkView = do
   projectView ← Project.mkView
   component "OpenProject" \(ctx ∷ Ctx) _ → React.do
-    projectConfigRD /\ openFolder /\ _ ← useIPCMessage ctx
+    { data: projectConfigRD, send: openFolder } ← useIPCMessage ctx
 
     let
       selectButton disabled = Block.centre_

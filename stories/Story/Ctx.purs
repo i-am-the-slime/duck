@@ -22,9 +22,10 @@ import Foreign (Foreign)
 import Partial.Unsafe (unsafeCrashWith)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
-import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockReadme, getMockRegistry, getMockSolutionDefinition)
+import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockReadme, getMockRegistry, getMockRepoDetails, getMockSolutionDefinition)
 import Story.Ctx.Types (OnMessage)
 import Story.Util.NotificationCentre (storyNotificationCentre)
+import UI.Ctx.Electron (mkGithubGraphQLCache)
 import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Unsafe.Coerce (unsafeCoerce)
@@ -38,6 +39,7 @@ defaultOnMessage msg = tryAllOf
   , getMockIsLoggedIntoGithub
   , getMockGithubUserQuery
   , getMockRegistry
+  , getMockRepoDetails
   , getMockReadme
   -- This stays last
   , logUnhandled
@@ -60,6 +62,8 @@ defaultOnMessage msg = tryAllOf
 mkStoryCtx ∷ OnMessage → Effect Ctx
 mkStoryCtx onMessage = do
   listenersRef ← Ref.new ([] ∷ (Array ElectronListener))
+  githubGraphQLCache ← mkGithubGraphQLCache
+
   let
     registerListener listener = do
       listenersRef # Ref.modify_ (Array.cons listener)
@@ -95,6 +99,7 @@ mkStoryCtx onMessage = do
         { getDeviceCode: alwaysSucceedGetDeviceCode
         , pollAccessToken: getAccessTokenImmediately
         }
+    , githubGraphQLCache
     }
 
 alwaysSucceedGetDeviceCode ∷ GetDeviceCode

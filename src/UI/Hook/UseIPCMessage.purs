@@ -7,7 +7,7 @@ import Data.Either (Either(..))
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Tuple.Nested (type (/\), (/\))
+import Data.Tuple.Nested ((/\))
 import Data.UUID (UUID, genUUID)
 import Data.UUID as UUID
 import Effect (Effect)
@@ -27,10 +27,10 @@ import Yoga.JSON as JSON
 useIPCMessage ∷
   Ctx →
   Hook UseIPCMessage
-    ( (RemoteData Void MessageToRenderer)
-        /\ (MessageToMain → Effect Unit)
-        /\ Effect Unit
-    )
+    { data ∷ (RemoteData Void MessageToRenderer)
+    , send ∷ (MessageToMain → Effect Unit)
+    , reset ∷ Effect Unit
+    }
 useIPCMessage
   { registerListener, postMessage } = coerceHook $ React.do
   result /\ setResult ← React.useState' NotAsked
@@ -67,7 +67,7 @@ useIPCMessage
       uuid ← genUUID
       Ref.write (Just uuid) inFlightMessageIDRef
       postMessage uuid msg
-  pure (result /\ send /\ reset)
+  pure { data: result, send, reset }
 
 newtype UseIPCMessage hooks = UseIPCMessage
   ( UseEffect Unit

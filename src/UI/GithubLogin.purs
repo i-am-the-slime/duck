@@ -49,7 +49,7 @@ useGetDeviceCode ∷
   Hook UseIPCMessage
     (RemoteData String DeviceCodeResponse /\ (Effect Unit) /\ (Effect Unit))
 useGetDeviceCode ctx = React.do
-  response /\ send /\ reset ← useIPCMessage ctx
+  { data: response, send, reset } ← useIPCMessage ctx
   let
     res = response # lmap (const "") >>= unsafePartial case _ of
       GithubLoginGetDeviceCodeResult v → RD.fromEither (failedOrToEither v)
@@ -64,7 +64,7 @@ usePollAccessToken ∷
         ((DeviceCode → Effect Unit) /\ (Effect Unit))
     )
 usePollAccessToken ctx = React.do
-  response /\ send /\ reset ← useIPCMessage ctx
+  { data: response, send, reset } ← useIPCMessage ctx
   let
     res = response >>= unsafePartial case _ of
       GithubPollAccessTokenResult v → RD.Success
@@ -175,7 +175,6 @@ renderInstructions copyToClipboardButton user_code verification_uri =
                 [ Block.box
                     { padding: E.str "20px"
                     , css: widthAndHeight 100 <> roundedFull
-                        <> mT (-34)
                         <> background' col.highlight
                         <> textCol' col.highlightText
                         <> E.css
@@ -272,7 +271,7 @@ mkCopyToClipboardButton = UI.component "CopyToClipboardButton" \ctx toCopy →
       ]
   where
   useCopyToClipboard ctx = React.do
-    res /\ send /\ reset ← useIPCMessage ctx
+    { data: res, send, reset } ← useIPCMessage ctx
     let copyToClipboard text = send $ CopyToClipboard text
     let
       copiedToClipboard = unsafePartial case res # RD.toMaybe of

@@ -3,6 +3,7 @@ module UI.Hook.UseGetTopLevelFilesInRepo where
 import Yoga.Prelude.View
 
 import Biz.GraphQL (GraphQL(..))
+import Data.Time.Duration (Hours(..))
 import Foreign (MultipleErrors)
 import Network.RemoteData (RemoteData)
 import React.Basic.Hooks as React
@@ -12,16 +13,14 @@ import UI.GithubLogin.UseGithubGraphQL (UseGithubGraphQL, useGithubGraphQL)
 useGetTopLevelFilesInRepo ∷
   ∀ hooks.
   Ctx →
-  Render hooks (UseGithubGraphQL hooks)
-    ( (RemoteData MultipleErrors (Array GithubFileInfo)) /\
-        ( { | GetTopLevelFilesInRepoInput } →
-          Effect Unit
-        )
-    )
+  Render hooks (UseGithubGraphQL GetTopLevelFilesInRepoInput hooks)
+    { data ∷ RemoteData MultipleErrors (Array GithubFileInfo)
+    , send ∷ { | GetTopLevelFilesInRepoInput } → Effect Unit
+    }
 useGetTopLevelFilesInRepo ctx = React.do
-  (rd ∷ _ _ { | TopLevelFilesInRepoResponse }) /\ query ←
-    useGithubGraphQL ctx getGetTopLevelFilesInRepoQuery
-  pure ((rd <#> _.data.repository.object.entries) /\ query)
+  { data: rd ∷ _ _ { | TopLevelFilesInRepoResponse }, send: query } ←
+    useGithubGraphQL ctx (Just (0.5 # Hours)) getGetTopLevelFilesInRepoQuery
+  pure { data: rd <#> _.data.repository.object.entries, send: query }
 
 type GetTopLevelFilesInRepoInput =
   ( owner ∷ String

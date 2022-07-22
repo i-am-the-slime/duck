@@ -5,7 +5,7 @@ import Prelude
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
-import Data.String.Extra (kebabCase)
+import Data.String.Extra (kebabCase, snakeCase)
 import Node.Path (FilePath)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 import Yoga.JSON.Generics (genericReadForeignEnum, genericReadForeignTaggedSum, genericWriteForeignEnum, genericWriteForeignTaggedSum)
@@ -52,10 +52,10 @@ instance Show EntryPointType where
   show = genericShow
 
 instance WriteForeign EntryPointType where
-  writeImpl = genericWriteForeignEnum
+  writeImpl = genericWriteForeignEnum { toConstructorName: snakeCase }
 
 instance ReadForeign EntryPointType where
-  readImpl = genericReadForeignEnum
+  readImpl = genericReadForeignEnum { toConstructorName: snakeCase }
 
 derive instance Generic PureScriptProjectDefinition _
 derive instance Eq PureScriptProjectDefinition

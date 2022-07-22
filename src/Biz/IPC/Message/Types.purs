@@ -4,6 +4,7 @@ import Prelude
 
 import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse)
 import Backend.Tool.Spago.Types (SpagoGlobalCacheDir)
+import Backend.Tool.Types (Tool)
 import Biz.Github.Auth.Types (DeviceCode, DeviceCodeResponse, DeviceTokenError)
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult)
 import Biz.IPC.Message.OpenDialog.Types as OpenDialog
@@ -30,6 +31,7 @@ data MessageToMain
   | CopyToClipboard String
   | GetClipboardText
   | GetSpagoGlobalCache
+  | RunCommand { tool ∷ Tool, args ∷ Array String }
 
 data MessageToRenderer
   = LoadSpagoProjectResponse SelectedFolderData
@@ -45,6 +47,7 @@ data MessageToRenderer
   | CopyToClipboardResult String
   | GetClipboardTextResult String
   | GetSpagoGlobalCacheResult (FailedOr String SpagoGlobalCacheDir)
+  | RunCommandResult (Either String String)
 
 data FailedOr e a = Failed e | Succeeded a
 

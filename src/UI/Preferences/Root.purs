@@ -2,7 +2,7 @@ module UI.Preferences.Root where
 
 import Yoga.Prelude.View
 
-import Backend.Tool.Types (Tool(..), ToolPath(..))
+import Backend.Tool.Types (Tool(..), ToolPath(..), toToolArray)
 import Backend.Tool.Types as Tool
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
@@ -37,11 +37,12 @@ mkView = do
   toolView ← mkToolView
   UI.component "PreferencesRoot" \ctx _ → React.do
     toolsʔ ← useGetTools ctx
-    pure $ toolsʔ # foldMap \tools → Block.stack { space: E.px 8 }
+    pure $ toolsʔ <#> toToolArray # foldMap \tools → Block.stack
+      { space: E.px 8 }
       (tools <#> toolView)
   where
   useGetTools ctx = React.do
-    result /\ query /\ _reset ← useIPCMessage ctx
+    { data: result, send: query } ← useIPCMessage ctx
     toolsʔ /\ setTools ← useStateEq' Nothing
     useEffect result do
       case result of

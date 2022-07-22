@@ -23,7 +23,7 @@ useIsLoggedIntoGithub ∷
     , resetCheckIsLoggedIn ∷ Effect Unit
     }
 useIsLoggedIntoGithub ctx = coerceHook React.do
-  msg /\ send /\ reset ← useIPCMessage ctx
+  { data: msg, send, reset } ← useIPCMessage ctx
   let checkIsLoggedIn = send GetIsLoggedIntoGithub
   let
     isLoggedIn = unsafePartial case RD.toMaybe msg of

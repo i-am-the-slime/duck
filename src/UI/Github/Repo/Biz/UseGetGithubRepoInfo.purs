@@ -14,6 +14,7 @@ import Data.List as List
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Newtype (class Newtype)
+import Data.Time.Duration (Hours(..))
 import Effect.Class.Console as Console
 import Effect.Unsafe (unsafePerformEffect)
 import Foreign (MultipleErrors)
@@ -23,6 +24,8 @@ import React.Basic.Hooks as React
 import UI.Ctx.Types (Ctx)
 import UI.FilePath (GithubRepo)
 import UI.GithubLogin.UseGithubGraphQL (UseGithubGraphQL, useDynamicGithubGraphQL)
+import Yoga.JSON as JSON
+import Yoga.JSON.Error (renderHumanError)
 
 type Entry =
   { name ∷ String
@@ -43,7 +46,7 @@ derive instance Newtype (UseGetGithubRepoInfo hooks) _
 
 useGetGithubRepoInfo ∷ Ctx → Hook UseGetGithubRepoInfo Result
 useGetGithubRepoInfo (ctx ∷ Ctx) = coerceHook React.do
-  rd /\ get ← useDynamicGithubGraphQL ctx
+  rd /\ get ← useDynamicGithubGraphQL ctx (Just (48.0 # Hours))
   remainingChunks /\ setRemainingChunks ← React.useState
     ([] ∷ (Array (NonEmptyArray GithubRepo)))
   results /\ setResults ← React.useState
@@ -67,8 +70,9 @@ useGetGithubRepoInfo (ctx ∷ Ctx) = coerceHook React.do
       RD.NotAsked → do
         React.writeRef resultsRef Map.empty
       RD.Loading → mempty
-      RD.Failure e → do
-        Console.log (show e)
+      RD.Failure errs → do
+        for_ errs \err →
+          Console.error $ (JSON.writeJSON $ renderHumanError err)
         mempty
       RD.Success (repoInfoResult ∷ { | RepoInfoResult }) → do
         intermediate ← React.readRef resultsRef
@@ -198,7 +202,7 @@ newtype UseGetGithubRepoInfo hooks = UseGetGithubRepoInfo
                               }
                           )
                       )
-                      (UseGithubGraphQL hooks)
+                      (UseGithubGraphQL () hooks)
                   )
               )
           )

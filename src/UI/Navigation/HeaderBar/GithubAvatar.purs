@@ -4,6 +4,7 @@ import Yoga.Prelude.View
 
 import Biz.GraphQL (GraphQL(..))
 import Data.Maybe (isNothing)
+import Data.Time.Duration (Days(..), convertDuration)
 import Fahrtwind (active, background', border, borderBottom, borderCol', divideY, fontMedium, hover, mT, overflowHidden, roundedDefault, roundedFull, roundedLg, shadowXxl, textXs, transform, widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Fahrtwind.Style.Divide (divideCol')
@@ -33,9 +34,10 @@ mkView = do
     useEffectAlways $ mempty <$ do
       unless isLoggedIn do checkIsLoggedIn
 
-    userInfoRD /\ loadUserInfo ←
+    { data: userInfoRD, send: loadUserInfo } ←
       useGithubGraphQL @UserInfoQueryVariables @UserInfoQueryResult
-        ctx (GraphQL "query { viewer { login } }")
+        ctx (Just (convertDuration (30.0 # Days)))
+          (GraphQL "query { viewer { login } }")
 
     useEffect isLoggedIn $ mempty <$ do
       when (userInfoRD # RD.toMaybe # isNothing) do loadUserInfo {}

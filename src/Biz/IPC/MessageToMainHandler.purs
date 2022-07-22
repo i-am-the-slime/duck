@@ -2,7 +2,7 @@ module Biz.IPC.MessageToMainHandler where
 
 import Prelude
 
-import Backend.CheckTools (getToolsWithPaths)
+import Backend.CheckTools (getToolPath, getToolsWithPaths)
 import Backend.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
 import Backend.Tool.Types (Tool(..))
@@ -12,13 +12,12 @@ import Biz.IPC.MessageToMainHandler.Github (getGithubDeviceCode, getIsLoggedInto
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, invalidSpagoDhall, noSpagoDhall, nothingSelected, validSpagoDhall)
 import Biz.Preferences (readAppPreferences)
 import Biz.Spago.Service (getGlobalCacheDir)
+import Biz.Tool (runToolAndGetStdout)
 import Control.Monad.Except (ExceptT(..), except, runExceptT)
-import Data.Array as Array
 import Data.Array.NonEmpty as NEA
-import Data.Either (Either(..), either, note)
+import Data.Either (either, note)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Traversable (for)
-import Data.Tuple (fst, snd)
 import Data.Tuple.Nested ((/\))
 import Data.UUID (UUID)
 import Data.UUID as UUID
@@ -52,6 +51,7 @@ handleMessageToMain window = \message_id message → do
     CopyToClipboard arg →
       (CopyToClipboardResult arg) <$ copyToClipboard arg # liftEffect
     GetSpagoGlobalCache → getSpagoGlobalCache
+    RunCommand arg → runCommand arg
 
   liftEffect do
     let
@@ -115,8 +115,11 @@ getSpagoGlobalCache ∷ Aff MessageToRenderer
 getSpagoGlobalCache = GetSpagoGlobalCacheResult <<< failedOrFromEither <$>
   runExceptT do
     os ← operatingSystemʔ # note "Unsupported OS" # except
-    tools ← getToolsWithPaths os <#> Right # ExceptT
-    spagoPath ← (Array.find (fst >>> (_ == Spago)) tools >>= snd)
-      # note "Spago is not installed"
-      # except
-    getGlobalCacheDir spagoPath # ExceptT
+    path ← getToolPath os Spago <#> note "Spago is not installed" # ExceptT
+    getGlobalCacheDir path # ExceptT
+
+runCommand ∷ { args ∷ Array String, tool ∷ Tool } → Aff MessageToRenderer
+runCommand { tool, args } = RunCommandResult <$> runExceptT do
+  os ← operatingSystemʔ # note "Unsupported OS" # except
+  path ← getToolPath os tool <#> note "Tool is not installed" # ExceptT
+  runToolAndGetStdout args path # ExceptT

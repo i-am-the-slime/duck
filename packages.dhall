@@ -99,8 +99,8 @@ in  upstream
 -------------------------------
 -}
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.2-20220611/packages.dhall
-        sha256:ea8cb7344562258469327872f4a955d7eb96f69eec07ad00df00f2de6f64048d
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.4-20220718/packages.dhall
+        sha256:a6d66723b6109f1e3eaf6575910f1c51aa545965ce313024ba329360e2f009ac
 
 in  upstream
   with playwright =
@@ -793,7 +793,7 @@ in  upstream
       ]
     , version = "main"
     }
-  with yoga-json.version = "353f5aa5aaebe59779d4521e8f2967191254de6d"
+  with yoga-json.version = "ddef23ce29665c19f6715a16bb5b26b1adc89218"
   with react-virtuoso =
     { dependencies =
         ( https://raw.githubusercontent.com/rowtype-yoga/purescript-react-virtuoso/main/spago.dhall
@@ -802,4 +802,4 @@ in  upstream
     , repo = "https://github.com/rowtype-yoga/purescript-react-virtuoso.git"
     , version = "5be142c5a651509e9e9a68582ed1807c029ba1b5"
     }
-  with datetime.version = "master"
+  with datetime.version = "v6.1.0"

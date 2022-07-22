@@ -24,7 +24,7 @@ import Yoga.Block.Container.Style (col)
 mkView ∷ Component Unit
 mkView = do
   component "Solutions" \(ctx ∷ Ctx) _ → React.do
-    (solutionsRD ∷ _ MessageToRenderer) /\ getPreferences /\ _ ←
+    { data: solutionsRD ∷ (_ MessageToRenderer), send: getPreferences } ←
       useIPCMessage ctx
 
     useEffectOnce do

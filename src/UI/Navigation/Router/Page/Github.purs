@@ -2,7 +2,7 @@ module UI.Navigation.Router.Page.Github where
 
 import Prelude hiding ((/))
 
-import Biz.Github.Types (Owner, Repository)
+import Biz.Github.Types (Login, Repository)
 import Data.Generic.Rep (class Generic)
 import Data.Lens.Iso.Newtype (_Newtype)
 import Data.Show.Generic (genericShow)
@@ -12,9 +12,9 @@ import Routing.Duplex as RD
 import Routing.Duplex.Generic as RG
 import Routing.Duplex.Generic.Syntax ((/))
 
-data Route = Root | Repository Owner Repository
+data Route = Root | Repository Login Repository
 
-owner ∷ RouteDuplex' Owner
+owner ∷ RouteDuplex' Login
 owner = _Newtype RD.segment
 
 repository ∷ RouteDuplex' Repository

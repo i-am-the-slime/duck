@@ -22,7 +22,7 @@ mkView = do
 
   where
   useGetSpagoGlobalCache ctx = React.do
-    result /\ query /\ _reset ← useIPCMessage ctx
+    { data: result, send: query } ← useIPCMessage ctx
     pathʔ /\ setPath ← useStateEq' Nothing
     React.useEffectAlways do
       case result of

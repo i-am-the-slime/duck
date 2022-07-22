@@ -3,6 +3,7 @@ module UI.Hook.UseGetFileInRepo where
 import Yoga.Prelude.View
 
 import Biz.GraphQL (GraphQL(..))
+import Data.Time.Duration (Hours(..))
 import Foreign (MultipleErrors)
 import Network.RemoteData (RemoteData)
 import React.Basic.Hooks as React
@@ -14,14 +15,16 @@ import Yoga.JSON as JSON
 useGetTextFileInRepo ∷
   ∀ hooks.
   Ctx →
-  Render hooks (UseGithubGraphQL hooks)
+  Render hooks (UseGithubGraphQL GetFileInRepoInput hooks)
     ( (RemoteData _ String) /\
         ( { | GetFileInRepoInput } →
           Effect Unit
         )
     )
 useGetTextFileInRepo ctx = React.do
-  (rd ∷ _ _ { | FileInRepoResponse }) /\ query ← useGithubGraphQL ctx
+  { data: rd ∷ _ _ { | FileInRepoResponse }, send: query } ← useGithubGraphQL
+    ctx
+    (Just (0.1 # Hours))
     getFileInRepoQuery
   pure ((rd <#> _.data.repository.object.text) /\ query)
 

@@ -54,6 +54,7 @@ to generate this file without the comments in this block.
   , "node-streams"
   , "now"
   , "nullable"
+  , "numbers"
   , "ordered-collections"
   , "parallel"
   , "partial"

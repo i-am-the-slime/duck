@@ -47,12 +47,11 @@ getMockInstalledTools ∷ OnMessage
 getMockInstalledTools = case _ of
   GetInstalledTools → pure $ Just $ GetInstalledToolsResponse $
     ToolsResult
-      ( enumFromTo bottom top <#> \tool → tool /\ case tool of
-          NPM → Just (ToolPath "/opt/homebrew/bin/npm")
-          Spago → Just (ToolPath "/Users/mark/.local/bin/spago")
-          Purs → Just (ToolPath "/Users/mark/.local/bin/purs")
-          DhallToJSON → Nothing
-      )
+      { npm: Just (ToolPath "/opt/homebrew/bin/npm")
+      , spago: Just (ToolPath "/Users/mark/.local/bin/spago")
+      , purs: Just (ToolPath "/Users/mark/.local/bin/purs")
+      , dhallToJSON: Nothing
+      }
   _ → pure Nothing
 
 getMockIsLoggedIntoGithub ∷ OnMessage
@@ -147,6 +146,51 @@ getMockRegistry = case _ of
                 }
             }
         }
+    }
+
+getMockRepoDetails ∷ OnMessage
+getMockRepoDetails = case _ of
+  QueryGithubGraphQL query
+    | unGithubGraphQLQuery query # String.contains
+        (String.Pattern "repo0:") →
+        pure $ Just $ GithubGraphQLResult
+          ( Succeeded
+              ( GithubGraphQLResponse
+                  ( writeJSON
+                      { data:
+                          { repo0: entry
+                              "purescript-framer-motion"
+                              "i-am-the-slime"
+                              "main"
+                              "2022-07-02"
+                          , repo1: entry
+                              "purescript-bigints"
+                              "purescript-contrib"
+                              "main"
+                              "2022-03-02"
+                          }
+                      }
+                  )
+              )
+          )
+  _ → pure Nothing
+  where
+  entry name owner branchName date =
+    { name
+    , owner: { login: owner }
+    , defaultBranchRef:
+        { name: branchName
+        , target:
+            { history:
+                { edges:
+                    [ { node:
+                          { pushedDate: date }
+                      }
+                    ]
+                }
+            }
+        }
+
     }
 
 getMockReadme ∷ OnMessage

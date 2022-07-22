@@ -12,8 +12,8 @@ import Node.ChildProcess as Exit
 import Sunde (spawn)
 
 runToolAndGetStdout ∷ Array String → ToolPath → Aff (Either String String)
-runToolAndGetStdout args spagoPath = do
-  { exit, stderr, stdout } ← spawnCmd spagoPath
+runToolAndGetStdout args toolPath = do
+  { exit, stderr, stdout } ← spawnCmd toolPath
   pure case exit of
     Exit.Normally 0 → Right (trim stdout)
     Exit.Normally other →

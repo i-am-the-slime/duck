@@ -13,7 +13,7 @@ import UI.Hook.UseIPCMessage (UseIPCMessage, useIPCMessage)
 
 useGithubUserInfo ∷ Ctx → Hook UseIPCMessage ((Maybe String) /\ (Effect Unit))
 useGithubUserInfo ctx = React.do
-  res /\ send /\ _ ← useIPCMessage ctx
+  { data: res, send } ← useIPCMessage ctx
   let
     result = unsafePartial case res # RD.toMaybe of
       Nothing → Nothing

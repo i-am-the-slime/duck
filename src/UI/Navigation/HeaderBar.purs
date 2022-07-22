@@ -2,7 +2,7 @@ module UI.Navigation.HeaderBar where
 
 import Yoga.Prelude.View
 
-import Biz.Github.Types (Owner(..), Repository(..))
+import Biz.Github.Types (Login(..), Repository(..))
 import Data.Array as Array
 import Fahrtwind (border, borderBottom, borderCol', flexRow, fontSemiMedium, gap, height, heightFull, hover, itemsCenter, justifyBetween, mL, mR, overflowHidden, overflowVisible, pL, pR, pX, pY, positionRelative, textCol', textSm, widthAndHeight)
 import Framer.Motion as M
@@ -108,7 +108,7 @@ renderRoute route =
       Registry → [ link "Registry" ]
       Github subRoute → case subRoute of
         Github.Root → [ link "Github" ]
-        Github.Repository (Owner owner) (Repository repo) →
+        Github.Repository (Login owner) (Repository repo) →
           [ linkTo (Github Github.Root) "Github"
           , link $ owner <> "/" <> repo
           ]
