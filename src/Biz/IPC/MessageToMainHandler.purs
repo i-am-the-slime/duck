@@ -7,7 +7,7 @@ import Backend.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
 import Backend.Tool.Types (Tool(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), failedOrFromEither)
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.IPC.MessageToMainHandler.Github (getGithubDeviceCode, getIsLoggedIntoGithub, pollGithubAccessToken, queryGithubGraphQL)
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, invalidSpagoDhall, noSpagoDhall, nothingSelected, validSpagoDhall)
 import Biz.Preferences (readAppPreferences)
@@ -116,7 +116,7 @@ getProjectDefinitions = do
   pure $ GetPureScriptSolutionDefinitionsResponse projects
 
 getSpagoGlobalCache ∷ Aff MessageToRenderer
-getSpagoGlobalCache = GetSpagoGlobalCacheResult <<< failedOrFromEither <$>
+getSpagoGlobalCache = GetSpagoGlobalCacheResult <$>
   runExceptT do
     os ← operatingSystemʔ # note "Unsupported OS" # except
     path ← getToolPath os Spago <#> note "Spago is not installed" # ExceptT

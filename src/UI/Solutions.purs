@@ -4,6 +4,7 @@ import Yoga.Prelude.View hiding (Component)
 
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.PureScriptSolutionDefinition.Types (PureScriptSolutionDefinition)
+import Data.Lens.Barlow (barlow)
 import Fahrtwind (divideY, mT, pL, pR, text2xl, textCol', widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicons
 import Fahrtwind.Style.Divide (divideCol')
@@ -16,7 +17,7 @@ import UI.Block.Card (clickableCard)
 import UI.Component (Component, component)
 import UI.Ctx.Types (Ctx)
 import UI.FilePath (renderFilePath)
-import UI.Hook.UseIPCMessage (useIPCMessage)
+import UI.Hook.UseIPCMessage (useIPC)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col)
@@ -24,8 +25,8 @@ import Yoga.Block.Container.Style (col)
 mkView ∷ Component Unit
 mkView = do
   component "Solutions" \(ctx ∷ Ctx) _ → React.do
-    { data: solutionsRD ∷ (_ MessageToRenderer), send: getPreferences } ←
-      useIPCMessage ctx
+    { data: solutionsRD, send: getPreferences } ←
+      useIPC ctx (barlow @"%GetPureScriptSolutionDefinitionsResponse")
 
     useEffectOnce do
       getPreferences GetPureScriptSolutionDefinitions
@@ -63,10 +64,7 @@ mkView = do
               [ solutionsRD # case _ of
                   RD.NotAsked → R.text "Jo, dann mach mal"
                   RD.Loading → R.text "Warte!"
-                  RD.Success (GetPureScriptSolutionDefinitionsResponse as) →
-                    R.ul_ (renderSolution <$> as)
-
-                  RD.Success _ → R.text $ "wrong message"
+                  RD.Success as → R.ul_ (renderSolution <$> as)
                   RD.Failure _ → mempty
               ]
           ]

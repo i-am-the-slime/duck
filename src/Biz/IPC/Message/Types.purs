@@ -42,37 +42,16 @@ data MessageToRenderer
   | GetPureScriptSolutionDefinitionsResponse
       (Array (Tuple FilePath PureScriptSolutionDefinition))
   | GetIsLoggedIntoGithubResult Boolean
-  | GithubGraphQLResult (FailedOr NoGithubToken GithubGraphQLResponse)
-  | GithubLoginGetDeviceCodeResult (FailedOr String DeviceCodeResponse)
+  | GithubGraphQLResult (Either NoGithubToken GithubGraphQLResponse)
+  | GithubLoginGetDeviceCodeResult (Either String DeviceCodeResponse)
   | GithubPollAccessTokenResult
-      (FailedOr String (FailedOr DeviceTokenError GithubAccessToken))
+      (Either String (Either DeviceTokenError GithubAccessToken))
   | CopyToClipboardResult String
   | GetClipboardTextResult String
-  | GetSpagoGlobalCacheResult (FailedOr String SpagoGlobalCacheDir)
+  | GetSpagoGlobalCacheResult (Either String SpagoGlobalCacheDir)
   | RunCommandResult (Either String String)
   | StoreTextFileResult (Maybe String)
   | LoadTextFileResult (Either String String)
-
-data FailedOr e a = Failed e | Succeeded a
-
-failedOrToEither ∷ ∀ e a. FailedOr e a → Either e a
-failedOrToEither = case _ of
-  Failed f → Left f
-  Succeeded a → Right a
-
-failedOrFromEither ∷ ∀ e a. Either e a → FailedOr e a
-failedOrFromEither = case _ of
-  Left f → Failed f
-  Right a → Succeeded a
-
-derive instance Generic (FailedOr e a) _
-derive instance (Eq e, Eq a) ⇒ Eq (FailedOr e a)
-derive instance (Ord e, Ord a) ⇒ Ord (FailedOr e a)
-instance (WriteForeign e, WriteForeign a) ⇒ WriteForeign (FailedOr e a) where
-  writeImpl = genericWriteForeignTaggedSum defaultOptions
-
-instance (ReadForeign e, ReadForeign a) ⇒ ReadForeign (FailedOr e a) where
-  readImpl = genericReadForeignTaggedSum defaultOptions
 
 derive instance Generic MessageToMain _
 derive instance Eq MessageToMain

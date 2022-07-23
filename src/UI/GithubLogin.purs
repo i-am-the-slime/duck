@@ -3,13 +3,13 @@ module UI.GithubLogin where
 import Yoga.Prelude.View
 
 import Biz.Github.Auth.Types (DeviceCode, DeviceCodeResponse(..), DeviceTokenError, UserCode(..), VerificationURI(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), failedOrToEither)
+import Biz.IPC.Message.Types (MessageToMain(..))
 import Biz.OAuth.Types (GithubAccessToken)
 import Color (cssStringRGBA)
 import Control.Monad.Rec.Class (forever)
 import Data.Array (intersperse)
 import Data.Array as Array
-import Data.Bifunctor (lmap)
+import Data.Lens.Barlow (barlow)
 import Data.Newtype (un)
 import Data.String (toCodePointArray)
 import Data.String as String
@@ -19,7 +19,6 @@ import Fahrtwind (background, background', border, borderCol', borderLeft, curso
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
-import Partial.Unsafe (unsafePartial)
 import Plumage.Util.HTML as P
 import Prim.Row (class Lacks, class Nub)
 import React.Basic.DOM as R
@@ -31,10 +30,9 @@ import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
 import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.GithubLogo (githubLogo)
-import UI.Hook.UseIPCMessage (UseIPCMessage, useIPCMessage)
+import UI.Hook.UseIPCMessage (UseIPC, useIPC)
 import UI.Modal (mkModalView)
-import UI.Notification.ErrorNotification (errorNotification)
-import UI.Notification.SendNotification (notifyError, sendNotification)
+import UI.Notification.SendNotification (notifyError)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button as Button
 import Yoga.Block.Atom.Button.Types (ButtonType(..)) as ButtonStyle
@@ -46,31 +44,25 @@ type Props =
 
 useGetDeviceCode ∷
   Ctx →
-  Hook UseIPCMessage
+  Hook UseIPC
     (RemoteData String DeviceCodeResponse /\ (Effect Unit) /\ (Effect Unit))
 useGetDeviceCode ctx = React.do
-  { data: response, send, reset } ← useIPCMessage ctx
+  { data: response, send, reset } ← useIPC ctx (barlow @"%GithubLoginGetDeviceCodeResult")
   let
-    res = response # lmap (const "") >>= unsafePartial case _ of
-      GithubLoginGetDeviceCodeResult v → RD.fromEither (failedOrToEither v)
+    res = response >>= RD.fromEither
   pure (res /\ (send GithubLoginGetDeviceCode) /\ reset)
 
 usePollAccessToken ∷
   Ctx →
-  Hook UseIPCMessage
-    ( ( RemoteData Void
+  Hook UseIPC
+    ( ( RemoteData String
           (Either String (Either DeviceTokenError GithubAccessToken))
       ) /\
         ((DeviceCode → Effect Unit) /\ (Effect Unit))
     )
 usePollAccessToken ctx = React.do
-  { data: response, send, reset } ← useIPCMessage ctx
-  let
-    res = response >>= unsafePartial case _ of
-      GithubPollAccessTokenResult v → RD.Success
-        (failedOrToEither v <#> failedOrToEither)
-
-  -- other → RD.Failure $ "Wrong response type " <> unsafeStringify other
+  { data: res, send, reset } ←
+    useIPC ctx (barlow @"%GithubPollAccessTokenResult")
   pure (res /\ (send <<< GithubPollAccessToken) /\ reset)
 
 mkGithubLogin ∷ UI.Component Props
@@ -260,21 +252,17 @@ mkCopyToClipboardButton = UI.component "CopyToClipboardButton" \ctx toCopy →
               ( width 22 <> height 18 <> mL 4 <> pL 4 <> borderLeft 1
                   <> borderCol' col.highlight
               )
-              [ if copied # isJust then Heroicon.clipboardCheck
-                else Heroicon.clipboard
+              [ if copied # isJust then Heroicon.check
+                else Heroicon.duplicate
 
               ]
           ]
       ]
   where
   useCopyToClipboard ctx = React.do
-    { data: res, send, reset } ← useIPCMessage ctx
+    { data: res, send, reset } ← useIPC ctx (barlow @"%CopyToClipboardResult")
     let copyToClipboard text = send $ CopyToClipboard text
-    let
-      copiedToClipboard = unsafePartial case res # RD.toMaybe of
-        Nothing → mempty
-        Just (CopyToClipboardResult text) → Just text
-    pure (copiedToClipboard /\ copyToClipboard /\ reset)
+    pure (RD.toMaybe res  /\ copyToClipboard /\ reset)
 
 renderCode ∷ UserCode → JSX
 renderCode user_code = Block.box_

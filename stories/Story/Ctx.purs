@@ -13,7 +13,9 @@ import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Seconds(..))
 import Data.UUID (UUID)
 import Data.UUID as UUID
+import Debug (debugger)
 import Effect (Effect)
+import Effect.Class (liftEffect)
 import Effect.Class.Console as Console
 import Effect.Ref as Ref
 import Effect.Uncurried (EffectFn1, runEffectFn1)
@@ -66,33 +68,13 @@ mkStoryCtx onMessage = do
   githubGraphQLCache ← mkGithubGraphQLCache
 
   let
-    registerListener listener = do
-      listenersRef # Ref.modify_ (Array.cons listener)
-      pure (listenersRef # Ref.modify_ (Array.filter (unsafeRefEq listener)))
-
-    postMessage ∷ UUID → MessageToMain → Effect Unit
-    postMessage uuid payload = do
-      let
-        msg ∷ MessageToMain
-        msg = JSON.write payload # JSON.read
-          # either (show >>> unsafeCrashWith) identity
-      responseʔ ← onMessage msg
-      for_ responseʔ \responseMessage → do
-        listenersRef # Ref.read >>=
-          traverse_
-            ( \elecList → do
-                let
-                  listener ∷ EffectFn1 Foreign Unit
-                  listener = unsafeCoerce elecList
-                runEffectFn1 listener
-                  ( JSON.write
-                      { response_for_message_id: UUID.toString uuid
-                      , response: responseMessage
-                      }
-                  )
-            )
-
-  { send: sendIPCMessage } ← mkSendIPCMessage { postMessage, registerListener }
+    sendIPCMessage = \msg → liftEffect do
+      resʔ ← onMessage msg
+      case resʔ of
+        Nothing → do
+          let _ = debugger \_ → msg
+          pure $ unsafeCoerce {}
+        Just r → pure r
   pure
     { sendIPCMessage
     , notificationCentre: storyNotificationCentre

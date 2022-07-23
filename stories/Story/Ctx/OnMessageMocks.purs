@@ -5,9 +5,10 @@ import Prelude
 import Backend.Github.API.Types (GithubGraphQLResponse(..), unGithubGraphQLQuery)
 import Backend.Tool.Types (ToolPath(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (FailedOr(..), MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Biz.PureScriptSolutionDefinition.Types (EntryPointType(..), PureScriptProjectDefinition(..), PureScriptSolutionDefinition)
 import Data.Array (mapWithIndex, replicate)
+import Data.Either (Either(..))
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.String as String
@@ -65,7 +66,7 @@ getMockGithubUserQuery = case _ of
     pure case q of
       """{"variables":{},"query":"query { viewer { login } }"}""" →
         Just
-          ( GithubGraphQLResult $ Succeeded $ GithubGraphQLResponse
+          ( GithubGraphQLResult $ Right $ GithubGraphQLResponse
               """{ "data": { "viewer": { "login": "rowtype-yoga" } } }"""
           )
       _ → Nothing
@@ -77,13 +78,13 @@ getMockRegistry = case _ of
     | unGithubGraphQLQuery query # String.contains
         (String.Pattern "new-packages.json") →
         pure $ Just $ GithubGraphQLResult
-          ( Succeeded (GithubGraphQLResponse (writeJSON exampleRepos))
+          ( Right (GithubGraphQLResponse (writeJSON exampleRepos))
           )
   QueryGithubGraphQL query
     | unGithubGraphQLQuery query # String.contains
         (String.Pattern "bower-packages.json") →
         pure $ Just $ GithubGraphQLResult
-          ( Succeeded (GithubGraphQLResponse (writeJSON exampleRepos2))
+          ( Right (GithubGraphQLResponse (writeJSON exampleRepos2))
           )
   _ → pure Nothing
   where
@@ -153,7 +154,7 @@ getMockRepoDetails = case _ of
     | unGithubGraphQLQuery query # String.contains
         (String.Pattern "repo0:") →
         pure $ Just $ GithubGraphQLResult
-          ( Succeeded
+          ( Right
               ( GithubGraphQLResponse
                   ( writeJSON
                       { data:
@@ -198,7 +199,7 @@ getMockReadme = case _ of
     | unGithubGraphQLQuery query # String.contains
         (String.Pattern "HEAD:README.md") →
         pure $ Just $ GithubGraphQLResult
-          ( Succeeded
+          ( Right
               ( GithubGraphQLResponse
                   ( writeJSON
                       { data:

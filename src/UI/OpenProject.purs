@@ -3,13 +3,14 @@ module UI.OpenProject where
 import Yoga.Prelude.View hiding (Component)
 
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Data.Lens.Barlow (barlow)
 import Data.Variant (match)
 import Network.RemoteData (RemoteData(..))
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import UI.Component (Component, component)
 import UI.Ctx.Types (Ctx)
-import UI.Hook.UseIPCMessage (useIPCMessage)
+import UI.Hook.UseIPCMessage (useIPC)
 import UI.Project as Project
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types (ButtonType(..))
@@ -18,7 +19,8 @@ mkView ∷ Component Unit
 mkView = do
   projectView ← Project.mkView
   component "OpenProject" \(ctx ∷ Ctx) _ → React.do
-    { data: projectConfigRD, send: openFolder } ← useIPCMessage ctx
+    { data: projectConfigRD, send: openFolder } ←
+      useIPC ctx (barlow @"%LoadSpagoProjectResponse")
 
     let
       selectButton disabled = Block.centre_
@@ -38,7 +40,7 @@ mkView = do
           Loading → selectButton true
           Failure _ → fragment
             [ selectButton false ]
-          Success (LoadSpagoProjectResponse success) →
+          Success success →
             success # match
               { noSpagoDhall:
                   \_ → Block.stack_
@@ -53,7 +55,5 @@ mkView = do
               , nothingSelected: \_ → selectButton false
               , validSpagoDhall: projectView
               }
-          Success _ → fragment
-            [ selectButton false, R.text $ "Unexpected message" ]
 
       ]

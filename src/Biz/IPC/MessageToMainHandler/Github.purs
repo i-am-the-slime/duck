@@ -3,10 +3,10 @@ module Biz.IPC.MessageToMainHandler.Github where
 import Prelude
 
 import Backend.Github.API as GithubGraphQL
-import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..))
+import Backend.Github.API.Types (GithubGraphQLQuery)
 import Biz.Github.API.Auth as Auth
 import Biz.Github.Auth.Types (DeviceCode)
-import Biz.IPC.Message.Types (FailedOr(..), MessageToRenderer(..), NoGithubToken(..), failedOrFromEither)
+import Biz.IPC.Message.Types (MessageToRenderer(..), NoGithubToken(..))
 import Biz.OAuth.Types (GithubAccessToken)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), isJust)
@@ -27,8 +27,8 @@ queryGithubGraphQL ∷
 queryGithubGraphQL query = GithubGraphQLResult <$> do
   tokenʔ ← readStoredGithubAccessToken
   case tokenʔ of
-    Just token → Succeeded <$> GithubGraphQL.sendRequest token query
-    Nothing → pure $ Failed NoGithubToken
+    Just token → Right <$> GithubGraphQL.sendRequest token query
+    Nothing → pure $ Left NoGithubToken
 
 githubTokenFile ∷ String
 githubTokenFile = "github-token"
@@ -60,7 +60,7 @@ storeGithubAccessToken token = do
 
 getGithubDeviceCode ∷ Aff MessageToRenderer
 getGithubDeviceCode =
-  (GithubLoginGetDeviceCodeResult <<< failedOrFromEither) <$>
+  GithubLoginGetDeviceCodeResult <$>
     Auth.getDeviceCode (Fetch.fetch nodeFetch)
 
 pollGithubAccessToken ∷ DeviceCode → Aff MessageToRenderer
@@ -73,6 +73,4 @@ pollGithubAccessToken deviceCode = do
     _ → pure unit
   pure
     <<< GithubPollAccessTokenResult
-    <<< failedOrFromEither
-    <<< map failedOrFromEither
     $ response

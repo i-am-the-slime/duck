@@ -3,15 +3,16 @@ module UI.GithubLogin.UseIsLoggedIntoGithub where
 import Yoga.Prelude.View
 
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Data.Lens.Barlow (barlow)
 import Data.Newtype (class Newtype)
 import Network.RemoteData as RD
 import Partial.Unsafe (unsafePartial)
 import React.Basic.Hooks as React
 import UI.Ctx.Types (Ctx)
-import UI.Hook.UseIPCMessage (UseIPCMessage, useIPCMessage)
+import UI.Hook.UseIPCMessage (UseIPC, useIPC)
 
 newtype UseIsLoggedIntoGithub hook =
-  UseIsLoggedIntoGithub (UseIPCMessage hook)
+  UseIsLoggedIntoGithub (UseIPC hook)
 
 derive instance Newtype (UseIsLoggedIntoGithub hook) _
 
@@ -23,10 +24,8 @@ useIsLoggedIntoGithub ∷
     , resetCheckIsLoggedIn ∷ Effect Unit
     }
 useIsLoggedIntoGithub ctx = coerceHook React.do
-  { data: msg, send, reset } ← useIPCMessage ctx
-  let checkIsLoggedIn = send GetIsLoggedIntoGithub
+  { data: msg, send, reset } ← useIPC ctx (barlow @"%GetIsLoggedIntoGithubResult")
   let
-    isLoggedIn = unsafePartial case RD.toMaybe msg of
-      Just (GetIsLoggedIntoGithubResult s) → s
-      Nothing → false
+    checkIsLoggedIn = send GetIsLoggedIntoGithub
+    isLoggedIn = RD.toMaybe msg # fromMaybe false
   pure { isLoggedIn, checkIsLoggedIn, resetCheckIsLoggedIn: reset }

@@ -3,34 +3,29 @@ module UI.Hook.UseIPCMessage where
 import Prelude
 
 import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
-import Data.Either (Either(..))
+import Data.Bifunctor (lmap)
+import Data.Either (Either, note)
 import Data.Foldable (for_)
+import Data.Lens (Prism', preview)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Tuple.Nested ((/\))
 import Data.UUID (UUID, genUUID)
-import Data.UUID as UUID
 import Effect (Effect)
 import Effect.AVar (AVar)
 import Effect.AVar as AVar
-import Effect.Aff (Aff)
+import Effect.Aff (Aff, attempt)
 import Effect.Aff.AVar as AffAVar
 import Effect.Class (liftEffect)
-import Effect.Class.Console as Console
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
-import Effect.Unsafe (unsafePerformEffect)
 import ElectronAPI (ElectronListener)
 import ElectronAPI as ElectronAPI
 import Foreign (MultipleErrors)
-import Foreign.Internal.Stringify (unsafeStringify)
-import Network.RemoteData (RemoteData(..))
-import Network.RemoteData as RD
-import React.Basic.Hooks (Hook, UseEffect, UseState, coerceHook, useEffectOnce)
+import Network.RemoteData (RemoteData)
+import Network.RemoteData as RemoteData
+import React.Basic.Hooks (Hook, coerceHook)
 import React.Basic.Hooks as React
-import UI.Ctx.Types (Ctx)
 import UI.Hook.UseRemoteData (UseRemoteData(..), useRemoteData)
 import Unsafe.Coerce (unsafeCoerce)
 import Yoga.JSON as JSON
@@ -70,20 +65,27 @@ mkSendIPCMessage { registerListener, postMessage } = do
       AffAVar.read resultAVar
   pure { send, destroy }
 
-useIPCMessage ∷
-  Ctx →
-  Hook UseIPCMessage
-    { data ∷ (RemoteData Void MessageToRenderer)
+useIPC ∷
+  ∀ ctx a.
+  { sendIPCMessage ∷ MessageToMain → Aff MessageToRenderer | ctx } →
+  Prism' MessageToRenderer a →
+  Hook UseIPC
+    { data ∷ (RemoteData String a)
     , send ∷ (MessageToMain → Effect Unit)
     , reset ∷ Effect Unit
     }
-useIPCMessage
-  { sendIPCMessage } = coerceHook $ React.do
-  { data: datar, load, reset } ← useRemoteData
-    (\i → Right <$> sendIPCMessage i)
-  pure { data: datar, send: load, reset }
+useIPC { sendIPCMessage } prism = coerceHook $ React.do
+  let
+    send ∷ MessageToMain → Aff (Either String MessageToRenderer)
+    send msg = attempt (sendIPCMessage msg) <#> lmap show
+  { data: msgData, load, reset } ← useRemoteData send
+  let
+    remoteData = msgData >>= preview prism >>> note "Wrong message type" >>>
+      RemoteData.fromEither
 
-newtype UseIPCMessage hooks = UseIPCMessage
-  (UseRemoteData MessageToMain Void MessageToRenderer hooks)
+  pure { data: remoteData, send: load, reset }
 
-derive instance Newtype (UseIPCMessage hooks) _
+newtype UseIPC hooks = UseIPC
+  (UseRemoteData MessageToMain String MessageToRenderer hooks)
+
+derive instance Newtype (UseIPC hooks) _

@@ -5,7 +5,8 @@ import Yoga.Prelude.View
 import Backend.Tool.Types (Tool(..), ToolPath(..), toToolArray)
 import Backend.Tool.Types as Tool
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.Message.Types (MessageToMain(..))
+import Data.Lens.Barlow (barlow)
 import Fahrtwind (background, border, borderCol, flexCol, green, mB, roundedFull, textCol', textLg, textSm, widthAndHeight, yellow)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..)) as RD
@@ -16,7 +17,7 @@ import React.Basic.Hooks as React
 import UI.Block.Card (card, clickableCard)
 import UI.Component as UI
 import UI.FilePath (renderFilePath)
-import UI.Hook.UseIPCMessage (useIPCMessage)
+import UI.Hook.UseIPCMessage (useIPC)
 import UI.Navigation.Router (useRouter)
 import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
@@ -27,7 +28,6 @@ import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
-import Yoga.JSON (writeJSON) as JSON
 
 rootView ∷ JSX
 rootView = mempty
@@ -42,25 +42,23 @@ mkView = do
       (tools <#> toolView)
   where
   useGetTools ctx = React.do
-    { data: result, send: query } ← useIPCMessage ctx
+    { data: result, send: query } ← useIPC ctx (barlow @"%GetInstalledToolsResponse")
     toolsʔ /\ setTools ← useStateEq' Nothing
     useEffect result do
       case result of
         RD.NotAsked → query GetInstalledTools
-        RD.Failure void → absurd void
+        RD.Failure e →
+          sendNotification ctx $ errorNotification
+            { title: "Error"
+            , body: R.text e
+            }
         RD.Loading → mempty
-        RD.Success (GetInstalledToolsResponse (UnsupportedOperatingSystem)) →
+        RD.Success (UnsupportedOperatingSystem) →
           sendNotification ctx $ errorNotification
             { title: "Error"
             , body: R.text "Your operating system is not supported."
             }
-        RD.Success (GetInstalledToolsResponse (ToolsResult tools)) → do
-          setTools (Just tools)
-        RD.Success other →
-          sendNotification ctx $ errorNotification
-            { title: "BUG: Unexpected message"
-            , body: R.text $ JSON.writeJSON other
-            }
+        RD.Success (ToolsResult tools) → setTools (Just tools)
       mempty
     pure toolsʔ
 

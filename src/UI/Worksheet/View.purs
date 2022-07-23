@@ -5,6 +5,7 @@ import Yoga.Prelude.View
 import Backend.Tool.Types (Tool(..))
 import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
 import Data.Either (either)
+import Data.Lens.Barlow (barlow)
 import Data.Lens.Barlow.Helpers (preview, view)
 import Fahrtwind (heightFull, height)
 import Network.RemoteData as RD
@@ -13,7 +14,7 @@ import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Component as UI
 import UI.Editor (useMonaco)
-import UI.Hook.UseIPCMessage (useIPCMessage)
+import UI.Hook.UseIPCMessage (useIPC)
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (notifyError, sendNotification)
 import Yoga.Block as Block
@@ -25,17 +26,15 @@ mkView = do
     textRef ← React.useRef ""
     editor ← useMonaco "" (React.writeRef textRef)
 
-    loadFileIPC ← useIPCMessage ctx
-    saveFileIPC ← useIPCMessage ctx
-    runCodeIPC ← useIPCMessage ctx
+    loadFileIPC ← useIPC ctx (barlow @"%LoadTextFileResult")
+    saveFileIPC ← useIPC ctx (barlow @"%StoreTextFileResult")
+    runCodeIPC ← useIPC ctx (barlow @"%RunCommandResult")
 
     useEffectOnce do
       loadFileIPC.send (LoadTextFile "/tmp/duck-worksheet/src/Main.purs")
       mempty
     useEffect loadFileIPC.data do
-      for_ (loadFileIPC.data) case _ of
-        LoadTextFileResult r → for_ r editor.setValue
-        _ → mempty
+      for_ (loadFileIPC.data) (traverse_ editor.setValue)
       mempty
 
     let
@@ -62,14 +61,14 @@ mkView = do
           [ saveButton, runButton ]
       , Block.sidebar
           { sidebar:
-            (runCodeIPC.data <#> preview @"%RunCommandResult")
+            runCodeIPC.data
               # case _ of
                   RD.NotAsked -> R.text "Go ahead run this"
                   RD.Loading -> spinner
-                  RD.Success (Just (Right r)) -> R.text r
-                  RD.Success (Just (Left e)) -> R.text e
-                  RD.Success _ -> mempty -- notifyError ctx "Unexpected message"
+                  RD.Success (Right r) -> R.text r
+                  RD.Success (Left e) -> R.text e
                   RD.Failure _ -> mempty -- notifyError ctx e
+
           , sideWidth: "300px"
           }
           [ R.div' </* { ref: editor.ref, css: height 500 } /> [] ]
