@@ -28,6 +28,7 @@ import Story.Util.NotificationCentre (storyNotificationCentre)
 import UI.Ctx.Electron (mkGithubGraphQLCache)
 import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
+import UI.Hook.UseIPCMessage (mkSendIPCMessage)
 import Unsafe.Coerce (unsafeCoerce)
 import Unsafe.Reference (unsafeRefEq)
 import Yoga.JSON as JSON
@@ -91,9 +92,11 @@ mkStoryCtx onMessage = do
                   )
             )
 
+  { send: sendIPCMessage } ← mkSendIPCMessage { postMessage, registerListener }
   pure
     { registerListener
     , postMessage
+    , sendIPCMessage
     , notificationCentre: storyNotificationCentre
     , githubAuth:
         { getDeviceCode: alwaysSucceedGetDeviceCode

@@ -59,6 +59,7 @@ renderLinks (currentRoute /\ setRoute) =
   renderTopLevelRoute tlr = case tlr of
     TopLevelHome → iconButton tlr Home Heroicon.home
     TopLevelSolutions → iconButton tlr Solutions Heroicon.code
+    TopLevelWorksheet → iconButton tlr Worksheet Heroicon.lightBulb
     TopLevelRegistry → iconButton tlr Registry Heroicon.identification
     TopLevelGithub → iconButton tlr (Github Github.Root) githubLogo
     TopLevelPreferences → iconButton tlr (Preferences PreferencesRoute.Root)

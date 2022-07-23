@@ -34,7 +34,7 @@ import UI.GithubLogin.GithubLogo (githubLogo)
 import UI.Hook.UseIPCMessage (UseIPCMessage, useIPCMessage)
 import UI.Modal (mkModalView)
 import UI.Notification.ErrorNotification (errorNotification)
-import UI.Notification.SendNotification (sendNotification)
+import UI.Notification.SendNotification (notifyError, sendNotification)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button as Button
 import Yoga.Block.Atom.Button.Types (ButtonType(..)) as ButtonStyle
@@ -79,9 +79,6 @@ mkGithubLogin = do
     liftEffect
   copyToClipboardButton ← mkCopyToClipboardButton
   UI.component "GithubLoginButton" \ctx (props ∷ Props) → React.do
-    let
-      notifyError message = sendNotification ctx $
-        errorNotification { title: "Error", body: R.text message }
     code /\ getDeviceCode /\ resetCode ← useGetDeviceCode ctx
     let codeʔ = RD.toMaybe code
 
@@ -100,16 +97,16 @@ mkGithubLogin = do
           Aff.delay (interval # fromDuration)
           liftEffect
             ( for_ accessToken case _ of
-                Left err → notifyError (show err)
+                Left err → notifyError ctx (show err)
                 Right (Left { error }) | error == "authorization_pending" →
                   pollAccessToken device_code # liftEffect
-                Right (Left error) → notifyError (show error)
+                Right (Left error) → notifyError ctx (show error)
                 Right (Right _) → resetCode
             )
 
     useEffect code do
       case code of
-        Failure err → notifyError err
+        Failure err → notifyError ctx err
         _ → mempty
       mempty
 

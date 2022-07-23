@@ -105,6 +105,7 @@ renderRoute route =
     /> Array.reverse case route of
       Home → [ link "Home" ]
       Solutions → [ link "Solutions" ]
+      Worksheet → [ link "Worksheet" ]
       Registry → [ link "Registry" ]
       Github subRoute → case subRoute of
         Github.Root → [ link "Github" ]

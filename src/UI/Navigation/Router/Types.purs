@@ -13,6 +13,7 @@ import UI.Navigation.Router.Page.Preferences as Preferences
 data Route
   = Home
   | Solutions
+  | Worksheet
   | Registry
   | Github Github.Route
   | Preferences Preferences.Route
@@ -21,6 +22,7 @@ toTopLevelRoute ∷ Route → TopLevelRoute
 toTopLevelRoute = case _ of
   Home → TopLevelHome
   Solutions → TopLevelSolutions
+  Worksheet → TopLevelWorksheet
   Registry → TopLevelRegistry
   Github _ → TopLevelGithub
   Preferences _ → TopLevelPreferences
@@ -33,6 +35,7 @@ instance Show Route where
 data TopLevelRoute
   = TopLevelHome
   | TopLevelSolutions
+  | TopLevelWorksheet
   | TopLevelRegistry
   | TopLevelGithub
   | TopLevelPreferences

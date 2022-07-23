@@ -84,6 +84,7 @@ appRoute =
     $ RG.sum
         { "Home": RG.noArgs
         , "Solutions": "projects" / RG.noArgs
+        , "Worksheet": "worksheet" / RG.noArgs
         , "Registry": "registry" / RG.noArgs
         , "Github": "github" / Github.subRoute
         , "Preferences": "preferences" / Preferences.subRoute

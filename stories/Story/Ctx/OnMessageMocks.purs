@@ -3,12 +3,11 @@ module Story.Ctx.OnMessageMocks where
 import Prelude
 
 import Backend.Github.API.Types (GithubGraphQLResponse(..), unGithubGraphQLQuery)
-import Backend.Tool.Types (Tool(..), ToolPath(..))
+import Backend.Tool.Types (ToolPath(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
 import Biz.IPC.Message.Types (FailedOr(..), MessageToMain(..), MessageToRenderer(..))
 import Biz.PureScriptSolutionDefinition.Types (EntryPointType(..), PureScriptProjectDefinition(..), PureScriptSolutionDefinition)
 import Data.Array (mapWithIndex, replicate)
-import Data.Enum (enumFromTo)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.String as String

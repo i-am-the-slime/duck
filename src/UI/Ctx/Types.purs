@@ -3,20 +3,22 @@ module UI.Ctx.Types where
 import Prelude
 
 import Biz.GraphQL (GraphQLQuery)
-import Biz.IPC.Message.Types (MessageToMain)
+import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
 import Data.Maybe (Maybe)
-import Data.Time.Duration (class Duration, Hours(..))
+import Data.Time.Duration (class Duration)
 import Data.UUID (UUID)
 import Effect (Effect)
+import Effect.Aff (Aff)
 import ElectronAPI (ElectronListener)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
 import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre)
-import Yoga.JSON (class ReadForeign, class WriteForeign)
+import Yoga.JSON (class WriteForeign)
 
 type Ctx =
   { registerListener ∷ ElectronListener → Effect (Effect Unit)
   , postMessage ∷ UUID → MessageToMain → Effect Unit
   , notificationCentre ∷ NotificationCentre
+  , sendIPCMessage ∷ MessageToMain → Aff MessageToRenderer
   , githubAuth ∷
       { getDeviceCode ∷ GetDeviceCode
       , pollAccessToken ∷ PollAccessToken

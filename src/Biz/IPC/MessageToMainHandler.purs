@@ -15,13 +15,14 @@ import Biz.Spago.Service (getGlobalCacheDir)
 import Biz.Tool (runToolAndGetStdout)
 import Control.Monad.Except (ExceptT(..), except, runExceptT)
 import Data.Array.NonEmpty as NEA
-import Data.Either (either, note)
+import Data.Bifunctor (lmap)
+import Data.Either (blush, either, note)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Traversable (for)
 import Data.Tuple.Nested ((/\))
 import Data.UUID (UUID)
 import Data.UUID as UUID
-import Effect.Aff (Aff)
+import Effect.Aff (Aff, attempt)
 import Effect.Class (liftEffect)
 import Electron (BrowserWindow, copyToClipboard, getClipboardText, openDirectory, sendToWebContents)
 import Electron as Electron
@@ -29,6 +30,7 @@ import Electron.Types (Channel(..))
 import Node.ChildProcess (defaultSpawnOptions)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff (readTextFile)
+import Node.FS.Aff as FSA
 import Node.FS.Sync (exists)
 import Node.Path as Path
 import Sunde (spawn)
@@ -52,6 +54,8 @@ handleMessageToMain window = \message_id message → do
       (CopyToClipboardResult arg) <$ copyToClipboard arg # liftEffect
     GetSpagoGlobalCache → getSpagoGlobalCache
     RunCommand arg → runCommand arg
+    StoreTextFile arg → storeTextFile arg
+    LoadTextFile arg → loadTextFile arg
 
   liftEffect do
     let
@@ -118,8 +122,19 @@ getSpagoGlobalCache = GetSpagoGlobalCacheResult <<< failedOrFromEither <$>
     path ← getToolPath os Spago <#> note "Spago is not installed" # ExceptT
     getGlobalCacheDir path # ExceptT
 
-runCommand ∷ { args ∷ Array String, tool ∷ Tool } → Aff MessageToRenderer
-runCommand { tool, args } = RunCommandResult <$> runExceptT do
+runCommand ∷
+  { args ∷ Array String, workingDir ∷ Maybe String, tool ∷ Tool } →
+  Aff MessageToRenderer
+runCommand { tool, workingDir, args } = RunCommandResult <$> runExceptT do
   os ← operatingSystemʔ # note "Unsupported OS" # except
   path ← getToolPath os tool <#> note "Tool is not installed" # ExceptT
-  runToolAndGetStdout args path # ExceptT
+  runToolAndGetStdout { args, toolPath: path, workingDir } # ExceptT
+
+storeTextFile ∷ { content ∷ String, path ∷ String } → Aff MessageToRenderer
+storeTextFile { path, content } = StoreTextFileResult <$> do
+  res ← attempt $ FSA.writeTextFile UTF8 path content
+  pure $ blush res <#> show
+
+loadTextFile ∷ String → Aff MessageToRenderer
+loadTextFile arg = LoadTextFileResult <$> do
+  attempt (FSA.readTextFile UTF8 arg) <#> lmap show

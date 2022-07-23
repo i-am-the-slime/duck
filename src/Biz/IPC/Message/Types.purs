@@ -31,7 +31,9 @@ data MessageToMain
   | CopyToClipboard String
   | GetClipboardText
   | GetSpagoGlobalCache
-  | RunCommand { tool ∷ Tool, args ∷ Array String }
+  | RunCommand { tool ∷ Tool, workingDir ∷ Maybe String, args ∷ Array String }
+  | StoreTextFile { path ∷ String, content ∷ String }
+  | LoadTextFile String
 
 data MessageToRenderer
   = LoadSpagoProjectResponse SelectedFolderData
@@ -48,6 +50,8 @@ data MessageToRenderer
   | GetClipboardTextResult String
   | GetSpagoGlobalCacheResult (FailedOr String SpagoGlobalCacheDir)
   | RunCommandResult (Either String String)
+  | StoreTextFileResult (Maybe String)
+  | LoadTextFileResult (Either String String)
 
 data FailedOr e a = Failed e | Succeeded a
 

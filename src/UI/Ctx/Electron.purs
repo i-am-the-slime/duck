@@ -24,6 +24,7 @@ import Electron.Types (Channel(..))
 import ElectronAPI as ElectronAPI
 import UI.Ctx.Types (Ctx, GithubGraphQLCache(..))
 import UI.GithubLogin.Repository (getDeviceCode, pollAccessToken)
+import UI.Hook.UseIPCMessage (mkSendIPCMessage)
 import Web.HTML (window)
 import Web.HTML.Window (localStorage)
 import Web.Storage.Storage as LocalStorage
@@ -34,13 +35,18 @@ import Yoga.JSON (class WriteForeign)
 import Yoga.JSON as JSON
 
 mkElectronCtx ∷ Effect Ctx
-mkElectronCtx = ado
+mkElectronCtx = do
   notificationCentre ← mkNotificationCentre
   githubGraphQLCache ← mkGithubGraphQLCache
-  in
-    { registerListener: ElectronAPI.on (Channel "ipc")
-    , postMessage: \uuid payload → ElectronAPI.sendToMain $ JSON.write
-        { type: "ipc", data: { message_id: UUID.toString uuid, payload } }
+  let
+    postMessage uuid payload = ElectronAPI.sendToMain $ JSON.write
+      { type: "ipc", data: { message_id: UUID.toString uuid, payload } }
+    registerListener = ElectronAPI.on (Channel "ipc")
+  { send: sendIPCMessage } ← mkSendIPCMessage { postMessage, registerListener }
+  pure
+    { registerListener
+    , sendIPCMessage
+    , postMessage
     , notificationCentre
     , githubAuth:
         { getDeviceCode: getDeviceCode (F.fetch windowFetch)

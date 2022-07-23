@@ -11,8 +11,13 @@ import Node.ChildProcess (defaultSpawnOptions)
 import Node.ChildProcess as Exit
 import Sunde (spawn)
 
-runToolAndGetStdout ∷ Array String → ToolPath → Aff (Either String String)
-runToolAndGetStdout args toolPath = do
+runToolAndGetStdout ∷
+  { args ∷ Array String
+  , workingDir ∷ Maybe String
+  , toolPath ∷ ToolPath
+  } →
+  Aff (Either String String)
+runToolAndGetStdout { args, workingDir, toolPath } = do
   { exit, stderr, stdout } ← spawnCmd toolPath
   pure case exit of
     Exit.Normally 0 → Right (trim stdout)
@@ -22,4 +27,4 @@ runToolAndGetStdout args toolPath = do
       Left ("Interrupted by signal: " <> show signal <> "\n" <> stderr)
   where
   spawnCmd (ToolPath path) = spawn { cmd: path, args, stdin: Nothing }
-    defaultSpawnOptions
+    (defaultSpawnOptions { cwd = (workingDir) })

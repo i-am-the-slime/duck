@@ -11,11 +11,13 @@ import UI.OpenProject as OpenProject
 import UI.Preferences as Preferences
 import UI.Registry as Registry
 import UI.Solutions as Solutions
+import UI.Worksheet.View as Worksheet
 
 mkView ∷ UI.Component Unit
 mkView = do
   openProjectView ← OpenProject.mkView
   solutionsView ← Solutions.mkView
+  worksheetView ← Worksheet.mkView
   registry ← Registry.mkView
   github ← Github.mkView
   preferences ← Preferences.mkView
@@ -24,6 +26,7 @@ mkView = do
     pure $ case route of
       Home → openProjectView unit
       Solutions → solutionsView unit
+      Worksheet → worksheetView unit
       Registry → registry unit
       Github subRoute → github subRoute
       Preferences subRoute → preferences subRoute
