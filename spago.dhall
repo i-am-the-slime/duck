@@ -18,6 +18,7 @@ to generate this file without the comments in this block.
   , "affjax-node"
   , "argonaut-core"
   , "arrays"
+  , "avar"
   , "barlow-lens"
   , "bifunctors"
   , "colors"

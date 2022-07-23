@@ -94,9 +94,7 @@ mkStoryCtx onMessage = do
 
   { send: sendIPCMessage } ← mkSendIPCMessage { postMessage, registerListener }
   pure
-    { registerListener
-    , postMessage
-    , sendIPCMessage
+    { sendIPCMessage
     , notificationCentre: storyNotificationCentre
     , githubAuth:
         { getDeviceCode: alwaysSucceedGetDeviceCode

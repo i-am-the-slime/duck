@@ -15,9 +15,7 @@ import Yoga.Block.Organism.NotificationCentre.Types (NotificationCentre)
 import Yoga.JSON (class WriteForeign)
 
 type Ctx =
-  { registerListener ∷ ElectronListener → Effect (Effect Unit)
-  , postMessage ∷ UUID → MessageToMain → Effect Unit
-  , notificationCentre ∷ NotificationCentre
+  { notificationCentre ∷ NotificationCentre
   , sendIPCMessage ∷ MessageToMain → Aff MessageToRenderer
   , githubAuth ∷
       { getDeviceCode ∷ GetDeviceCode

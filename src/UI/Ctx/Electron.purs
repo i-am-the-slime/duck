@@ -44,9 +44,7 @@ mkElectronCtx = do
     registerListener = ElectronAPI.on (Channel "ipc")
   { send: sendIPCMessage } ← mkSendIPCMessage { postMessage, registerListener }
   pure
-    { registerListener
-    , sendIPCMessage
-    , postMessage
+    { sendIPCMessage
     , notificationCentre
     , githubAuth:
         { getDeviceCode: getDeviceCode (F.fetch windowFetch)
