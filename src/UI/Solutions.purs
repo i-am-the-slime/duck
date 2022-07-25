@@ -17,7 +17,7 @@ import UI.Block.Card (clickableCard)
 import UI.Component (Component, component)
 import UI.Ctx.Types (Ctx)
 import UI.FilePath (renderFilePath)
-import UI.Hook.UseIPCMessage (useIPC)
+import UI.Hook.UseIPC (useIPC)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col)

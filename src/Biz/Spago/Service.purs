@@ -7,9 +7,13 @@ import Backend.Tool.Types (ToolPath)
 import Biz.Tool (runToolAndGetStdout)
 import Data.Either (Either)
 import Data.Maybe (Maybe(..))
+import Data.String (trim)
 import Effect.Aff (Aff)
 
 getGlobalCacheDir ∷ ToolPath → Aff (Either String SpagoGlobalCacheDir)
-getGlobalCacheDir = map (SpagoGlobalCacheDir <$> _)
+getGlobalCacheDir = map ((SpagoGlobalCacheDir <<< trim <<< _.stdout) <$> _)
   <<< \toolPath → runToolAndGetStdout
-    { args: [ "path", "global-cache" ], toolPath, workingDir: Nothing }
+    { args: [ "path", "global-cache" ]
+    , toolPath
+    , workingDir: Nothing
+    }

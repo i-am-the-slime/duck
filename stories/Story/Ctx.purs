@@ -3,36 +3,25 @@ module Story.Ctx where
 import Prelude
 
 import Biz.Github.Auth.Types (DeviceCode(..), DeviceCodeResponse(..), UserCode(..), VerificationURI(..))
-import Biz.IPC.Message.Types (MessageToMain)
 import Biz.OAuth.Types (AccessToken(..), ScopeList(..), TokenType(..))
 import Data.Array (foldl, singleton)
-import Data.Array as Array
-import Data.Either (either)
-import Data.Foldable (for_, traverse_)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Seconds(..))
-import Data.UUID (UUID)
-import Data.UUID as UUID
-import Debug (debugger)
+import Debug (spy)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Class.Console as Console
 import Effect.Ref as Ref
-import Effect.Uncurried (EffectFn1, runEffectFn1)
 import ElectronAPI (ElectronListener)
-import Foreign (Foreign)
-import Partial.Unsafe (unsafeCrashWith)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
-import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockReadme, getMockRegistry, getMockRepoDetails, getMockSolutionDefinition)
+import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockLoadWorksheetFile, getMockOwnerImage, getMockReadme, getMockRegistry, getMockRepoDetails, getMockSolutionDefinition)
 import Story.Ctx.Types (OnMessage)
 import Story.Util.NotificationCentre (storyNotificationCentre)
 import UI.Ctx.Electron (mkGithubGraphQLCache)
 import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.Repository (GetDeviceCode, PollAccessToken)
-import UI.Hook.UseIPCMessage (mkSendIPCMessage)
 import Unsafe.Coerce (unsafeCoerce)
-import Unsafe.Reference (unsafeRefEq)
 import Yoga.JSON as JSON
 
 defaultOnMessage ∷ OnMessage
@@ -44,6 +33,8 @@ defaultOnMessage msg = tryAllOf
   , getMockRegistry
   , getMockRepoDetails
   , getMockReadme
+  , getMockOwnerImage
+  , getMockLoadWorksheetFile
   -- This stays last
   , logUnhandled
   ]
@@ -64,7 +55,6 @@ defaultOnMessage msg = tryAllOf
 
 mkStoryCtx ∷ OnMessage → Effect Ctx
 mkStoryCtx onMessage = do
-  listenersRef ← Ref.new ([] ∷ (Array ElectronListener))
   githubGraphQLCache ← mkGithubGraphQLCache
 
   let
@@ -72,7 +62,8 @@ mkStoryCtx onMessage = do
       resʔ ← onMessage msg
       case resʔ of
         Nothing → do
-          let _ = debugger \_ → msg
+          Console.debug "Unhandled message"
+          let _ = spy "message" msg
           pure $ unsafeCoerce {}
         Just r → pure r
   pure

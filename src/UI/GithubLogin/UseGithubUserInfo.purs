@@ -10,7 +10,7 @@ import Network.RemoteData as RD
 import Partial.Unsafe (unsafePartial)
 import React.Basic.Hooks as React
 import UI.Ctx.Types (Ctx)
-import UI.Hook.UseIPCMessage (UseIPC, useIPC)
+import UI.Hook.UseIPC (UseIPC, useIPC)
 
 useGithubUserInfo ∷ Ctx → Hook UseIPC ((Maybe String) /\ (Effect Unit))
 useGithubUserInfo ctx = React.do

@@ -3,7 +3,7 @@ module Biz.IPC.MessageToMainHandler where
 import Prelude
 
 import Backend.CheckTools (getToolPath, getToolsWithPaths)
-import Backend.OperatingSystem (operatingSystemʔ)
+import Biz.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
 import Backend.Tool.Types (Tool(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))

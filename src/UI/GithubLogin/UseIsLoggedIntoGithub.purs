@@ -9,7 +9,7 @@ import Network.RemoteData as RD
 import Partial.Unsafe (unsafePartial)
 import React.Basic.Hooks as React
 import UI.Ctx.Types (Ctx)
-import UI.Hook.UseIPCMessage (UseIPC, useIPC)
+import UI.Hook.UseIPC (UseIPC, useIPC)
 
 newtype UseIsLoggedIntoGithub hook =
   UseIsLoggedIntoGithub (UseIPC hook)

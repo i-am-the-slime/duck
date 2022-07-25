@@ -3,7 +3,7 @@ module Backend.CheckTools where
 
 import Prelude
 
-import Backend.OperatingSystem.Types (OperatingSystem(..))
+import Biz.OperatingSystem.Types (OperatingSystem(..))
 import Backend.Tool.Types (Tool(..), ToolPath(..), ToolsR)
 import Backend.Tool.Types as Tool
 import Data.Maybe (Maybe(..))

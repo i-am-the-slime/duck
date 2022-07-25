@@ -17,7 +17,7 @@ import React.Basic.Hooks as React
 import UI.Block.Card (card, clickableCard)
 import UI.Component as UI
 import UI.FilePath (renderFilePath)
-import UI.Hook.UseIPCMessage (useIPC)
+import UI.Hook.UseIPC (useIPC)
 import UI.Navigation.Router (useRouter)
 import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))

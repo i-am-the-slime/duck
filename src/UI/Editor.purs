@@ -37,7 +37,11 @@ derive instance Newtype (UseMonaco hooks) _
 useMonaco ∷
   String →
   (String → Effect Unit) →
-  React.Hook UseMonaco { ref ∷ NodeRef, setValue ∷ String → Effect Unit }
+  React.Hook UseMonaco
+    { ref ∷ NodeRef
+    , monacoRef ∷ Ref (Maybe Monaco)
+    , setValue ∷ String → Effect Unit
+    }
 useMonaco initialValue onChange = coerceHook React.do
   ref ← React.useRef null
   monacoRef ← React.useRef Nothing
@@ -108,7 +112,7 @@ useMonaco initialValue onChange = coerceHook React.do
     setValue s = do
       React.readRef monacoRef >>= traverse_ (Monaco.setValue s)
 
-  pure $ { ref, setValue }
+  pure $ { ref, monacoRef, setValue }
 
 darkThemeName ∷ String
 darkThemeName = "NightOwl"
@@ -119,7 +123,7 @@ lightThemeName = "Horizon"
 initEditor ∷ Effect Unit
 initEditor = do
   editor ← Monaco.editor
-  defineTheme editor darkThemeName (nightOwlTheme "#1D2630") -- [TODO] Read from somewhere else
+  defineTheme editor darkThemeName (nightOwlTheme "#212B36") -- [TODO] Read from somewhere else
   defineTheme editor lightThemeName (horizonTheme "#F1F3F5") -- [TODO] Don't hardcode
   registerLanguage "purescript"
   setMonarchTokensProvider "purescript" purescriptSyntax

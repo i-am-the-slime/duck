@@ -1,9 +1,9 @@
-module Backend.OperatingSystem where
+module Biz.OperatingSystem where
 
 import Prelude
 
-import Backend.OperatingSystem.Types (OperatingSystem)
-import Backend.OperatingSystem.Types as OperatingSystem
+import Biz.OperatingSystem.Types (OperatingSystem)
+import Biz.OperatingSystem.Types as OperatingSystem
 import Data.Maybe (Maybe(..))
 import Node.Platform as Platform
 import Node.Process (platform)

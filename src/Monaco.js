@@ -1,4 +1,4 @@
-import { languages, editor as editorImpl } from 'monaco-editor/esm/vs/editor/editor.main.js';
+import { languages, editor as editorImpl, KeyMod, KeyCode } from 'monaco-editor/esm/vs/editor/editor.main.js';
 
 self.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {
@@ -41,6 +41,16 @@ export const layout = m => () => m.layout()
 export const registerLanguage = languageId => () => languages.register({ id: languageId });
 
 export const remeasureFonts = editor => () => editor.remeasureFonts()
+
+
+export const keyModCtrlCmd = KeyMod.CtrlCmd
+export const keyModShift = KeyMod.Shift
+export const keyModAlt = KeyMod.Alt
+export const keyModWinCtrl = KeyMod.WinCtrl
+
+export const keyCodeEnter = KeyCode.Enter
+
+export const addCommand = code => handler => editor => () => editor.addCommand(code, handler)
 
 export const setMonarchTokensProvider = (name) => (monarchLanguage) => () => {
   return languages.setMonarchTokensProvider(

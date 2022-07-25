@@ -30,7 +30,7 @@ import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
 import UI.Ctx.Types (Ctx)
 import UI.GithubLogin.GithubLogo (githubLogo)
-import UI.Hook.UseIPCMessage (UseIPC, useIPC)
+import UI.Hook.UseIPC (UseIPC, useIPC)
 import UI.Modal (mkModalView)
 import UI.Notification.SendNotification (notifyError)
 import Yoga.Block as Block

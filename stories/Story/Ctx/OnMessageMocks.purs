@@ -54,6 +54,16 @@ getMockInstalledTools = case _ of
       }
   _ → pure Nothing
 
+getMockLoadWorksheetFile ∷ OnMessage
+getMockLoadWorksheetFile = case _ of
+  LoadTextFile path | String.contains (String.Pattern "/tmp/") path → pure
+    $ Just
+    $ LoadTextFileResult
+    $ Right
+        "module Main where\n\nimport Effect.Console (log)\n\nmain = log \"hi\""
+
+  _ → pure Nothing
+
 getMockIsLoggedIntoGithub ∷ OnMessage
 getMockIsLoggedIntoGithub = case _ of
   GetIsLoggedIntoGithub → pure $ Just $ GetIsLoggedIntoGithubResult true
@@ -148,6 +158,44 @@ getMockRegistry = case _ of
         }
     }
 
+getMockOwnerImage ∷ OnMessage
+getMockOwnerImage = case _ of
+  QueryGithubGraphQL query
+    | unGithubGraphQLQuery query # String.contains
+        (String.Pattern "query getUserImage") →
+        pure $ Just $ GithubGraphQLResult
+          ( Right
+              ( GithubGraphQLResponse
+                  ( writeJSON
+                      { data:
+                          { repositoryOwner:
+                              { avatarUrl:
+                                  "https://avatars.githubusercontent.com/u/7391813?s=400&u=47c833bad3cba4595186e331aa98bb8d08a15ea1&v=4"
+                              }
+                          }
+                      }
+                  )
+              )
+          )
+  _ → pure Nothing
+  where
+  entry name owner branchName date =
+    { name
+    , owner: { login: owner }
+    , defaultBranchRef:
+        { name: branchName
+        , target:
+            { history:
+                { edges:
+                    [ { node:
+                          { pushedDate: date }
+                      }
+                    ]
+                }
+            }
+        }
+    }
+
 getMockRepoDetails ∷ OnMessage
 getMockRepoDetails = case _ of
   QueryGithubGraphQL query
@@ -190,7 +238,6 @@ getMockRepoDetails = case _ of
                 }
             }
         }
-
     }
 
 getMockReadme ∷ OnMessage

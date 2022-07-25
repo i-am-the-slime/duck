@@ -16,11 +16,11 @@ runToolAndGetStdout ∷
   , workingDir ∷ Maybe String
   , toolPath ∷ ToolPath
   } →
-  Aff (Either String String)
+  Aff (Either String { stdout ∷ String, stderr ∷ String })
 runToolAndGetStdout { args, workingDir, toolPath } = do
   { exit, stderr, stdout } ← spawnCmd toolPath
   pure case exit of
-    Exit.Normally 0 → Right (trim stdout)
+    Exit.Normally 0 → Right { stdout, stderr }
     Exit.Normally other →
       Left ("Unexpected exit code: " <> show other <> "\n" <> stderr)
     Exit.BySignal signal →

@@ -8,7 +8,7 @@ import Network.RemoteData as RD
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import UI.Component as UI
-import UI.Hook.UseIPCMessage (useIPC)
+import UI.Hook.UseIPC (useIPC)
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (sendNotification)
 import Yoga.Block.Hook.UseStateEq (useStateEq')

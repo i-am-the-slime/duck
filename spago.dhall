@@ -94,6 +94,7 @@ to generate this file without the comments in this block.
   , "web-html"
   , "web-router"
   , "web-storage"
+  , "web-uievents"
   , "yoga-fetch"
   , "yoga-json"
   ]

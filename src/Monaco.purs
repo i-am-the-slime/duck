@@ -74,3 +74,15 @@ createEditor = createEditorImpl
 
 foreign import getValue ∷ Monaco → Effect String
 foreign import setValue ∷ String → Monaco → Effect Unit
+
+foreign import keyModCtrlCmd ∷ Int
+foreign import keyModShift ∷ Int
+foreign import keyModAlt ∷ Int
+foreign import keyModWinCtrl ∷ Int
+
+foreign import keyCodeEnter ∷ Int
+foreign import addCommand ∷
+  Int →
+  (Effect Unit) →
+  Monaco →
+  Effect Unit

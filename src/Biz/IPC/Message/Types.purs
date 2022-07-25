@@ -49,7 +49,7 @@ data MessageToRenderer
   | CopyToClipboardResult String
   | GetClipboardTextResult String
   | GetSpagoGlobalCacheResult (Either String SpagoGlobalCacheDir)
-  | RunCommandResult (Either String String)
+  | RunCommandResult (Either String { stdout ∷ String, stderr ∷ String })
   | StoreTextFileResult (Maybe String)
   | LoadTextFileResult (Either String String)
 

@@ -24,7 +24,7 @@ import Electron.Types (Channel(..))
 import ElectronAPI as ElectronAPI
 import UI.Ctx.Types (Ctx, GithubGraphQLCache(..))
 import UI.GithubLogin.Repository (getDeviceCode, pollAccessToken)
-import UI.Hook.UseIPCMessage (mkSendIPCMessage)
+import UI.Hook.UseIPC (mkSendIPCMessage)
 import Web.HTML (window)
 import Web.HTML.Window (localStorage)
 import Web.Storage.Storage as LocalStorage

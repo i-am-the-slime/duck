@@ -10,7 +10,7 @@ import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import UI.Component (Component, component)
 import UI.Ctx.Types (Ctx)
-import UI.Hook.UseIPCMessage (useIPC)
+import UI.Hook.UseIPC (useIPC)
 import UI.Project as Project
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types (ButtonType(..))

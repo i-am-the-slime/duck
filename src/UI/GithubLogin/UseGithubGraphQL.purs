@@ -14,7 +14,7 @@ import Network.RemoteData as RD
 import React.Basic.Hooks (type (&))
 import React.Basic.Hooks as React
 import UI.Ctx.Types (Ctx, GithubGraphQLCache(..))
-import UI.Hook.UseIPCMessage (UseIPC, useIPC)
+import UI.Hook.UseIPC (UseIPC, useIPC)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
 import Yoga.JSON as JSON
 
