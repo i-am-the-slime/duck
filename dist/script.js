@@ -22,7 +22,10 @@ var __copyProps = (to2, from3, except4, desc) => {
   }
   return to2;
 };
-var __toESM = (mod3, isNodeMode, target) => (target = mod3 != null ? __create(__getProtoOf(mod3)) : {}, __copyProps(isNodeMode || !mod3 || !mod3.__esModule ? __defProp(target, "default", { value: mod3, enumerable: true }) : target, mod3));
+var __toESM = (mod3, isNodeMode, target) => (target = mod3 != null ? __create(__getProtoOf(mod3)) : {}, __copyProps(
+  isNodeMode || !mod3 || !mod3.__esModule ? __defProp(target, "default", { value: mod3, enumerable: true }) : target,
+  mod3
+));
 
 // node_modules/big-integer/BigInteger.js
 var require_BigInteger = __commonJS({
@@ -1185,7 +1188,10 @@ var require_BigInteger = __commonJS({
             return { value: [0], isNegative: false };
           if (n.isNegative())
             return {
-              value: [].concat.apply([], Array.apply(null, Array(-n.toJSNumber())).map(Array.prototype.valueOf, [1, 0])),
+              value: [].concat.apply(
+                [],
+                Array.apply(null, Array(-n.toJSNumber())).map(Array.prototype.valueOf, [1, 0])
+              ),
               isNegative: false
             };
           var arr = Array.apply(null, Array(n.toJSNumber() - 1)).map(Array.prototype.valueOf, [0, 1]);
@@ -6649,30 +6655,33 @@ var showIntImpl = function(n) {
 };
 var showStringImpl = function(s2) {
   var l = s2.length;
-  return '"' + s2.replace(/[\0-\x1F\x7F"\\]/g, function(c, i2) {
-    switch (c) {
-      case '"':
-      case "\\":
-        return "\\" + c;
-      case "\x07":
-        return "\\a";
-      case "\b":
-        return "\\b";
-      case "\f":
-        return "\\f";
-      case "\n":
-        return "\\n";
-      case "\r":
-        return "\\r";
-      case "	":
-        return "\\t";
-      case "\v":
-        return "\\v";
+  return '"' + s2.replace(
+    /[\0-\x1F\x7F"\\]/g,
+    function(c, i2) {
+      switch (c) {
+        case '"':
+        case "\\":
+          return "\\" + c;
+        case "\x07":
+          return "\\a";
+        case "\b":
+          return "\\b";
+        case "\f":
+          return "\\f";
+        case "\n":
+          return "\\n";
+        case "\r":
+          return "\\r";
+        case "	":
+          return "\\t";
+        case "\v":
+          return "\\v";
+      }
+      var k = i2 + 1;
+      var empty4 = k < l && s2[k] >= "0" && s2[k] <= "9" ? "\\&" : "";
+      return "\\" + c.charCodeAt(0).toString(10) + empty4;
     }
-    var k = i2 + 1;
-    var empty4 = k < l && s2[k] >= "0" && s2[k] <= "9" ? "\\&" : "";
-    return "\\" + c.charCodeAt(0).toString(10) + empty4;
-  }) + '"';
+  ) + '"';
 };
 
 // output/Data.Show/index.js
@@ -32608,7 +32617,9 @@ function readChunkImpl(Left2) {
     } else if (typeof chunk === "string") {
       return Left2(chunk);
     } else {
-      throw new Error("Node.Stream.readChunkImpl: Unrecognised chunk type; expected String or Buffer, got: " + chunk);
+      throw new Error(
+        "Node.Stream.readChunkImpl: Unrecognised chunk type; expected String or Buffer, got: " + chunk
+      );
     }
   };
 }
@@ -34773,6 +34784,11 @@ var isDomainOrSubdomain = (destination, original) => {
   const dest = new URL(destination).hostname;
   return orig === dest || orig.endsWith(`.${dest}`);
 };
+var isSameProtocol = (destination, original) => {
+  const orig = new URL(original).protocol;
+  const dest = new URL(destination).protocol;
+  return orig === dest;
+};
 
 // node_modules/node-fetch/src/body.js
 var pipeline = (0, import_node_util.promisify)(import_node_stream.default.pipeline);
@@ -34870,8 +34886,12 @@ Object.defineProperties(Body.prototype, {
   blob: { enumerable: true },
   json: { enumerable: true },
   text: { enumerable: true },
-  data: { get: (0, import_node_util.deprecate)(() => {
-  }, "data doesn't exist, use json(), text(), arrayBuffer(), or body instead", "https://github.com/node-fetch/node-fetch/issues/1000 (response)") }
+  data: { get: (0, import_node_util.deprecate)(
+    () => {
+    },
+    "data doesn't exist, use json(), text(), arrayBuffer(), or body instead",
+    "https://github.com/node-fetch/node-fetch/issues/1000 (response)"
+  ) }
 });
 async function consumeBody(data) {
   if (data[INTERNALS].disturbed) {
@@ -34934,7 +34954,11 @@ var clone = (instance, highWaterMark) => {
   }
   return body;
 };
-var getNonSpecFormDataBoundary = (0, import_node_util.deprecate)((body) => body.getBoundary(), "form-data doesn't follow the spec and requires special treatment. Use alternative package", "https://github.com/node-fetch/node-fetch/issues/1167");
+var getNonSpecFormDataBoundary = (0, import_node_util.deprecate)(
+  (body) => body.getBoundary(),
+  "form-data doesn't follow the spec and requires special treatment. Use alternative package",
+  "https://github.com/node-fetch/node-fetch/issues/1167"
+);
 var extractContentType = (body, request3) => {
   if (body === null) {
     return null;
@@ -35049,14 +35073,21 @@ var Headers = class extends URLSearchParams {
             return (name3, value2) => {
               validateHeaderName(name3);
               validateHeaderValue(name3, String(value2));
-              return URLSearchParams.prototype[p].call(target, String(name3).toLowerCase(), String(value2));
+              return URLSearchParams.prototype[p].call(
+                target,
+                String(name3).toLowerCase(),
+                String(value2)
+              );
             };
           case "delete":
           case "has":
           case "getAll":
             return (name3) => {
               validateHeaderName(name3);
-              return URLSearchParams.prototype[p].call(target, String(name3).toLowerCase());
+              return URLSearchParams.prototype[p].call(
+                target,
+                String(name3).toLowerCase()
+              );
             };
           case "keys":
             return () => {
@@ -35122,25 +35153,30 @@ var Headers = class extends URLSearchParams {
     }, {});
   }
 };
-Object.defineProperties(Headers.prototype, ["get", "entries", "forEach", "values"].reduce((result, property) => {
-  result[property] = { enumerable: true };
-  return result;
-}, {}));
-function fromRawHeaders(headers = []) {
-  return new Headers(headers.reduce((result, value2, index3, array) => {
-    if (index3 % 2 === 0) {
-      result.push(array.slice(index3, index3 + 2));
-    }
+Object.defineProperties(
+  Headers.prototype,
+  ["get", "entries", "forEach", "values"].reduce((result, property) => {
+    result[property] = { enumerable: true };
     return result;
-  }, []).filter(([name3, value2]) => {
-    try {
-      validateHeaderName(name3);
-      validateHeaderValue(name3, String(value2));
-      return true;
-    } catch {
-      return false;
-    }
-  }));
+  }, {})
+);
+function fromRawHeaders(headers = []) {
+  return new Headers(
+    headers.reduce((result, value2, index3, array) => {
+      if (index3 % 2 === 0) {
+        result.push(array.slice(index3, index3 + 2));
+      }
+      return result;
+    }, []).filter(([name3, value2]) => {
+      try {
+        validateHeaderName(name3);
+        validateHeaderValue(name3, String(value2));
+        return true;
+      } catch {
+        return false;
+      }
+    })
+  );
 }
 
 // node_modules/node-fetch/src/utils/is-redirect.js
@@ -35399,8 +35435,12 @@ var INTERNALS3 = Symbol("Request internals");
 var isRequest = (object) => {
   return typeof object === "object" && typeof object[INTERNALS3] === "object";
 };
-var doBadDataWarn = (0, import_node_util3.deprecate)(() => {
-}, ".data is not a valid RequestInit property, use .body instead", "https://github.com/node-fetch/node-fetch/issues/1000 (request)");
+var doBadDataWarn = (0, import_node_util3.deprecate)(
+  () => {
+  },
+  ".data is not a valid RequestInit property, use .body instead",
+  "https://github.com/node-fetch/node-fetch/issues/1000 (request)"
+);
 var Request = class extends Body {
   constructor(input, init3 = {}) {
     let parsedURL;
@@ -35697,7 +35737,7 @@ async function fetch2(url, options_) {
               referrer: request3.referrer,
               referrerPolicy: request3.referrerPolicy
             };
-            if (!isDomainOrSubdomain(request3.url, locationURL)) {
+            if (!isDomainOrSubdomain(request3.url, locationURL) || !isSameProtocol(request3.url, locationURL)) {
               for (const name3 of ["authorization", "www-authenticate", "cookie", "cookie2"]) {
                 requestOptions.headers.delete(name3);
               }

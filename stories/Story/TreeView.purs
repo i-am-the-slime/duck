@@ -11,13 +11,12 @@ import Plumage.Util.HTML as P
 import React.Basic (JSX)
 import React.Basic.Hooks as React
 import Story.Util.Decorator (containerDecorator)
-import Storybook (story)
 import Storybook.Types (Story)
 import UI.Github.Repo.Biz.UseGetAllFiles.Types (RESTFileInfo, AllFilesAPIResult)
 import UI.Repository.FileTree.View as TreeView
 
 default ∷ Story
-default = story { title: "TreeView", decorators: [ containerDecorator ] }
+default = { title: "TreeView", decorators: [ containerDecorator ] }
 
 folder ∷
   String → RESTFileInfo

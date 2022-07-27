@@ -5,15 +5,12 @@ import Yoga.Prelude.View
 import Backend.Tool.Types (Tool(..))
 import Biz.IPC.Message.Types (MessageToMain(..))
 import Biz.OperatingSystem.Types (OperatingSystem(..))
-import Data.Int.Bits ((.&.))
+import Data.Int.Bits ((.|.))
 import Data.Lens.Barlow (barlow)
 import Data.Lens.Barlow.Helpers (preview)
-import Data.Set as Set
-import Debug (spy)
 import Effect.Aff (attempt)
-import Effect.Class.Console as Console
 import Fahrtwind (background', borderCol', borderLeft, height, heightFull, mXAuto, textCol', widthAndHeight)
-import Monaco (Monaco, addCommand, keyCodeEnter, keyModCtrlCmd)
+import Monaco (addCommand, keyCodeEnter, keyModCtrlCmd)
 import Network.RemoteData as RD
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
@@ -25,16 +22,19 @@ import UI.Hook.UseRemoteData (useRemoteData)
 import UI.Notification.SendNotification (notifyError)
 import UI.OperatingSystem (getOS)
 import UI.Worksheet.Style as Style
-import Web.Event.Event as Event
+import Web.Event.Event (Event, EventType(..))
+import Web.Event.EventTarget (dispatchEvent)
+import Web.HTML.Event.EventTypes (click)
+import Web.HTML.Event.EventTypes as EventType
 import Web.HTML.HTMLElement (click)
-import Web.UIEvent.KeyboardEvent as KeyboardEvent
+import Web.HTML.HTMLElement as HTMLElement
 import Yoga.Block as Block
+import Yoga.Block.Atom.Button.Types (ButtonType(..)) as Button
 import Yoga.Block.Container.Style (col)
-import Yoga.Block.Hook.Key as Key
-import Yoga.Block.Hook.UseKeyDown (useKeyDown)
 import Yoga.Block.Icon.SVG.Spinner (spinner)
 import Yoga.Block.Layout.Sidebar.Style (SidebarSide(..))
 
+foreign import newEvent :: EventType -> { bubbles :: Boolean } -> Effect Event
 
 mkView ∷ UI.Component Unit
 mkView = do
@@ -42,11 +42,14 @@ mkView = do
   UI.component "WorksheetView" \ctx _props → React.do
     textRef ← React.useRef ""
     editor ← useMonaco "" (React.writeRef textRef)
-    useEffectOnce do
-      React.readRef editor.monacoRef >>= traverse_ \(m::Monaco) ->
-        addCommand (keyCodeEnter .&. keyModCtrlCmd) (Console.log "Hihiih") m
-      mempty
     buttonRef <- React.useRef null
+    useEffectOnce do
+      React.readRef editor.monacoRef >>= traverse_ \m -> m#
+        addCommand (keyCodeEnter .|. keyModCtrlCmd) do
+          getHTMLElementFromRef buttonRef >>= traverse_ \el -> do
+            event <- newEvent (EventType.click) { bubbles: true }
+            dispatchEvent event (HTMLElement.toEventTarget el)
+      mempty
 
     loadFileIPC ← useIPC ctx (barlow @"%LoadTextFileResult")
     saveAndRunIPC ← useRemoteData \content → attempt do
@@ -69,23 +72,14 @@ mkView = do
       for_ (loadFileIPC.data) (traverse_ editor.setValue)
       mempty
 
-    useKeyDown \ev modifiers key -> do
-      let
-        osModifier = case os of
-          MacOS -> Key.Shift
-          _ -> Key.Shift
-      when (Set.member osModifier modifiers && key == Key.Return) do
-        Event.preventDefault (KeyboardEvent.toEvent ev)
-        Event.stopPropagation (KeyboardEvent.toEvent ev)
-        getHTMLElementFromRef buttonRef >>= traverse_ \el -> do
-          click el
-
     let
       runButton = Block.button
         { onClick: handler_ do
             text ← React.readRef textRef
             saveAndRunIPC.load text
         , css: Style.runButtonStyle
+        , buttonType: Button.Primary
+        , ripple: "rgba(255,255,255, 0.2)"
         , ref: buttonRef
         }
         [ P.div_ Style.buttonContentStyle
@@ -97,7 +91,9 @@ mkView = do
                       MacOS -> "⌘"
                       _ -> "ctrl-"
                   ]
-                , P.div_ (Style.keyStyle) [ R.text "↵" ]
+                , P.div_ (Style.keyStyle) [
+                    R.text "↩"
+                ]
                 ]
             ]
         ]

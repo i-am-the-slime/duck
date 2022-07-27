@@ -13,14 +13,13 @@ import React.Basic (JSX)
 import Story.Ctx (mkStoryCtx)
 import Story.Ctx.Types (OnMessage)
 import Story.Util.Decorator (containerDecorator)
-import Storybook (story)
 import Storybook.Types (Story)
 import UI.Component (runComponent)
 import UI.OpenProject as OpenProject
 import UI.Project as Project
 
 default ∷ Story
-default = story { title: "Select Folder", decorators: [ containerDecorator ] }
+default = { title: "Select Folder", decorators: [ containerDecorator ] }
 
 exampleProject ∷ ProjectConfig
 exampleProject =

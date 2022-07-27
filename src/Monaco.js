@@ -50,7 +50,10 @@ export const keyModWinCtrl = KeyMod.WinCtrl
 
 export const keyCodeEnter = KeyCode.Enter
 
-export const addCommand = code => handler => editor => () => editor.addCommand(code, handler)
+export const addCommand = code => handler => editor => () => {
+  console.log(handler, code)
+  editor.addCommand(code, handler)
+}
 
 export const setMonarchTokensProvider = (name) => (monarchLanguage) => () => {
   return languages.setMonarchTokensProvider(

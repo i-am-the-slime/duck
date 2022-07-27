@@ -6,13 +6,12 @@ import Effect (Effect)
 import React.Basic (JSX)
 import React.Basic.Hooks as React
 import Story.Util.Decorator (containerDecorator)
-import Storybook (story)
 import Storybook.Types (Story)
 import UI.Navigation.Router.Types (Route(..))
 import UI.Navigation.SideBar as SideBar
 
 default ∷ Story
-default = story { title: "SideBar", decorators: [ containerDecorator ] }
+default = { title: "SideBar", decorators: [ containerDecorator ] }
 
 sideBar ∷ Effect JSX
 sideBar = do

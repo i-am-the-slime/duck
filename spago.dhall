@@ -68,6 +68,7 @@ to generate this file without the comments in this block.
   , "react-basic-dom"
   , "react-basic-emotion"
   , "react-basic-hooks"
+  , "react-icons"
   , "react-virtuoso"
   , "record"
   , "record-extra"

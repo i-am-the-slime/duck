@@ -6,14 +6,13 @@ import Effect (Effect)
 import React.Basic (JSX)
 import Story.Ctx (defaultOnMessage, mkStoryCtx)
 import Story.Util.Decorator (containerDecorator)
-import Storybook (story)
 import Storybook.Types (Story)
 import UI.Component (runComponent)
 import UI.Navigation.Router.Page.Preferences as PreferencesRoute
 import UI.Preferences as Preferences
 
 default ∷ Story
-default = story { title: "Preferences", decorators: [ containerDecorator ] }
+default = { title: "Preferences", decorators: [ containerDecorator ] }
 
 tools ∷ Effect JSX
 tools = do

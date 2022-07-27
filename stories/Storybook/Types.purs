@@ -2,4 +2,4 @@ module Storybook.Types where
 
 foreign import data Decorator ∷ Type
 
-foreign import data Story ∷ Type
+type Story = { title ∷ String, decorators ∷ Array Decorator }
