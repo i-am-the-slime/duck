@@ -132,8 +132,8 @@ mkPresentationalView = React.component "Tree" \props → React.do
         observer ← resizeObserver \_ _ → do
           calcWidth
         let element = HTMLElement.toElement htmlElement
-        ResizeObserver.observe element ResizeObserver.ContentBox observer
-        pure $ ResizeObserver.unobserve element observer
+        ResizeObserver.observe ResizeObserver.ContentBox observer element
+        pure $ element # ResizeObserver.unobserve observer
       Nothing → mempty
 
   animatedXPos ← useSpringWithMotionValue xPos {}

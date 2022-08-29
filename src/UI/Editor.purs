@@ -84,8 +84,8 @@ useMonaco initialValue onChange = coerceHook React.do
           -- Monaco.editor >>= Monaco.remeasureFonts
           Monaco.layout monaco
         let element = HTMLElement.toElement htmlElement
-        ResizeObserver.observe element ResizeObserver.ContentBox observer
-        pure $ ResizeObserver.unobserve element observer
+        ResizeObserver.observe ResizeObserver.ContentBox observer element
+        pure $ ResizeObserver.unobserve observer element
       Nothing →
         mempty
 

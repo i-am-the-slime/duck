@@ -6914,20 +6914,20 @@ var apply = function(dict) {
 };
 var applySecond = function(dictApply) {
   var apply1 = apply(dictApply);
-  var map27 = map(dictApply.Functor0());
+  var map28 = map(dictApply.Functor0());
   return function(a) {
     return function(b) {
-      return apply1(map27($$const(identity2))(a))(b);
+      return apply1(map28($$const(identity2))(a))(b);
     };
   };
 };
 var lift2 = function(dictApply) {
   var apply1 = apply(dictApply);
-  var map27 = map(dictApply.Functor0());
+  var map28 = map(dictApply.Functor0());
   return function(f3) {
     return function(a) {
       return function(b) {
-        return apply1(map27(f3)(a))(b);
+        return apply1(map28(f3)(a))(b);
       };
     };
   };
@@ -7582,10 +7582,10 @@ var catchError = function(dict) {
 var $$try2 = function(dictMonadError) {
   var catchError1 = catchError(dictMonadError);
   var Monad0 = dictMonadError.MonadThrow0().Monad0();
-  var map27 = map(Monad0.Bind1().Apply0().Functor0());
+  var map28 = map(Monad0.Bind1().Apply0().Functor0());
   var pure17 = pure(Monad0.Applicative0());
   return function(a) {
-    return catchError1(map27(Right.create)(a))(function($52) {
+    return catchError1(map28(Right.create)(a))(function($52) {
       return pure17(Left.create($52));
     });
   };
@@ -8418,7 +8418,7 @@ var traverseArrayImpl = function() {
     };
   }
   return function(apply4) {
-    return function(map27) {
+    return function(map28) {
       return function(pure17) {
         return function(f3) {
           return function(array) {
@@ -8427,14 +8427,14 @@ var traverseArrayImpl = function() {
                 case 0:
                   return pure17([]);
                 case 1:
-                  return map27(array1)(f3(array[bot]));
+                  return map28(array1)(f3(array[bot]));
                 case 2:
-                  return apply4(map27(array2)(f3(array[bot])))(f3(array[bot + 1]));
+                  return apply4(map28(array2)(f3(array[bot])))(f3(array[bot + 1]));
                 case 3:
-                  return apply4(apply4(map27(array3)(f3(array[bot])))(f3(array[bot + 1])))(f3(array[bot + 2]));
+                  return apply4(apply4(map28(array3)(f3(array[bot])))(f3(array[bot + 1])))(f3(array[bot + 2]));
                 default:
                   var pivot = bot + Math.floor((top4 - bot) / 4) * 2;
-                  return apply4(map27(concat22)(go(bot, pivot)))(go(pivot, top4));
+                  return apply4(map28(concat22)(go(bot, pivot)))(go(pivot, top4));
               }
             }
             return go(0, array.length);
@@ -8635,10 +8635,10 @@ var traverse1Impl = function() {
     return arr;
   }
   return function(apply4) {
-    return function(map27) {
+    return function(map28) {
       return function(f3) {
         var buildFrom = function(x2, ys) {
-          return apply4(map27(consList)(f3(x2)))(ys);
+          return apply4(map28(consList)(f3(x2)))(ys);
         };
         var go = function(acc, currentLen, xs) {
           if (currentLen === 0) {
@@ -8652,12 +8652,12 @@ var traverse1Impl = function() {
           }
         };
         return function(array) {
-          var acc = map27(finalCell)(f3(array[array.length - 1]));
+          var acc = map28(finalCell)(f3(array[array.length - 1]));
           var result = go(acc, array.length - 1, array);
           while (result instanceof Cont) {
             result = result.fn();
           }
-          return map27(listToArray)(result);
+          return map28(listToArray)(result);
         };
       };
     };
@@ -8724,11 +8724,11 @@ var showNonEmpty = function(dictShow) {
   };
 };
 var functorNonEmpty = function(dictFunctor) {
-  var map27 = map(dictFunctor);
+  var map28 = map(dictFunctor);
   return {
     map: function(f3) {
       return function(m2) {
-        return new NonEmpty(f3(m2.value0), map27(f3)(m2.value1));
+        return new NonEmpty(f3(m2.value0), map28(f3)(m2.value1));
       };
     }
   };
@@ -29045,13 +29045,17 @@ var genericEnumSumRepSum2 = /* @__PURE__ */ genericEnumSumRepSum(/* @__PURE__ */
   }
 }))(/* @__PURE__ */ genericEnumSumRepSum(/* @__PURE__ */ genericEnumSumRepConstruc({
   reflectSymbol: function() {
+    return "PureScriptLanguageServer";
+  }
+}))(/* @__PURE__ */ genericEnumSumRepSum(/* @__PURE__ */ genericEnumSumRepConstruc({
+  reflectSymbol: function() {
     return "Purs";
   }
 }))(/* @__PURE__ */ genericEnumSumRepConstruc({
   reflectSymbol: function() {
     return "DhallToJSON";
   }
-}))));
+})))));
 var NPM = /* @__PURE__ */ function() {
   function NPM2() {
   }
@@ -29065,6 +29069,13 @@ var Spago = /* @__PURE__ */ function() {
   ;
   Spago2.value = new Spago2();
   return Spago2;
+}();
+var PureScriptLanguageServer = /* @__PURE__ */ function() {
+  function PureScriptLanguageServer2() {
+  }
+  ;
+  PureScriptLanguageServer2.value = new PureScriptLanguageServer2();
+  return PureScriptLanguageServer2;
 }();
 var Purs = /* @__PURE__ */ function() {
   function Purs2() {
@@ -29092,14 +29103,18 @@ var genericTool_ = {
     }
     ;
     if (x2 instanceof Inr && (x2.value0 instanceof Inr && x2.value0.value0 instanceof Inl)) {
+      return PureScriptLanguageServer.value;
+    }
+    ;
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && x2.value0.value0.value0 instanceof Inl))) {
       return Purs.value;
     }
     ;
-    if (x2 instanceof Inr && (x2.value0 instanceof Inr && x2.value0.value0 instanceof Inr)) {
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && x2.value0.value0.value0 instanceof Inr))) {
       return DhallToJSON.value;
     }
     ;
-    throw new Error("Failed pattern match at Backend.Tool.Types (line 70, column 1 - line 70, column 31): " + [x2.constructor.name]);
+    throw new Error("Failed pattern match at Backend.Tool.Types (line 74, column 1 - line 74, column 31): " + [x2.constructor.name]);
   },
   from: function(x2) {
     if (x2 instanceof NPM) {
@@ -29110,15 +29125,19 @@ var genericTool_ = {
       return new Inr(new Inl(NoArguments.value));
     }
     ;
-    if (x2 instanceof Purs) {
+    if (x2 instanceof PureScriptLanguageServer) {
       return new Inr(new Inr(new Inl(NoArguments.value)));
     }
     ;
-    if (x2 instanceof DhallToJSON) {
-      return new Inr(new Inr(new Inr(NoArguments.value)));
+    if (x2 instanceof Purs) {
+      return new Inr(new Inr(new Inr(new Inl(NoArguments.value))));
     }
     ;
-    throw new Error("Failed pattern match at Backend.Tool.Types (line 70, column 1 - line 70, column 31): " + [x2.constructor.name]);
+    if (x2 instanceof DhallToJSON) {
+      return new Inr(new Inr(new Inr(new Inr(NoArguments.value))));
+    }
+    ;
+    throw new Error("Failed pattern match at Backend.Tool.Types (line 74, column 1 - line 74, column 31): " + [x2.constructor.name]);
   }
 };
 var readForeignTool = {
@@ -29143,7 +29162,11 @@ var toCommand = function(v) {
     return "purs";
   }
   ;
-  throw new Error("Failed pattern match at Backend.Tool.Types (line 57, column 13 - line 61, column 16): " + [v.constructor.name]);
+  if (v instanceof PureScriptLanguageServer) {
+    return "purescript-language-server";
+  }
+  ;
+  throw new Error("Failed pattern match at Backend.Tool.Types (line 59, column 13 - line 64, column 58): " + [v.constructor.name]);
 };
 
 // output/Biz.OAuth.Types/index.js
@@ -29434,6 +29457,11 @@ var npmIsSymbol = {
     return "npm";
   }
 };
+var purescriptLanguageServerIsSymbol = {
+  reflectSymbol: function() {
+    return "purescriptLanguageServer";
+  }
+};
 var pursIsSymbol = {
   reflectSymbol: function() {
     return "purs";
@@ -29492,7 +29520,7 @@ var genericGetInstalledToolsR = {
   }
 };
 var writeForeignGetInstalledT = {
-  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericGetInstalledToolsR)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(writeGenericTaggedSumRepN)(UnsupportedOperatingSystemIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons(dhallToJSONIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(npmIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(pursIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(spagoIsSymbol)(writeForeignMaybe2)(writeForeignFieldsNilRowR)()()())()()())()()())()()())))(ToolsResultIsSymbol)))(defaultOptions)
+  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericGetInstalledToolsR)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(writeGenericTaggedSumRepN)(UnsupportedOperatingSystemIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons(dhallToJSONIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(npmIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(purescriptLanguageServerIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(pursIsSymbol)(writeForeignMaybe2)(/* @__PURE__ */ writeForeignFieldsCons(spagoIsSymbol)(writeForeignMaybe2)(writeForeignFieldsNilRowR)()()())()()())()()())()()())()()())))(ToolsResultIsSymbol)))(defaultOptions)
 };
 
 // output/Biz.PureScriptSolutionDefinition.Types/index.js
@@ -29661,6 +29689,24 @@ var readForeignProjectName = readForeignString;
 
 // output/Biz.IPC.Message.Types/index.js
 var writeImpl6 = /* @__PURE__ */ writeImpl(writeForeignString);
+var readGenericTaggedSumRepCo13 = /* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignString));
+var StdoutDataIsSymbol = {
+  reflectSymbol: function() {
+    return "StdoutData";
+  }
+};
+var StderrDataIsSymbol = {
+  reflectSymbol: function() {
+    return "StderrData";
+  }
+};
+var CommandFinishedIsSymbol = {
+  reflectSymbol: function() {
+    return "CommandFinished";
+  }
+};
+var writeGenericTaggedSumRepC3 = /* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignString));
+var writeGenericTaggedSumRepC1 = /* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignBoolean));
 var invalidSpagoDhallIsSymbol = {
   reflectSymbol: function() {
     return "invalidSpagoDhall";
@@ -29794,7 +29840,6 @@ var GithubPollAccessTokenResultIsSymbol = {
     return "GithubPollAccessTokenResult";
   }
 };
-var readGenericTaggedSumRepCo11 = /* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignString));
 var CopyToClipboardResultIsSymbol = {
   reflectSymbol: function() {
     return "CopyToClipboardResult";
@@ -29825,6 +29870,11 @@ var RunCommandResultIsSymbol = {
     return "RunCommandResult";
   }
 };
+var RunCommandUpdateResultIsSymbol = {
+  reflectSymbol: function() {
+    return "RunCommandUpdateResult";
+  }
+};
 var StoreTextFileResultIsSymbol = {
   reflectSymbol: function() {
     return "StoreTextFileResult";
@@ -29835,14 +29885,18 @@ var LoadTextFileResultIsSymbol = {
     return "LoadTextFileResult";
   }
 };
+var StartPureScriptLanguageServerResponseIsSymbol = {
+  reflectSymbol: function() {
+    return "StartPureScriptLanguageServerResponse";
+  }
+};
 var writeForeignRecord4 = /* @__PURE__ */ writeForeignRecord();
 var writeForeignRecord1 = /* @__PURE__ */ writeForeignRecord4(writeForeignFieldsNilRowR);
 var writeForeignFieldsCons2 = /* @__PURE__ */ writeForeignFieldsCons(dependenciesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignProjectName));
 var writeForeignFieldsCons1 = /* @__PURE__ */ writeForeignFieldsCons(nameIsSymbol);
 var writeForeignMaybe3 = /* @__PURE__ */ writeForeignMaybe(writeForeignString);
-var writeGenericTaggedSumRepC3 = /* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignMaybe3));
+var writeGenericTaggedSumRepC22 = /* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignMaybe3));
 var writeForeignEither2 = /* @__PURE__ */ writeForeignEither(writeForeignString);
-var writeGenericTaggedSumRepC1 = /* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignString));
 var LoadSpagoProjectIsSymbol = {
   reflectSymbol: function() {
     return "LoadSpagoProject";
@@ -29954,6 +30008,46 @@ var LoadTextFileIsSymbol = {
     return "LoadTextFile";
   }
 };
+var folderIsSymbol = {
+  reflectSymbol: function() {
+    return "folder";
+  }
+};
+var StartPureScriptLanguageServerIsSymbol = {
+  reflectSymbol: function() {
+    return "StartPureScriptLanguageServer";
+  }
+};
+var StdoutData = /* @__PURE__ */ function() {
+  function StdoutData2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  StdoutData2.create = function(value0) {
+    return new StdoutData2(value0);
+  };
+  return StdoutData2;
+}();
+var StderrData = /* @__PURE__ */ function() {
+  function StderrData2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  StderrData2.create = function(value0) {
+    return new StderrData2(value0);
+  };
+  return StderrData2;
+}();
+var CommandFinished = /* @__PURE__ */ function() {
+  function CommandFinished2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  CommandFinished2.create = function(value0) {
+    return new CommandFinished2(value0);
+  };
+  return CommandFinished2;
+}();
 var NoGithubToken = /* @__PURE__ */ function() {
   function NoGithubToken2() {
   }
@@ -30081,6 +30175,16 @@ var RunCommandResult = /* @__PURE__ */ function() {
   };
   return RunCommandResult2;
 }();
+var RunCommandUpdateResult = /* @__PURE__ */ function() {
+  function RunCommandUpdateResult2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  RunCommandUpdateResult2.create = function(value0) {
+    return new RunCommandUpdateResult2(value0);
+  };
+  return RunCommandUpdateResult2;
+}();
 var StoreTextFileResult = /* @__PURE__ */ function() {
   function StoreTextFileResult2(value0) {
     this.value0 = value0;
@@ -30100,6 +30204,16 @@ var LoadTextFileResult = /* @__PURE__ */ function() {
     return new LoadTextFileResult2(value0);
   };
   return LoadTextFileResult2;
+}();
+var StartPureScriptLanguageServerResponse = /* @__PURE__ */ function() {
+  function StartPureScriptLanguageServerResponse2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  StartPureScriptLanguageServerResponse2.create = function(value0) {
+    return new StartPureScriptLanguageServerResponse2(value0);
+  };
+  return StartPureScriptLanguageServerResponse2;
 }();
 var LoadSpagoProject = /* @__PURE__ */ function() {
   function LoadSpagoProject2() {
@@ -30220,10 +30334,55 @@ var LoadTextFile = /* @__PURE__ */ function() {
   };
   return LoadTextFile2;
 }();
+var StartPureScriptLanguageServer = /* @__PURE__ */ function() {
+  function StartPureScriptLanguageServer2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  StartPureScriptLanguageServer2.create = function(value0) {
+    return new StartPureScriptLanguageServer2(value0);
+  };
+  return StartPureScriptLanguageServer2;
+}();
 var writeForeignNoGithubToken = {
   writeImpl: function(v) {
     return writeImpl6("no_github_token");
   }
+};
+var genericRunCommandUpdate_ = {
+  to: function(x2) {
+    if (x2 instanceof Inl) {
+      return new StdoutData(x2.value0);
+    }
+    ;
+    if (x2 instanceof Inr && x2.value0 instanceof Inl) {
+      return new StderrData(x2.value0.value0);
+    }
+    ;
+    if (x2 instanceof Inr && x2.value0 instanceof Inr) {
+      return new CommandFinished(x2.value0.value0);
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 95, column 1 - line 95, column 43): " + [x2.constructor.name]);
+  },
+  from: function(x2) {
+    if (x2 instanceof StdoutData) {
+      return new Inl(x2.value0);
+    }
+    ;
+    if (x2 instanceof StderrData) {
+      return new Inr(new Inl(x2.value0));
+    }
+    ;
+    if (x2 instanceof CommandFinished) {
+      return new Inr(new Inr(x2.value0));
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 95, column 1 - line 95, column 43): " + [x2.constructor.name]);
+  }
+};
+var writeForeignRunCommandUpd = {
+  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericRunCommandUpdate_)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(StdoutDataIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(StderrDataIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC1(CommandFinishedIsSymbol))))(defaultOptions)
 };
 var genericMessageToRenderer_ = {
   to: function(x2) {
@@ -30276,14 +30435,22 @@ var genericMessageToRenderer_ = {
     }
     ;
     if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inl)))))))))))) {
-      return new StoreTextFileResult(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
+      return new RunCommandUpdateResult(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
     }
     ;
-    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr)))))))))))) {
-      return new LoadTextFileResult(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inl))))))))))))) {
+      return new StoreTextFileResult(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
     }
     ;
-    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 69, column 1 - line 69, column 44): " + [x2.constructor.name]);
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inl)))))))))))))) {
+      return new LoadTextFileResult(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
+    }
+    ;
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr)))))))))))))) {
+      return new StartPureScriptLanguageServerResponse(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 72, column 1 - line 72, column 44): " + [x2.constructor.name]);
   },
   from: function(x2) {
     if (x2 instanceof LoadSpagoProjectResponse) {
@@ -30334,19 +30501,27 @@ var genericMessageToRenderer_ = {
       return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inl(x2.value0))))))))))));
     }
     ;
-    if (x2 instanceof StoreTextFileResult) {
+    if (x2 instanceof RunCommandUpdateResult) {
       return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inl(x2.value0)))))))))))));
     }
     ;
-    if (x2 instanceof LoadTextFileResult) {
-      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(x2.value0)))))))))))));
+    if (x2 instanceof StoreTextFileResult) {
+      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inl(x2.value0))))))))))))));
     }
     ;
-    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 69, column 1 - line 69, column 44): " + [x2.constructor.name]);
+    if (x2 instanceof LoadTextFileResult) {
+      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inl(x2.value0)))))))))))))));
+    }
+    ;
+    if (x2 instanceof StartPureScriptLanguageServerResponse) {
+      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(x2.value0)))))))))))))));
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 72, column 1 - line 72, column 44): " + [x2.constructor.name]);
   }
 };
 var writeForeignMessageToRend = {
-  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericMessageToRenderer_)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignVariant()(/* @__PURE__ */ writeForeignVariantCons(invalidSpagoDhallIsSymbol)(writeForeignString)()(/* @__PURE__ */ writeForeignVariantCons(noSpagoDhallIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(nothingSelectedIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(validSpagoDhallIsSymbol)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(/* @__PURE__ */ writeForeignFieldsCons1(writeForeignProjectName)(/* @__PURE__ */ writeForeignFieldsCons(packagesIsSymbol)(/* @__PURE__ */ writeForeignObject(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(/* @__PURE__ */ writeForeignFieldsCons(repoIsSymbol)(writeForeignRepository)(/* @__PURE__ */ writeForeignFieldsCons(versionIsSymbol)(writeForeignVersion)(writeForeignFieldsNilRowR)()()())()()())()()())))(/* @__PURE__ */ writeForeignFieldsCons(repositoryIsSymbol)(/* @__PURE__ */ writeForeignMaybe(writeForeignRepository))(/* @__PURE__ */ writeForeignFieldsCons(sourcesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignSourceGlob))(writeForeignFieldsNilRowR)()()())()()())()()())()()())()()()))()(writeForeignVariantNilRow)))))))(LoadSpagoProjectResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(UserSelectedFileIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignGetInstalledT))(GetInstalledToolsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignArray(/* @__PURE__ */ writeForeignTuple(writeForeignString)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons1(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(projectsIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignPureScriptPro))(writeForeignFieldsNilRowR)()()())()()())))))(GetPureScriptSolutionDefinitionsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignBoolean))(GetIsLoggedIntoGithubResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither(writeForeignNoGithubToken)(writeForeignGithubGraphQL)))(GithubGraphQLResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignDeviceCodeRes)))(GithubLoginGetDeviceCodeResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignEither(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(errorIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_descriptionIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_uriIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()())()()()))(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(access_tokenIsSymbol)(writeForeignAccessToken)(/* @__PURE__ */ writeForeignFieldsCons(scopeIsSymbol)(writeForeignScopeList)(/* @__PURE__ */ writeForeignFieldsCons(token_typeIsSymbol)(writeForeignTokenType)(writeForeignFieldsNilRowR)()()())()()())()()())))))(GithubPollAccessTokenResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC1(CopyToClipboardResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC1(GetClipboardTextResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignSpagoGlobalCa)))(GetSpagoGlobalCacheResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(stderrIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(stdoutIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()))))(RunCommandResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(StoreTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignString)))(LoadTextFileResultIsSymbol)))))))))))))))(defaultOptions)
+  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericMessageToRenderer_)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignVariant()(/* @__PURE__ */ writeForeignVariantCons(invalidSpagoDhallIsSymbol)(writeForeignString)()(/* @__PURE__ */ writeForeignVariantCons(noSpagoDhallIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(nothingSelectedIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(validSpagoDhallIsSymbol)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(/* @__PURE__ */ writeForeignFieldsCons1(writeForeignProjectName)(/* @__PURE__ */ writeForeignFieldsCons(packagesIsSymbol)(/* @__PURE__ */ writeForeignObject(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(/* @__PURE__ */ writeForeignFieldsCons(repoIsSymbol)(writeForeignRepository)(/* @__PURE__ */ writeForeignFieldsCons(versionIsSymbol)(writeForeignVersion)(writeForeignFieldsNilRowR)()()())()()())()()())))(/* @__PURE__ */ writeForeignFieldsCons(repositoryIsSymbol)(/* @__PURE__ */ writeForeignMaybe(writeForeignRepository))(/* @__PURE__ */ writeForeignFieldsCons(sourcesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignSourceGlob))(writeForeignFieldsNilRowR)()()())()()())()()())()()())()()()))()(writeForeignVariantNilRow)))))))(LoadSpagoProjectResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC22(UserSelectedFileIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignGetInstalledT))(GetInstalledToolsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignArray(/* @__PURE__ */ writeForeignTuple(writeForeignString)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons1(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(projectsIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignPureScriptPro))(writeForeignFieldsNilRowR)()()())()()())))))(GetPureScriptSolutionDefinitionsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC1(GetIsLoggedIntoGithubResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither(writeForeignNoGithubToken)(writeForeignGithubGraphQL)))(GithubGraphQLResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignDeviceCodeRes)))(GithubLoginGetDeviceCodeResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignEither(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(errorIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_descriptionIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_uriIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()())()()()))(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(access_tokenIsSymbol)(writeForeignAccessToken)(/* @__PURE__ */ writeForeignFieldsCons(scopeIsSymbol)(writeForeignScopeList)(/* @__PURE__ */ writeForeignFieldsCons(token_typeIsSymbol)(writeForeignTokenType)(writeForeignFieldsNilRowR)()()())()()())()()())))))(GithubPollAccessTokenResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(CopyToClipboardResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(GetClipboardTextResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignSpagoGlobalCa)))(GetSpagoGlobalCacheResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(stderrIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(stdoutIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()))))(RunCommandResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignRunCommandUpd))(RunCommandUpdateResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC22(StoreTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignString)))(LoadTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignRecord1)))(StartPureScriptLanguageServerResponseIsSymbol)))))))))))))))))(defaultOptions)
 };
 var genericMessageToMain_ = {
   to: function(x2) {
@@ -30402,11 +30577,15 @@ var genericMessageToMain_ = {
       return new StoreTextFile(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
     }
     ;
-    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr)))))))))))) {
-      return new LoadTextFile(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inl))))))))))))) {
+      return new LoadTextFile(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
     }
     ;
-    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 56, column 1 - line 56, column 40): " + [x2.constructor.name]);
+    if (x2 instanceof Inr && (x2.value0 instanceof Inr && (x2.value0.value0 instanceof Inr && (x2.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && (x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr && x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Inr))))))))))))) {
+      return new StartPureScriptLanguageServer(x2.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0);
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 59, column 1 - line 59, column 40): " + [x2.constructor.name]);
   },
   from: function(x2) {
     if (x2 instanceof LoadSpagoProject) {
@@ -30462,14 +30641,18 @@ var genericMessageToMain_ = {
     }
     ;
     if (x2 instanceof LoadTextFile) {
-      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(x2.value0)))))))))))));
+      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inl(x2.value0))))))))))))));
     }
     ;
-    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 56, column 1 - line 56, column 40): " + [x2.constructor.name]);
+    if (x2 instanceof StartPureScriptLanguageServer) {
+      return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(x2.value0))))))))))))));
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.Message.Types (line 59, column 1 - line 59, column 40): " + [x2.constructor.name]);
   }
 };
 var readForeignMessageToMain = {
-  readImpl: /* @__PURE__ */ genericReadForeignTaggedSum(genericMessageToMain_)(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(LoadSpagoProjectIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(directoryIsSymbol)(readForeignBoolean)(/* @__PURE__ */ readForeignFieldsCons(filtersIsSymbol)(/* @__PURE__ */ readForeignArray(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(extensionsIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignArray2))(/* @__PURE__ */ readForeignFieldsCons1(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())))(readForeignFieldsNilRowRo)()())()())))(ShowOpenDialogIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetInstalledToolsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetPureScriptSolutionDefinitionsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetIsLoggedIntoGithubIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignGithubGraphQLQ))(QueryGithubGraphQLIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GithubLoginGetDeviceCodeIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignDeviceCode))(GithubPollAccessTokenIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo11(CopyToClipboardIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetClipboardTextIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetSpagoGlobalCacheIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(argsIsSymbol)(readForeignArray2)(/* @__PURE__ */ readForeignFieldsCons(toolIsSymbol)(readForeignTool)(/* @__PURE__ */ readForeignFieldsCons(workingDirIsSymbol)(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())()())))(RunCommandIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(contentIsSymbol)(readForeignString)(/* @__PURE__ */ readForeignFieldsCons(pathIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())()())))(StoreTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepCo11(LoadTextFileIsSymbol)))))))))))))))(defaultOptions)
+  readImpl: /* @__PURE__ */ genericReadForeignTaggedSum(genericMessageToMain_)(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(LoadSpagoProjectIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(directoryIsSymbol)(readForeignBoolean)(/* @__PURE__ */ readForeignFieldsCons(filtersIsSymbol)(/* @__PURE__ */ readForeignArray(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(extensionsIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignArray2))(/* @__PURE__ */ readForeignFieldsCons1(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())))(readForeignFieldsNilRowRo)()())()())))(ShowOpenDialogIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetInstalledToolsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetPureScriptSolutionDefinitionsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetIsLoggedIntoGithubIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignGithubGraphQLQ))(QueryGithubGraphQLIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GithubLoginGetDeviceCodeIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignDeviceCode))(GithubPollAccessTokenIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo13(CopyToClipboardIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetClipboardTextIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetSpagoGlobalCacheIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(argsIsSymbol)(readForeignArray2)(/* @__PURE__ */ readForeignFieldsCons(toolIsSymbol)(readForeignTool)(/* @__PURE__ */ readForeignFieldsCons(workingDirIsSymbol)(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())()())))(RunCommandIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(contentIsSymbol)(readForeignString)(/* @__PURE__ */ readForeignFieldsCons(pathIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())()())))(StoreTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo13(LoadTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(folderIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())))(StartPureScriptLanguageServerIsSymbol))))))))))))))))(defaultOptions)
 };
 
 // output/Biz.OperatingSystem.Types/index.js
@@ -32541,14 +32724,14 @@ var sequenceRecordSingle = function(dictIsSymbol) {
   var insert1 = insert6(dictIsSymbol);
   return function() {
     return function(dictFunctor) {
-      var map27 = map(dictFunctor);
+      var map28 = map(dictFunctor);
       return function() {
         return function() {
           return {
             sequenceRecordImpl: function(v) {
               return function(a) {
                 var valA = get3($$Proxy.value)(a);
-                return map27(insert1($$Proxy.value))(valA);
+                return map28(insert1($$Proxy.value))(valA);
               };
             },
             Functor0: function() {
@@ -32570,7 +32753,7 @@ var sequenceRecordCons = function(dictIsSymbol) {
     return function(dictApply) {
       var apply4 = apply(dictApply);
       var Functor0 = dictApply.Functor0();
-      var map27 = map(Functor0);
+      var map28 = map(Functor0);
       return function(dictSequenceRecord) {
         var sequenceRecordImpl1 = sequenceRecordImpl(dictSequenceRecord);
         return function() {
@@ -32585,7 +32768,7 @@ var sequenceRecordCons = function(dictIsSymbol) {
                       return compose2(insert1($$Proxy.value)(valA$prime))(rest$prime);
                     };
                   };
-                  return apply4(map27(fn)(valA))(rest);
+                  return apply4(map28(fn)(valA))(rest);
                 };
               },
               Functor0: function() {
@@ -32601,10 +32784,10 @@ var sequenceRecordCons = function(dictIsSymbol) {
 var sequenceRecord = function() {
   return function(dictSequenceRecord) {
     var sequenceRecordImpl1 = sequenceRecordImpl(dictSequenceRecord);
-    var map27 = map(dictSequenceRecord.Functor0());
+    var map28 = map(dictSequenceRecord.Functor0());
     return function(a) {
       var builder = sequenceRecordImpl1($$Proxy.value)(a);
-      return map27(flap2(build)({}))(builder);
+      return map28(flap2(build)({}))(builder);
     };
   };
 };
@@ -32998,11 +33181,11 @@ var unsafeFreeze2 = function(dictMonad) {
   };
 };
 var usingFromImmutable = function(dictMonad) {
-  var map27 = map(dictMonad.Bind1().Apply0().Functor0());
+  var map28 = map(dictMonad.Bind1().Apply0().Functor0());
   var unsafeFreeze1 = unsafeFreeze2(dictMonad);
   return function(f3) {
     return function(buf) {
-      return map27(f3)(unsafeFreeze1(buf));
+      return map28(f3)(unsafeFreeze1(buf));
     };
   };
 };
@@ -33233,13 +33416,17 @@ var sequenceRecord2 = /* @__PURE__ */ sequenceRecord()(/* @__PURE__ */ sequenceR
   }
 })()(applyAff)(/* @__PURE__ */ sequenceRecordCons({
   reflectSymbol: function() {
+    return "purescriptLanguageServer";
+  }
+})()(applyAff)(/* @__PURE__ */ sequenceRecordCons({
+  reflectSymbol: function() {
     return "purs";
   }
 })()(applyAff)(/* @__PURE__ */ sequenceRecordSingle({
   reflectSymbol: function() {
     return "spago";
   }
-})()(functorAff)()())()())()())()());
+})()(functorAff)()())()())()())()())()());
 var which = function(os) {
   return function(tool) {
     var cmd = function() {
@@ -33255,7 +33442,7 @@ var which = function(os) {
         return "which";
       }
       ;
-      throw new Error("Failed pattern match at Backend.CheckTools (line 45, column 9 - line 48, column 20): " + [os.constructor.name]);
+      throw new Error("Failed pattern match at Backend.CheckTools (line 46, column 9 - line 49, column 20): " + [os.constructor.name]);
     }();
     var arg = toCommand(tool);
     var spawnCmd = spawn3({
@@ -33284,7 +33471,8 @@ var getToolsWithPaths = function(os) {
     npm: getToolPath(os)(NPM.value),
     spago: getToolPath(os)(Spago.value),
     purs: getToolPath(os)(Purs.value),
-    dhallToJSON: getToolPath(os)(DhallToJSON.value)
+    dhallToJSON: getToolPath(os)(DhallToJSON.value),
+    purescriptLanguageServer: getToolPath(os)(PureScriptLanguageServer.value)
   });
 };
 
@@ -35339,7 +35527,7 @@ function isOriginPotentiallyTrustworthy(url) {
   if (hostIPVersion === 6 && /^(((0+:){7})|(::(0+:){0,6}))0*1$/.test(hostIp)) {
     return true;
   }
-  if (/^(.+\.)*localhost$/.test(url.host)) {
+  if (url.host === "localhost" || url.host.endsWith(".localhost")) {
     return false;
   }
   if (url.protocol === "file:") {
@@ -36199,10 +36387,40 @@ var readAppPreferences = /* @__PURE__ */ bind9(getPreferencesFilePath1)(function
 });
 
 // output/Biz.Tool/index.js
-var bind10 = /* @__PURE__ */ bind(bindAff);
+var bind1 = /* @__PURE__ */ bind(bindAff);
 var pure15 = /* @__PURE__ */ pure(applicativeAff);
 var show9 = /* @__PURE__ */ show(showInt);
 var show13 = /* @__PURE__ */ show(showSignal);
+var runToolAndSendOutput = function(respond) {
+  return function(v) {
+    return function __do2() {
+      var cp = spawn2(v.toolPath)(v.args)({
+        cwd: v.workingDir,
+        stdio: defaultSpawnOptions.stdio,
+        env: defaultSpawnOptions.env,
+        detached: defaultSpawnOptions.detached,
+        uid: defaultSpawnOptions.uid,
+        gid: defaultSpawnOptions.gid
+      })();
+      onDataString(stdout(cp))(UTF8.value)(respond.onStdout)();
+      onDataString(stderr(cp))(UTF8.value)(respond.onStderr)();
+      onExit(cp)(function(v1) {
+        if (v1 instanceof Normally) {
+          return respond.onExit(v1.value0 === 0);
+        }
+        ;
+        if (v1 instanceof BySignal) {
+          return respond.onExit(false);
+        }
+        ;
+        throw new Error("Failed pattern match at Biz.Tool (line 52, column 16 - line 54, column 43): " + [v1.constructor.name]);
+      })();
+      return {
+        kill: kill(SIGINT.value)(cp)
+      };
+    };
+  };
+};
 var runToolAndGetStdout = function(v) {
   var spawnCmd = function(v1) {
     return spawn3({
@@ -36218,7 +36436,7 @@ var runToolAndGetStdout = function(v) {
       gid: defaultSpawnOptions.gid
     });
   };
-  return bind10(spawnCmd(v.toolPath))(function(v1) {
+  return bind1(spawnCmd(v.toolPath))(function(v1) {
     return pure15(function() {
       if (v1.exit instanceof Normally && v1.exit.value0 === 0) {
         return new Right({
@@ -36235,7 +36453,7 @@ var runToolAndGetStdout = function(v) {
         return new Left("Interrupted by signal: " + (show13(v1.exit.value0) + ("\n" + v1.stderr)));
       }
       ;
-      throw new Error("Failed pattern match at Biz.Tool (line 22, column 8 - line 27, column 72): " + [v1.exit.constructor.name]);
+      throw new Error("Failed pattern match at Biz.Tool (line 28, column 8 - line 33, column 72): " + [v1.exit.constructor.name]);
     }());
   });
 };
@@ -36268,16 +36486,18 @@ var toString6 = function(v) {
 
 // output/Biz.IPC.MessageToMainHandler/index.js
 var map26 = /* @__PURE__ */ map(functorAff);
-var bind11 = /* @__PURE__ */ bind(bindAff);
+var bind10 = /* @__PURE__ */ bind(bindAff);
 var pure16 = /* @__PURE__ */ pure(applicativeAff);
 var mapFlipped4 = /* @__PURE__ */ mapFlipped(functorMaybe);
 var show10 = /* @__PURE__ */ show(showError);
-var showOpenDialog1 = /* @__PURE__ */ showOpenDialog();
-var bind1 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadAff));
+var map110 = /* @__PURE__ */ map(functorFn);
+var map27 = /* @__PURE__ */ map(functorEither);
+var bind12 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadAff));
 var except3 = /* @__PURE__ */ except(applicativeAff);
 var mapFlipped1 = /* @__PURE__ */ mapFlipped(functorAff);
-var lmap4 = /* @__PURE__ */ lmap(bifunctorEither);
+var showOpenDialog1 = /* @__PURE__ */ showOpenDialog();
 var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
+var lmap4 = /* @__PURE__ */ lmap(bifunctorEither);
 var readForeignRecord5 = /* @__PURE__ */ readForeignRecord();
 var readForeignFieldsCons2 = /* @__PURE__ */ readForeignFieldsCons({
   reflectSymbol: function() {
@@ -36310,9 +36530,11 @@ var readJSON5 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord5(/* @
   }
 })(/* @__PURE__ */ readForeignArray(readForeignSourceGlob))(readForeignFieldsNilRowRo)()())()())()())()())()()));
 var $$for2 = /* @__PURE__ */ $$for(applicativeAff)(traversableArray);
-var map110 = /* @__PURE__ */ map(functorEffect);
-var voidRight3 = /* @__PURE__ */ voidRight(functorEffect);
 var sendToWebContents2 = /* @__PURE__ */ sendToWebContents(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons({
+  reflectSymbol: function() {
+    return "isPartial";
+  }
+})(writeForeignBoolean)(/* @__PURE__ */ writeForeignFieldsCons({
   reflectSymbol: function() {
     return "response";
   }
@@ -36320,14 +36542,27 @@ var sendToWebContents2 = /* @__PURE__ */ sendToWebContents(/* @__PURE__ */ write
   reflectSymbol: function() {
     return "response_for_message_id";
   }
-})(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()));
+})(writeForeignString)(writeForeignFieldsNilRowR)()()())()()())()()()));
+var map32 = /* @__PURE__ */ map(functorEffect);
+var voidRight3 = /* @__PURE__ */ voidRight(functorEffect);
 var storeTextFile = function(v) {
-  return map26(StoreTextFileResult.create)(bind11(attempt(writeTextFile2(UTF8.value)(v.path)(v.content)))(function(res) {
+  return map26(StoreTextFileResult.create)(bind10(attempt(writeTextFile2(UTF8.value)(v.path)(v.content)))(function(res) {
     return pure16(mapFlipped4(blush(res))(show10));
   }));
 };
+var startPureScriptLanguageServer = function(v) {
+  return map26(map110(StartPureScriptLanguageServerResponse.create)(map27($$const({}))))(runExceptT(bind12(except3(note("Unsupported OS")(operatingSystem\u0294)))(function(os) {
+    return bind12(mapFlipped1(getToolPath(os)(PureScriptLanguageServer.value))(note("PureScript language server is not installed")))(function(path2) {
+      return runToolAndGetStdout({
+        args: ["--node-ipc"],
+        toolPath: path2,
+        workingDir: new Just(v.folder)
+      });
+    });
+  })));
+};
 var showOpenDialog2 = function(window2) {
-  return bind11(showOpenDialog1({
+  return bind10(showOpenDialog1({
     properties: [openDirectory]
   })(window2))(function(result) {
     return map26(UserSelectedFile.create)(function() {
@@ -36346,42 +36581,85 @@ var showOpenDialog2 = function(window2) {
     }());
   });
 };
-var runCommand = function(v) {
-  return map26(RunCommandResult.create)(runExceptT(bind1(except3(note("Unsupported OS")(operatingSystem\u0294)))(function(os) {
-    return bind1(mapFlipped1(getToolPath(os)(v.tool))(note("Tool is not installed")))(function(path2) {
-      return runToolAndGetStdout({
-        args: v.args,
-        toolPath: path2,
-        workingDir: v.workingDir
+var runCommandLong = function(respondWith) {
+  return function(v) {
+    var partial = function() {
+      var $158 = respondWith({
+        isPartial: true
       });
-    });
-  })));
+      return function($159) {
+        return launchAff_($158(RunCommandUpdateResult.create($159)));
+      };
+    }();
+    var fail6 = respondWith({
+      isPartial: false
+    })(RunCommandUpdateResult.create(new CommandFinished(false)));
+    var done = function(isSuccess) {
+      return launchAff_(respondWith({
+        isPartial: false
+      })(RunCommandUpdateResult.create(new CommandFinished(isSuccess))));
+    };
+    if (operatingSystem\u0294 instanceof Nothing) {
+      return fail6;
+    }
+    ;
+    if (operatingSystem\u0294 instanceof Just) {
+      return bind10(getToolPath(operatingSystem\u0294.value0)(v.tool))(function(toolPath\u0294) {
+        if (toolPath\u0294 instanceof Nothing) {
+          return fail6;
+        }
+        ;
+        if (toolPath\u0294 instanceof Just) {
+          return liftEffect7(function __do2() {
+            var _kill = runToolAndSendOutput({
+              onStdout: function($160) {
+                return partial(StdoutData.create($160));
+              },
+              onStderr: function($161) {
+                return partial(StderrData.create($161));
+              },
+              onExit: done
+            })({
+              args: v.args,
+              toolPath: toolPath\u0294.value0,
+              workingDir: v.workingDir
+            })();
+            return unit;
+          });
+        }
+        ;
+        throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 165, column 7 - line 174, column 20): " + [toolPath\u0294.constructor.name]);
+      });
+    }
+    ;
+    throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 161, column 3 - line 174, column 20): " + [operatingSystem\u0294.constructor.name]);
+  };
 };
 var loadTextFile = function(arg) {
   return map26(LoadTextFileResult.create)(mapFlipped1(attempt(readTextFile2(UTF8.value)(arg)))(lmap4(show10)));
 };
 var loadSpagoProject = function(window2) {
-  return bind11(showOpenDialog1({
+  return bind10(showOpenDialog1({
     properties: [openDirectory]
   })(window2))(function(result) {
-    return bind11(function() {
+    return bind10(function() {
       var v = function(v1) {
         return pure16(nothingSelected);
       };
       if (!result.canceled) {
-        var $111 = fromArray(result.filePaths);
-        if ($111 instanceof Just) {
-          var spagoPath = concat5([head2($111.value0), "spago.dhall"]);
-          return bind11(liftEffect7(exists(spagoPath)))(function(pathExists\u0294) {
-            var packagesPath = concat5([head2($111.value0), "packages.dhall"]);
-            return bind11(liftEffect7(exists(packagesPath)))(function(path2Exists\u0294) {
-              var $112 = !pathExists\u0294 || !path2Exists\u0294;
-              if ($112) {
+        var $138 = fromArray(result.filePaths);
+        if ($138 instanceof Just) {
+          var spagoPath = concat5([head2($138.value0), "spago.dhall"]);
+          return bind10(liftEffect7(exists(spagoPath)))(function(pathExists\u0294) {
+            var packagesPath = concat5([head2($138.value0), "packages.dhall"]);
+            return bind10(liftEffect7(exists(packagesPath)))(function(path2Exists\u0294) {
+              var $139 = !pathExists\u0294 || !path2Exists\u0294;
+              if ($139) {
                 return pure16(noSpagoDhall);
               }
               ;
-              return bind11(readTextFile2(UTF8.value)(spagoPath))(function(spagoDhall) {
-                return bind11(spawn3({
+              return bind10(readTextFile2(UTF8.value)(spagoPath))(function(spagoDhall) {
+                return bind10(spawn3({
                   cmd: "dhall-to-json",
                   args: [],
                   stdin: new Just(spagoDhall)
@@ -36403,14 +36681,14 @@ var loadSpagoProject = function(window2) {
   });
 };
 var getSpagoGlobalCache = /* @__PURE__ */ function() {
-  return map26(GetSpagoGlobalCacheResult.create)(runExceptT(bind1(except3(note("Unsupported OS")(operatingSystem\u0294)))(function(os) {
-    return bind1(mapFlipped1(getToolPath(os)(Spago.value))(note("Spago is not installed")))(function(path2) {
+  return map26(GetSpagoGlobalCacheResult.create)(runExceptT(bind12(except3(note("Unsupported OS")(operatingSystem\u0294)))(function(os) {
+    return bind12(mapFlipped1(getToolPath(os)(Spago.value))(note("Spago is not installed")))(function(path2) {
       return getGlobalCacheDir(path2);
     });
   })));
 }();
-var getProjectDefinitions = /* @__PURE__ */ bind11(readAppPreferences)(function(prefs) {
-  return bind11($$for2(prefs.solutions)(function(fp) {
+var getProjectDefinitions = /* @__PURE__ */ bind10(readAppPreferences)(function(prefs) {
+  return bind10($$for2(prefs.solutions)(function(fp) {
     return map26(function(v) {
       return new Tuple(fp, v);
     })(readSolutionDefinition(fp));
@@ -36424,73 +36702,82 @@ var getInstalledTools = /* @__PURE__ */ function() {
 var handleMessageToMain = function(window2) {
   return function(message_id) {
     return function(message2) {
-      return bind11(function() {
-        if (message2 instanceof LoadSpagoProject) {
-          return loadSpagoProject(window2);
-        }
-        ;
-        if (message2 instanceof ShowOpenDialog) {
-          return showOpenDialog2(window2);
-        }
-        ;
-        if (message2 instanceof GetInstalledTools) {
-          return getInstalledTools;
-        }
-        ;
-        if (message2 instanceof GetPureScriptSolutionDefinitions) {
-          return getProjectDefinitions;
-        }
-        ;
-        if (message2 instanceof QueryGithubGraphQL) {
-          return queryGithubGraphQL(message2.value0);
-        }
-        ;
-        if (message2 instanceof GetIsLoggedIntoGithub) {
-          return getIsLoggedIntoGithub;
-        }
-        ;
-        if (message2 instanceof GithubLoginGetDeviceCode) {
-          return getGithubDeviceCode;
-        }
-        ;
-        if (message2 instanceof GithubPollAccessToken) {
-          return pollGithubAccessToken(message2.value0);
-        }
-        ;
-        if (message2 instanceof GetClipboardText) {
-          return liftEffect7(map110(GetClipboardTextResult.create)(getClipboardText));
-        }
-        ;
-        if (message2 instanceof CopyToClipboard) {
-          return liftEffect7(voidRight3(new CopyToClipboardResult(message2.value0))(copyToClipboard(message2.value0)));
-        }
-        ;
-        if (message2 instanceof GetSpagoGlobalCache) {
-          return getSpagoGlobalCache;
-        }
-        ;
-        if (message2 instanceof RunCommand) {
-          return runCommand(message2.value0);
-        }
-        ;
-        if (message2 instanceof StoreTextFile) {
-          return storeTextFile(message2.value0);
-        }
-        ;
-        if (message2 instanceof LoadTextFile) {
-          return loadTextFile(message2.value0);
-        }
-        ;
-        throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 42, column 34 - line 58, column 40): " + [message2.constructor.name]);
-      }())(function(v) {
-        return liftEffect7(function() {
-          var responsePayload = {
-            response_for_message_id: toString6(message_id),
-            response: v
-          };
-          return sendToWebContents2(responsePayload)("ipc")(window2);
-        }());
+      var respondWith = function(v) {
+        return function(response) {
+          return liftEffect7(function() {
+            var responsePayload = {
+              response_for_message_id: toString6(message_id),
+              response,
+              isPartial: v.isPartial
+            };
+            return sendToWebContents2(responsePayload)("ipc")(window2);
+          }());
+        };
+      };
+      var respond = respondWith({
+        isPartial: false
       });
+      if (message2 instanceof LoadSpagoProject) {
+        return bind10(loadSpagoProject(window2))(respond);
+      }
+      ;
+      if (message2 instanceof ShowOpenDialog) {
+        return bind10(showOpenDialog2(window2))(respond);
+      }
+      ;
+      if (message2 instanceof GetInstalledTools) {
+        return bind10(getInstalledTools)(respond);
+      }
+      ;
+      if (message2 instanceof GetPureScriptSolutionDefinitions) {
+        return bind10(getProjectDefinitions)(respond);
+      }
+      ;
+      if (message2 instanceof QueryGithubGraphQL) {
+        return bind10(queryGithubGraphQL(message2.value0))(respond);
+      }
+      ;
+      if (message2 instanceof GetIsLoggedIntoGithub) {
+        return bind10(getIsLoggedIntoGithub)(respond);
+      }
+      ;
+      if (message2 instanceof GithubLoginGetDeviceCode) {
+        return bind10(getGithubDeviceCode)(respond);
+      }
+      ;
+      if (message2 instanceof GithubPollAccessToken) {
+        return bind10(pollGithubAccessToken(message2.value0))(respond);
+      }
+      ;
+      if (message2 instanceof GetClipboardText) {
+        return bind10(liftEffect7(map32(GetClipboardTextResult.create)(getClipboardText)))(respond);
+      }
+      ;
+      if (message2 instanceof CopyToClipboard) {
+        return bind10(liftEffect7(voidRight3(new CopyToClipboardResult(message2.value0))(copyToClipboard(message2.value0))))(respond);
+      }
+      ;
+      if (message2 instanceof GetSpagoGlobalCache) {
+        return bind10(getSpagoGlobalCache)(respond);
+      }
+      ;
+      if (message2 instanceof RunCommand) {
+        return runCommandLong(respondWith)(message2.value0);
+      }
+      ;
+      if (message2 instanceof StoreTextFile) {
+        return bind10(storeTextFile(message2.value0))(respond);
+      }
+      ;
+      if (message2 instanceof LoadTextFile) {
+        return bind10(loadTextFile(message2.value0))(respond);
+      }
+      ;
+      if (message2 instanceof StartPureScriptLanguageServer) {
+        return bind10(startPureScriptLanguageServer(message2.value0))(respond);
+      }
+      ;
+      throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 58, column 3 - line 79, column 14): " + [message2.constructor.name]);
     };
   };
 };
@@ -36536,7 +36823,7 @@ var registerProtocol = function __do() {
 // output/Main/index.js
 var discard6 = /* @__PURE__ */ discard(discardUnit)(bindAff);
 var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
-var bind12 = /* @__PURE__ */ bind(bindAff);
+var bind11 = /* @__PURE__ */ bind(bindAff);
 var mkOptions = /* @__PURE__ */ map(functorEffect)(function(v) {
   return {
     width: 800,
@@ -36558,8 +36845,8 @@ var main = /* @__PURE__ */ launchAff_(/* @__PURE__ */ discard6(waitUntilAppReady
   return discard6(liftEffect8(openHttpsInBrowserAndBlockOtherURLs))(function() {
     return discard6(liftEffect8(appendSwitch("enable-features")("CSSContainerQueries")))(function() {
       return discard6(liftEffect8(registerProtocol))(function() {
-        return bind12(liftEffect8(mkOptions))(function(options) {
-          return bind12(liftEffect8(newBrowserWindow(options)))(function(window2) {
+        return bind11(liftEffect8(mkOptions))(function(options) {
+          return bind11(liftEffect8(newBrowserWindow(options)))(function(window2) {
             return discard6(liftEffect8(registerAllHandlers(window2)))(function() {
               return discard6(liftEffect8(showWhenReadyToShow(window2)))(function() {
                 return discard6(loadFile("index.html")(window2))(function() {

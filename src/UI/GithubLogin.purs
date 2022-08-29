@@ -48,8 +48,7 @@ useGetDeviceCode ∷
     (RemoteData String DeviceCodeResponse /\ (Effect Unit) /\ (Effect Unit))
 useGetDeviceCode ctx = React.do
   { data: response, send, reset } ← useIPC ctx (barlow @"%GithubLoginGetDeviceCodeResult")
-  let
-    res = response >>= RD.fromEither
+  let res = response >>= RD.fromEither
   pure (res /\ (send GithubLoginGetDeviceCode) /\ reset)
 
 usePollAccessToken ∷

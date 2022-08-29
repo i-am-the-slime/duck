@@ -9,13 +9,13 @@ import React.Basic (JSX)
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import Story.Util.Decorator (containerDecorator)
-import Storybook (mkStoryWrapper)
+import Storybook (mkStoryWrapper, story)
 import Storybook.Types (Story)
 import UI.Editor as Editor
 import Yoga ((</*>))
 
 default ∷ Story
-default = { title: "Editor", decorators: [ containerDecorator ] }
+default = story { title: "Editor", decorators: [ containerDecorator ] }
 
 editor ∷ Effect JSX
 editor = do

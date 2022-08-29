@@ -4,20 +4,22 @@ import Yoga.Prelude.View
 
 import Biz.Github.Types (Login(..), Repository(..))
 import Data.Array as Array
-import Fahrtwind (border, borderBottom, borderCol', flexRow, fontSemiMedium, gap, height, heightFull, hover, itemsCenter, justifyBetween, mL, mR, overflowHidden, overflowVisible, pL, pR, pX, pY, positionRelative, textCol', textSm, widthAndHeight)
+import Debug (spy)
+import Fahrtwind (widthAndHeight)
+import Fahrtwind.Icon.Heroicons as Heroicon
 import Framer.Motion as M
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
-import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Component as UI
 import UI.Navigation.HeaderBar.GithubAvatar as GithubAvatar
+import UI.Navigation.HeaderBar.Style as Style
 import UI.Navigation.Router (printRoute, useRouter)
 import UI.Navigation.Router.Page.Github as Github
 import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
-import UI.Style (toolbarBackground, toolbarBorderCol)
-import Yoga.Block.Container.Style (col, colour)
+import Yoga.Block.Hook.UseOverflows (useOverflows)
+import Yoga.Block.Hook.UseStateEq (useStateEq')
 
 mkView ∷ UI.Component Unit
 mkView = do
@@ -27,55 +29,41 @@ mkView = do
     { route } ← useRouter
     pure $ view { route, topRight: Just (githubAvatar unit) }
 
-mkPresentationalView ∷
-  React.Component { route ∷ Route, topRight ∷ Maybe JSX }
+mkPresentationalView ∷ React.Component { route ∷ Route, topRight ∷ Maybe JSX }
 mkPresentationalView = do
+  routeView ← mkRouteView
   React.component "HeaderBarPresentational" \{ route, topRight } → React.do
-    React.do
-      pure $
-        P.div "header-bar"
-          ( flexRow <> gap 8 <> justifyBetween <> itemsCenter
-              <> toolbarBackground
-              <> heightFull
-              <> borderBottom 1
-              <> toolbarBorderCol
-              <> fontSemiMedium
-              <> textCol' col.textPaler1
-              <> textSm
-              <> pY 12
-              <> pX 24
-              <>
-                E.css
-                  { containerType: E.str "inline-size"
-                  , containerName: E.str "breadcrumbs"
-                  , overflow: E.str "auto"
-                  , minWidth: E.str "150px"
-                  , maxWidth: E.str "100%"
-                  }
-          )
-          [ renderRoute route
-          , fold topRight
-          ]
+    pure $
+      P.div "header-bar" Style.headerBar
+        [ routeView route
+        , fold topRight
+        ]
 
-renderRoute ∷ Route → JSX
-renderRoute route =
-  P.div_
-    ( E.css
-        { "@container breadcrumbs (max-width: 350px)": E.nested $ E.css
-            { ".breadcrumb-container > *":
-                E.nested $ E.css
-                  { display: E.none
-                  }
-            , ".breadcrumb-container > a:last-of-type, .breadcrumb-container > div:last-of-type":
-                E.nested $ E.css
-                  { display: E.block
-                  }
-            }
-        }
-    ) $ pure
+mkRouteView ∷ React.Component Route
+mkRouteView = React.component "HeaderBarRoute" \route → React.do
+  let link = linkTo route
+  breadcrumb ← useOverflows
+  showDots /\ setShowDots ← useStateEq' Nothing
+
+  useEffect route do
+    setShowDots Nothing
+    mempty
+
+  useEffect breadcrumb.xOverflows do
+    let _ = spy "xoverflows" breadcrumb.xOverflows
+    if (showDots == Just route) then do
+      unless (breadcrumb.xOverflows) $ setShowDots Nothing
+    else when (breadcrumb.xOverflows) do
+      setShowDots (Just route)
+    mempty
+
+  pure $ R.div'
+    </* { css: Style.breadcrumbContainerWrapper, ref: breadcrumb.ref }
+    /> pure
     $ M.div
     </*
       { className: "breadcrumb-container"
+      , css: Style.breadcrumbContainer
       , animate: M.animate $ R.css
           { transition:
               { when: "beforeChildren"
@@ -83,24 +71,6 @@ renderRoute route =
               , delayChildren: 0.1
               }
           }
-      , css: flexRow <> border 1 <> borderCol' col.backgroundLayer2
-          <> overflowHidden
-          <> E.css
-            { borderRadius: E.str "8px"
-            , flexDirection: E.str "row-reverse"
-            , "& > a:last-of-type": E.nested $ pL 12 <> mL 0
-            , "& > a:first-of-type": E.nested
-                ( E.css
-                    { "&:after": E.nested $ E.css { content: E.none }
-                    }
-                    <> pR 12
-                    <> mR 0
-                    <> E.css
-                      { borderRadius: E.str "8px"
-                      , "--bg": col.backgroundLayer4
-                      }
-                )
-            }
       }
     /> Array.reverse case route of
       Home → [ link "Home" ]
@@ -110,8 +80,14 @@ renderRoute route =
       Github subRoute → case subRoute of
         Github.Root → [ link "Github" ]
         Github.Repository (Login owner) (Repository repo) →
-          [ linkTo (Github Github.Root) "Github"
-          , link $ owner <> "/" <> repo
+          [ if showDots # isJust then
+              R.a' </* { css: Style.link } />
+                [ P.div_ Style.dots [ Heroicon.dotsHorizontal ] ]
+            else fragment
+              [ linkTo (Github Github.Root) "Github"
+              , linkTo (Github Github.Root) owner -- [FIXME] Dedicated page
+              ]
+          , link repo
           ]
       Preferences subRoute → case subRoute of
         Preferences.Root → [ link "Preferences" ]
@@ -120,38 +96,10 @@ renderRoute route =
           , link "Spago"
           ]
   where
-  linkStyle = pL 30
-    <> pY 3
-    <> overflowHidden
-    <> height 28
-    <> positionRelative
-    -- <> border 1
-    -- <> borderCol' col.backgroundBright5
-    <> mR 18
-    <> mL (-26)
-    <> overflowVisible
-    <> textSm
-    <> E.css
-      { "--bg": col.backgroundLayer3
-      , borderRight: E.str "1px solid var(--bg)"
-      , background: E.str "var(--bg)"
-      , "&:after": E.nested
-          $ E.css
-              { content: E.str "''"
-              , border: E.str $ "1px solid " <> colour.backgroundLayer2
-              , position: E.str "absolute"
-              , background: E.str "var(--bg)"
-              , overflow: E.visible
-              , top: E.str "3px"
-              , right: E.str "-11px"
-              , borderRadius: E.str "0 3px 0 0"
-              , clipPath: E.str "polygon(0 0, 100% 0, 100% 100%)"
-              , transform: E.str "rotate(45deg)"
-              }
-          <> widthAndHeight 22
-      }
-    <> hover (E.css { "--bg": col.backgroundBright3 })
   linkTo r child = R.a'
-    </* { className: "route-link", css: linkStyle, href: printRoute r }
+    </*
+      { className: "route-link"
+      , css: Style.link
+      , href: printRoute r
+      }
     /> [ R.text child ]
-  link = linkTo route

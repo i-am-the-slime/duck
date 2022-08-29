@@ -3,30 +3,31 @@ module UI.Worksheet.View where
 import Yoga.Prelude.View
 
 import Backend.Tool.Types (Tool(..))
-import Biz.IPC.Message.Types (MessageToMain(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), RunCommandUpdate(..))
 import Biz.OperatingSystem.Types (OperatingSystem(..))
 import Data.Int.Bits ((.|.))
 import Data.Lens.Barlow (barlow)
 import Data.Lens.Barlow.Helpers (preview)
-import Effect.Aff (attempt)
-import Fahrtwind (background', borderCol', borderLeft, height, heightFull, mXAuto, textCol', widthAndHeight)
+import Data.String as String
+import Debug (spy)
+import Effect.Aff (launchAff_)
+import Fahrtwind (background', borderCol', borderLeft, fontFamilyOrMono, height, heightFull, mXAuto, maxWidth, overflowYScroll, textCol', textSm, width, widthAndHeight)
 import Monaco (addCommand, keyCodeEnter, keyModCtrlCmd)
 import Network.RemoteData as RD
 import Plumage.Util.HTML as P
 import React.Basic.DOM as R
+import React.Basic.Emotion (css)
+import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import UI.Component as UI
 import UI.Editor (useMonaco)
 import UI.Hook.UseIPC (useIPC)
-import UI.Hook.UseRemoteData (useRemoteData)
 import UI.Notification.SendNotification (notifyError)
 import UI.OperatingSystem (getOS)
 import UI.Worksheet.Style as Style
-import Web.Event.Event (Event, EventType(..))
+import Web.Event.Event (Event, EventType)
 import Web.Event.EventTarget (dispatchEvent)
-import Web.HTML.Event.EventTypes (click)
 import Web.HTML.Event.EventTypes as EventType
-import Web.HTML.HTMLElement (click)
 import Web.HTML.HTMLElement as HTMLElement
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types (ButtonType(..)) as Button
@@ -52,22 +53,52 @@ mkView = do
       mempty
 
     loadFileIPC ← useIPC ctx (barlow @"%LoadTextFileResult")
-    saveAndRunIPC ← useRemoteData \content → attempt do
+    result  /\ setResult <- React.useState (RD.NotAsked:: (RD.RemoteData _ { stdout :: String, stderr :: String, done :: Maybe Boolean }))
+    let
+     saveAndRun content = do
       errʔ ← ctx.sendIPCMessage
         (StoreTextFile { path: "/tmp/duck-worksheet/src/Main.purs", content })
         <#> (preview @"%StoreTextFileResult" >>> join)
-      for_ errʔ (notifyError ctx) # liftEffect
-      ctx.sendIPCMessage
-        ( RunCommand
-            { tool: Spago
-            , workingDir: Just "/tmp/duck-worksheet"
-            , args: [ "run" ]
-            }
-        ) <#> (preview @"%RunCommandResult" >>> note "Bug: Wrong response" >>> join)
+      do
+        setResult (const RD.Loading) # liftEffect
+        for_ errʔ (notifyError ctx) # liftEffect
+        ctx.streamIPCMessage
+          ( RunCommand
+              { tool: Spago
+              , workingDir: Just "/tmp/duck-worksheet"
+              , args: [ "run" ]
+              }
+          )
+          \msg -> do
+            case preview @"%RunCommandUpdateResult" msg of
+              Nothing -> setResult (const $ RD.Failure ("Unexpected message"))
+              Just (StdoutData s) ->
+                setResult case _ of
+                  RD.Success d -> RD.Success (d { stdout = d.stdout <> s })
+                  _ -> RD.Success { stdout: s, stderr: "", done: Nothing}
+              Just (StderrData s) ->
+                setResult case _ of
+                  RD.Success d -> RD.Success (d { stderr = d.stderr <> s })
+                  _ -> RD.Success { stdout: "", stderr: s, done: Nothing}
+              Just (CommandFinished succeeded) ->
+                setResult case _ of
+                  RD.Success d -> RD.Success (d { done = Just succeeded })
+                  _ -> RD.Success { stdout: "", stderr: "", done: Just succeeded}
 
     useEffectOnce do
       loadFileIPC.send (LoadTextFile "/tmp/duck-worksheet/src/Main.purs")
       mempty
+
+    startLS <- useIPC ctx (barlow @"%StartPureScriptLanguageServerResponse")
+    useEffectOnce do
+      startLS.send (StartPureScriptLanguageServer { folder: "/tmp/duck-worksheet/" })
+      mempty
+
+    useEffect startLS.data do
+      let _ = spy "deta" startLS.data
+      mempty
+
+
     useEffect loadFileIPC.data do
       for_ (loadFileIPC.data) (traverse_ editor.setValue)
       mempty
@@ -76,7 +107,7 @@ mkView = do
       runButton = Block.button
         { onClick: handler_ do
             text ← React.readRef textRef
-            saveAndRunIPC.load text
+            launchAff_ $ saveAndRun text
         , css: Style.runButtonStyle
         , buttonType: Button.Primary
         , ripple: "rgba(255,255,255, 0.2)"
@@ -84,7 +115,7 @@ mkView = do
         }
         [ P.div_ Style.buttonContentStyle
             [ R.div_ []
-            , R.div_ [R.text "Run"]
+            , R.div_ [ R.text "Run"]
             , P.div_ Style.shortcutStyle
                 [ P.div_ (Style.keyStyle)
                   [ R.text case os of
@@ -101,19 +132,29 @@ mkView = do
     pure $ Block.stack { css: heightFull <> background' col.backgroundBright3 }
       [  Block.sidebar
           { space: "0"
-          , sidebar:  P.div_ ( heightFull <> borderLeft 1 <> borderCol' col.backgroundLayer2) [
+          , sidebar:  P.div_ ( heightFull <> borderLeft 1 <> borderCol' col.backgroundLayer2 <> width 300) [
             Block.box_ [Block.stack_ [
-              runButton ,
-              saveAndRunIPC.data
+              runButton,
+              result
                 # case _ of
                     RD.NotAsked → R.text "Go ahead run this"
                     RD.Loading → P.div_ (widthAndHeight 24 <> mXAuto) [spinner]
-                    RD.Success (Right {stdout, stderr}) →
-                      Block.stack_ [
-                        P.div_ mempty [R.text stdout]
-                        , R.details_ [ P.div_ (textCol' col.invalid) [R.text stderr]]
+                    RD.Success {stdout, stderr, done} →
+                      P.div_ (maxWidth 300) [
+                        Block.stack_ [
+                          guard (done == Nothing)  (P.div_ (widthAndHeight 24 <> mXAuto) [spinner])
+                         , P.div_ mempty [R.text stdout]
+                          , R.details' </ { open: done /= Just true } /> [
+                            P.div_ (textSm <> overflowYScroll <> height 400 <> guard (done == Just false) (textCol' col.invalid) <>  fontFamilyOrMono "Jetbrains Mono") [
+                            P.div_ (css { whiteSpace: E.str "pre-wrap"}) [
+                            R.text (stderr
+                            # String.replaceAll (String.Pattern "\\n") (String.Replacement "\n")
+                            # String.replaceAll (String.Pattern "\\") (String.Replacement "")
+                            )]
+                            ]
+                            ]
+                        ]
                       ]
-                    RD.Success (Left e) → R.text e
                     RD.Failure _ → mempty -- notifyError ctx e
                ]]]
           , sideWidth: "300px"

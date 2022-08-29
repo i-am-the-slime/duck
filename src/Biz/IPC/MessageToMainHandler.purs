@@ -3,31 +3,33 @@ module Biz.IPC.MessageToMainHandler where
 import Prelude
 
 import Backend.CheckTools (getToolPath, getToolsWithPaths)
-import Biz.OperatingSystem (operatingSystemʔ)
 import Backend.PureScriptSolutionDefinition (readSolutionDefinition)
 import Backend.Tool.Types (Tool(..))
 import Biz.IPC.GetInstalledTools.Types (GetInstalledToolsResult(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), RunCommandUpdate(..))
 import Biz.IPC.MessageToMainHandler.Github (getGithubDeviceCode, getIsLoggedIntoGithub, pollGithubAccessToken, queryGithubGraphQL)
 import Biz.IPC.SelectFolder.Types (SelectedFolderData, invalidSpagoDhall, noSpagoDhall, nothingSelected, validSpagoDhall)
+import Biz.OperatingSystem (operatingSystemʔ)
 import Biz.Preferences (readAppPreferences)
 import Biz.Spago.Service (getGlobalCacheDir)
-import Biz.Tool (runToolAndGetStdout)
+import Biz.Tool (runToolAndGetStdout, runToolAndSendOutput)
 import Control.Monad.Except (ExceptT(..), except, runExceptT)
 import Data.Array.NonEmpty as NEA
 import Data.Bifunctor (lmap)
 import Data.Either (blush, either, note)
+import Data.Map (Map)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Traversable (for)
 import Data.Tuple.Nested ((/\))
 import Data.UUID (UUID)
 import Data.UUID as UUID
-import Effect.Aff (Aff, attempt)
+import Effect.Aff (Aff, attempt, launchAff_)
 import Effect.Class (liftEffect)
+import Effect.Ref (Ref)
 import Electron (BrowserWindow, copyToClipboard, getClipboardText, openDirectory, sendToWebContents)
 import Electron as Electron
 import Electron.Types (Channel(..))
-import Node.ChildProcess (defaultSpawnOptions)
+import Node.ChildProcess (ChildProcess, defaultSpawnOptions)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff (readTextFile)
 import Node.FS.Aff as FSA
@@ -36,35 +38,45 @@ import Node.Path as Path
 import Sunde (spawn)
 import Yoga.JSON (readJSON)
 
-handleMessageToMain ∷
-  BrowserWindow → (UUID → MessageToMain → Aff Unit)
-handleMessageToMain window = \message_id message → do
-  response ∷ MessageToRenderer ← case message of
-    LoadSpagoProject → loadSpagoProject window
-    ShowOpenDialog _ → showOpenDialog window
-    GetInstalledTools → getInstalledTools
-    GetPureScriptSolutionDefinitions → getProjectDefinitions
-    QueryGithubGraphQL arg → queryGithubGraphQL arg
-    GetIsLoggedIntoGithub → getIsLoggedIntoGithub
-    GithubLoginGetDeviceCode → getGithubDeviceCode
-    GithubPollAccessToken arg → pollGithubAccessToken arg
-    GetClipboardText →
-      GetClipboardTextResult <$> getClipboardText # liftEffect
-    CopyToClipboard arg →
-      (CopyToClipboardResult arg) <$ copyToClipboard arg # liftEffect
-    GetSpagoGlobalCache → getSpagoGlobalCache
-    RunCommand arg → runCommand arg
-    StoreTextFile arg → storeTextFile arg
-    LoadTextFile arg → loadTextFile arg
+type Ctx = { pscIdeServers ∷ Ref (Map UUID ChildProcess) }
 
-  liftEffect do
-    let
-      responsePayload =
-        { response_for_message_id: UUID.toString message_id
-        , response
-        }
-    -- let _ = spy "Responding with" (JSON.write responsePayload)
-    window # sendToWebContents responsePayload (Channel "ipc")
+handleMessageToMain ∷
+  -- Ctx →
+  BrowserWindow →
+  (UUID → MessageToMain → Aff Unit)
+handleMessageToMain {-context-} window = \message_id message → do
+  let
+    respondWith { isPartial } response = liftEffect do
+      let
+        responsePayload =
+          { response_for_message_id: UUID.toString message_id
+          , response
+          , isPartial
+          }
+      window # sendToWebContents responsePayload (Channel "ipc")
+    respond = respondWith { isPartial: false }
+  case message of
+    LoadSpagoProject → loadSpagoProject window >>= respond
+    ShowOpenDialog _ → showOpenDialog window >>= respond
+    GetInstalledTools → getInstalledTools >>= respond
+    GetPureScriptSolutionDefinitions → getProjectDefinitions >>= respond
+    QueryGithubGraphQL arg → queryGithubGraphQL arg >>= respond
+    GetIsLoggedIntoGithub → getIsLoggedIntoGithub >>= respond
+    GithubLoginGetDeviceCode → getGithubDeviceCode >>= respond
+    GithubPollAccessToken arg → pollGithubAccessToken arg >>= respond
+    GetClipboardText →
+      GetClipboardTextResult <$> getClipboardText # liftEffect >>= respond
+    CopyToClipboard arg →
+      (CopyToClipboardResult arg) <$ copyToClipboard arg # liftEffect >>=
+        respond
+    GetSpagoGlobalCache → getSpagoGlobalCache >>= respond
+    RunCommand arg →
+      -- runCommand respondWith arg
+      runCommandLong respondWith arg
+    StoreTextFile arg → storeTextFile arg >>= respond
+    LoadTextFile arg → loadTextFile arg >>= respond
+    StartPureScriptLanguageServer arg → startPureScriptLanguageServer arg >>=
+      respond
 
 getInstalledTools ∷ Aff MessageToRenderer
 getInstalledTools =
@@ -123,12 +135,43 @@ getSpagoGlobalCache = GetSpagoGlobalCacheResult <$>
     getGlobalCacheDir path # ExceptT
 
 runCommand ∷
+  ({ isPartial ∷ Boolean } → MessageToRenderer → Aff Unit) →
   { args ∷ Array String, workingDir ∷ Maybe String, tool ∷ Tool } →
-  Aff MessageToRenderer
-runCommand { tool, workingDir, args } = RunCommandResult <$> runExceptT do
-  os ← operatingSystemʔ # note "Unsupported OS" # except
-  path ← getToolPath os tool <#> note "Tool is not installed" # ExceptT
-  runToolAndGetStdout { args, toolPath: path, workingDir } # ExceptT
+  Aff Unit
+runCommand respondWith { tool, workingDir, args } =
+  respondWith { isPartial: false } =<<
+    RunCommandResult
+      <$> runExceptT do
+        os ← operatingSystemʔ # note "Unsupported OS" # except
+        path ← getToolPath os tool <#> note "Tool is not installed" # ExceptT
+        runToolAndGetStdout { args, toolPath: path, workingDir } # ExceptT
+
+runCommandLong ∷
+  ({ isPartial ∷ Boolean } → MessageToRenderer → Aff Unit) →
+  { args ∷ Array String, workingDir ∷ Maybe String, tool ∷ Tool } →
+  Aff Unit
+runCommandLong respondWith { tool, workingDir, args } = do
+  let
+    r = RunCommandUpdateResult
+    fail = respondWith { isPartial: false }
+      (r $ CommandFinished false)
+    partial = launchAff_ <<< respondWith { isPartial: true } <<< r
+    done isSuccess = launchAff_ $ respondWith { isPartial: false }
+      (r $ CommandFinished isSuccess)
+  case operatingSystemʔ of
+    Nothing → fail
+    Just os → do
+      toolPathʔ ← getToolPath os tool
+      case toolPathʔ of
+        Nothing → fail
+        Just toolPath → liftEffect do
+          _kill ← runToolAndSendOutput
+            { onStdout: partial <<< StdoutData
+            , onStderr: partial <<< StderrData
+            , onExit: done
+            }
+            { args, toolPath, workingDir }
+          pure unit
 
 storeTextFile ∷ { content ∷ String, path ∷ String } → Aff MessageToRenderer
 storeTextFile { path, content } = StoreTextFileResult <$> do
@@ -138,3 +181,15 @@ storeTextFile { path, content } = StoreTextFileResult <$> do
 loadTextFile ∷ String → Aff MessageToRenderer
 loadTextFile arg = LoadTextFileResult <$> do
   attempt (FSA.readTextFile UTF8 arg) <#> lmap show
+
+startPureScriptLanguageServer ∷ { folder ∷ String } → Aff MessageToRenderer
+startPureScriptLanguageServer { folder } = StartPureScriptLanguageServerResponse
+  <$> (map (const {}))
+  <$> runExceptT do
+    os ← operatingSystemʔ # note "Unsupported OS" # except
+    path ← getToolPath os PureScriptLanguageServer
+      <#> note "PureScript language server is not installed"
+      # ExceptT
+    runToolAndGetStdout
+      { args: [ "--node-ipc" ], toolPath: path, workingDir: Just folder } #
+      ExceptT

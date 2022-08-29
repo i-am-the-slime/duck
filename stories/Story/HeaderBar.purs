@@ -7,12 +7,13 @@ import Effect (Effect)
 import React.Basic (JSX)
 import React.Basic.DOM as R
 import Story.Util.Decorator (containerDecorator)
+import Storybook (story)
 import Storybook.Types (Story)
 import UI.Navigation.HeaderBar as HeaderBar
 import UI.Navigation.Router.Types (Route(..))
 
 default ∷ Story
-default = { title: "HeaderBar", decorators: [ containerDecorator ] }
+default = story { title: "HeaderBar", decorators: [ containerDecorator ] }
 
 headerBar ∷ Effect JSX
 headerBar = HeaderBar.mkPresentationalView <@>

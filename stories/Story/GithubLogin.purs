@@ -1,4 +1,8 @@
-module Story.GithubLogin (default, githubLogin, instructions) where
+module Story.GithubLogin
+  ( default
+  , githubLogin
+  , instructions
+  ) where
 
 import Prelude
 
@@ -7,14 +11,21 @@ import Effect (Effect)
 import React.Basic (JSX)
 import Story.Ctx (defaultOnMessage, mkStoryCtx)
 import Story.Util.Decorator (containerDecorator)
+import Storybook (story)
 import Storybook.Types (Story)
 import UI.Component (runComponent)
 import UI.GithubLogin (renderInstructions)
 import UI.GithubLogin as GithubLogin
 
 default ∷ Story
-default = { title: "Github Login", decorators: [ containerDecorator ] }
+default = story
+  { title: "Github Login", decorators: [ containerDecorator ] }
 
+-- | Github Login
+-- | Usage:
+-- | ```
+-- | GithubLogin.mkGithubLogin <#> { onComplete: Console.log "Complete" }
+-- | ```
 githubLogin ∷ Effect JSX
 githubLogin = do
   storyCtx ← mkStoryCtx defaultOnMessage

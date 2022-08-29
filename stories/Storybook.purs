@@ -1,4 +1,8 @@
-module Storybook (decorator, mkStoryWrapper) where
+module Storybook
+  ( decorator
+  , mkStoryWrapper
+  , story
+  ) where
 
 import Prelude
 
@@ -22,3 +26,6 @@ type StoryProps = (title ∷ String, decorators ∷ Array Decorator)
 mkStoryWrapper ∷ ∀ hooks. React.Render Unit hooks JSX → Effect JSX
 mkStoryWrapper doThis = (_ $ unit) <$> React.component "StoryWrapper"
   \(_ ∷ Unit) → doThis
+
+story ∷ ∀ r. { title ∷ String | r } → Story
+story = unsafeCoerce

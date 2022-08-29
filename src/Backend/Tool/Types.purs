@@ -19,13 +19,14 @@ import Yoga.JSON.Generics (genericReadForeignEnum, genericWriteForeignEnum)
 
 type ToolWithPath = Tool /\ Maybe ToolPath
 
-data Tool = NPM | Spago | Purs | DhallToJSON
+data Tool = NPM | Spago | PureScriptLanguageServer | Purs | DhallToJSON
 
 type ToolsR r =
   { npm ∷ r
   , spago ∷ r
   , purs ∷ r
   , dhallToJSON ∷ r
+  , purescriptLanguageServer ∷ r
   }
 
 toToolArray ∷ ∀ r. ToolsR r → Array (Tool /\ r)
@@ -36,6 +37,7 @@ toToolArray = Object.fromHomogeneous >>> Object.toUnfoldable >>>
       "spago" /\ v → Just (Spago /\ v)
       "purs" /\ v → Just (Purs /\ v)
       "dhallToJSON" /\ v → Just (DhallToJSON /\ v)
+      "purescript-language-server" /\ v → Just (PureScriptLanguageServer /\ v)
       huh /\ _ → unsafePerformEffect do
         Console.error ("Unhandled case in toToolArray: " <> huh)
         pure Nothing
@@ -59,6 +61,7 @@ toCommand = case _ of
   DhallToJSON → "dhall-to-json"
   Spago → "spago"
   Purs → "purs"
+  PureScriptLanguageServer → "purescript-language-server"
 
 toName ∷ Tool → String
 toName = case _ of
@@ -66,6 +69,7 @@ toName = case _ of
   DhallToJSON → "Dhall to JSON"
   Spago → "Spago"
   Purs → "PureScript Compiler"
+  PureScriptLanguageServer → "PureScript Language Server"
 
 derive instance Generic Tool _
 derive instance Eq Tool

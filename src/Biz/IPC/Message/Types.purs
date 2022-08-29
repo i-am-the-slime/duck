@@ -11,7 +11,7 @@ import Biz.IPC.Message.OpenDialog.Types as OpenDialog
 import Biz.IPC.SelectFolder.Types (SelectedFolderData)
 import Biz.OAuth.Types (GithubAccessToken)
 import Biz.PureScriptSolutionDefinition.Types (PureScriptSolutionDefinition)
-import Data.Either (Either(..))
+import Data.Either (Either)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Tuple (Tuple)
@@ -34,6 +34,7 @@ data MessageToMain
   | RunCommand { tool ∷ Tool, workingDir ∷ Maybe String, args ∷ Array String }
   | StoreTextFile { path ∷ String, content ∷ String }
   | LoadTextFile String
+  | StartPureScriptLanguageServer { folder ∷ String }
 
 data MessageToRenderer
   = LoadSpagoProjectResponse SelectedFolderData
@@ -50,8 +51,10 @@ data MessageToRenderer
   | GetClipboardTextResult String
   | GetSpagoGlobalCacheResult (Either String SpagoGlobalCacheDir)
   | RunCommandResult (Either String { stdout ∷ String, stderr ∷ String })
+  | RunCommandUpdateResult RunCommandUpdate
   | StoreTextFileResult (Maybe String)
   | LoadTextFileResult (Either String String)
+  | StartPureScriptLanguageServerResponse (Either String {})
 
 derive instance Generic MessageToMain _
 derive instance Eq MessageToMain
@@ -83,3 +86,18 @@ instance WriteForeign NoGithubToken where
 
 instance ReadForeign NoGithubToken where
   readImpl = pure $ pure NoGithubToken
+
+data RunCommandUpdate
+  = StdoutData String
+  | StderrData String
+  | CommandFinished Boolean
+
+derive instance Generic RunCommandUpdate _
+derive instance Eq RunCommandUpdate
+derive instance Ord RunCommandUpdate
+
+instance WriteForeign RunCommandUpdate where
+  writeImpl = genericWriteForeignTaggedSum defaultOptions
+
+instance ReadForeign RunCommandUpdate where
+  readImpl = genericReadForeignTaggedSum defaultOptions

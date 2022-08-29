@@ -24,7 +24,7 @@ import Electron.Types (Channel(..))
 import ElectronAPI as ElectronAPI
 import UI.Ctx.Types (Ctx, GithubGraphQLCache(..))
 import UI.GithubLogin.Repository (getDeviceCode, pollAccessToken)
-import UI.Hook.UseIPC (mkSendIPCMessage)
+import UI.Hook.UseIPC (mkSendIPCMessage, mkStreamIPCMessage)
 import Web.HTML (window)
 import Web.HTML.Window (localStorage)
 import Web.Storage.Storage as LocalStorage
@@ -43,8 +43,11 @@ mkElectronCtx = do
       { type: "ipc", data: { message_id: UUID.toString uuid, payload } }
     registerListener = ElectronAPI.on (Channel "ipc")
   { send: sendIPCMessage } ← mkSendIPCMessage { postMessage, registerListener }
+  { stream: streamIPCMessage } ← mkStreamIPCMessage
+    { postMessage, registerListener }
   pure
     { sendIPCMessage
+    , streamIPCMessage
     , notificationCentre
     , githubAuth:
         { getDeviceCode: getDeviceCode (F.fetch windowFetch)

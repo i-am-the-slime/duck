@@ -22,6 +22,7 @@ getToolsWithPaths os = sequenceRecord
   , spago: getToolPath os Spago
   , purs: getToolPath os Purs
   , dhallToJSON: getToolPath os DhallToJSON
+  , purescriptLanguageServer: getToolPath os PureScriptLanguageServer
   }
 
 getToolPath ∷ OperatingSystem → Tool → Aff (Maybe ToolPath)

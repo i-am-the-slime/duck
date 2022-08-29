@@ -15,6 +15,10 @@ import Yoga.JSON (class WriteForeign)
 type Ctx =
   { notificationCentre ∷ NotificationCentre
   , sendIPCMessage ∷ MessageToMain → Aff MessageToRenderer
+  , streamIPCMessage ∷
+      MessageToMain →
+      (MessageToRenderer → Effect Unit) →
+      Aff Unit
   , githubAuth ∷
       { getDeviceCode ∷ GetDeviceCode
       , pollAccessToken ∷ PollAccessToken

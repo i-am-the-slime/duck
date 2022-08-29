@@ -68,6 +68,7 @@ mkStoryCtx onMessage = do
         Just r → pure r
   pure
     { sendIPCMessage
+    , streamIPCMessage: \_ _ → pure unit
     , notificationCentre: storyNotificationCentre
     , githubAuth:
         { getDeviceCode: alwaysSucceedGetDeviceCode
