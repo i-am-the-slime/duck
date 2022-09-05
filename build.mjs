@@ -27,7 +27,7 @@ const workerEntryPoints = [
   'vs/editor/editor.worker.js'
 ];
 
-const outdir = path.dirname(fileURLToPath(import.meta.url))
+const outdir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'dist');
 
 build({
   entryPoints: workerEntryPoints.map((entry) => `node_modules/monaco-editor/esm/${entry}`),
@@ -35,6 +35,19 @@ build({
   format: 'iife',
   outbase: './node_modules/monaco-editor/esm/',
   outdir,
+  loader: {
+    ".png": "file",
+    ".ttf": "file",
+    ".css": "css",
+  },
+});
+
+build({
+  entryPoints: ['./purescript-worker.js'],
+  bundle: true,
+  sourcemap: true,
+  format: 'iife',
+  outfile: path.join(outdir, 'vs', 'language', 'purescript', 'purescript.worker.js'),
   loader: {
     ".png": "file",
     ".ttf": "file",

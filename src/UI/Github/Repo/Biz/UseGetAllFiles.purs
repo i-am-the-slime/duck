@@ -7,9 +7,9 @@ import Data.Array (foldl)
 import Data.Array as Array
 import Data.Bifunctor (lmap)
 import Data.String as String
-import Data.Tree (Tree, mkLeaf)
-import Data.Tree.Zipper (Loc)
-import Data.Tree.Zipper as Loc
+import Yoga.Tree (Tree, mkLeaf)
+import Yoga.Tree.Zipper (Loc)
+import Yoga.Tree.Zipper as Loc
 import Data.Tuple (fst, snd)
 import Effect.Aff (Aff, sequential)
 import Network.RemoteData (RemoteData)

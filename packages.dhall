@@ -188,50 +188,6 @@ in  upstream
         "https://github.com/working-group-purescript-es/purescript-stringutils.git"
     , version = "es-modules"
     }
-  with plumage =
-    { dependencies =
-      [ "aff"
-      , "arrays"
-      , "colors"
-      , "console"
-      , "datetime"
-      , "debug"
-      , "effect"
-      , "either"
-      , "enums"
-      , "exceptions"
-      , "foldable-traversable"
-      , "foreign"
-      , "foreign-object"
-      , "framer-motion"
-      , "integers"
-      , "literals"
-      , "maybe"
-      , "newtype"
-      , "now"
-      , "nullable"
-      , "ordered-collections"
-      , "prelude"
-      , "psci-support"
-      , "react-basic"
-      , "react-basic-dom"
-      , "react-basic-emotion"
-      , "react-basic-hooks"
-      , "record"
-      , "remotedata"
-      , "ry-blocks"
-      , "strings"
-      , "tuples"
-      , "typelevel-prelude"
-      , "unsafe-coerce"
-      , "unsafe-reference"
-      , "untagged-union"
-      , "web-dom"
-      , "web-html"
-      ]
-    , repo = "https://github.com/murmuras-tech/plumage.git"
-    , version = "613f97e6b8d0de44427dca6ca61278434047254c"
-    }
   with web-router =
     { dependencies =
       [ "aff"
@@ -766,15 +722,7 @@ in  upstream
       , "typelevel-prelude"
       , "unsafe-coerce"
       ]
-    , version = "654be2533b0ea950511f26e29ba9ab574f7abc03"
-    }
-  with dhall-purescript =
-    { dependencies =
-        ( https://raw.githubusercontent.com/MonoidMusician/dhall-purescript/main/spago.dhall
-            sha256:c6e616e203fd0a9556b6bf62735e28c82553aa5d0de926124feffb38c3cba000
-        ).dependencies
-    , repo = "https://github.com/MonoidMusician/dhall-purescript.git"
-    , version = "main"
+    , version = "6f457d26d56d15f8eb3609dd687dba19fbfd85b5"
     }
   with fahrtwind =
     { repo = "https://github.com/rowtype-yoga/purescript-fahrtwind.git"
@@ -793,7 +741,39 @@ in  upstream
       ]
     , version = "main"
     }
-  with yoga-json.version = "ddef23ce29665c19f6715a16bb5b26b1adc89218"
+  with yoga-json.version = "9d6263b6f31276c9b6528ecf9d043fdc39c42443"
+  with yoga-json.dependencies
+       =
+    [ "arrays"
+    , "bifunctors"
+    , "bigints"
+    , "console"
+    , "control"
+    , "datetime"
+    , "effect"
+    , "either"
+    , "exceptions"
+    , "foldable-traversable"
+    , "foreign"
+    , "foreign-object"
+    , "identity"
+    , "integers"
+    , "js-date"
+    , "lists"
+    , "maybe"
+    , "newtype"
+    , "nullable"
+    , "numbers"
+    , "ordered-collections"
+    , "partial"
+    , "prelude"
+    , "record"
+    , "transformers"
+    , "tuples"
+    , "typelevel-prelude"
+    , "unsafe-coerce"
+    , "variant"
+    ]
   with react-virtuoso =
     { dependencies =
         ( https://raw.githubusercontent.com/rowtype-yoga/purescript-react-virtuoso/main/spago.dhall
@@ -804,3 +784,16 @@ in  upstream
     }
   with datetime.version = "v6.1.0"
   with barlow-lens.version = "vta"
+  with yoga-tree =
+    { dependencies =
+      [ "arrays"
+      , "control"
+      , "foldable-traversable"
+      , "free"
+      , "maybe"
+      , "prelude"
+      , "tailrec"
+      ]
+    , version = "master"
+    , repo = "https://github.com/rowtype-yoga/purescript-yoga-tree.git"
+    }

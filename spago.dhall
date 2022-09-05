@@ -27,7 +27,7 @@ to generate this file without the comments in this block.
   , "control"
   , "datetime"
   , "debug"
-  , "dhall-purescript"
+  , "dodo-printer"
   , "effect"
   , "either"
   , "enums"
@@ -59,8 +59,8 @@ to generate this file without the comments in this block.
   , "numbers"
   , "ordered-collections"
   , "parallel"
+  , "parsing"
   , "partial"
-  , "plumage"
   , "posix-types"
   , "prelude"
   , "profunctor-lenses"
@@ -80,6 +80,7 @@ to generate this file without the comments in this block.
   , "st"
   , "strings"
   , "strings-extra"
+  , "stringutils"
   , "tailrec"
   , "transformers"
   , "tuples"
@@ -98,6 +99,7 @@ to generate this file without the comments in this block.
   , "web-uievents"
   , "yoga-fetch"
   , "yoga-json"
+  , "yoga-tree"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]

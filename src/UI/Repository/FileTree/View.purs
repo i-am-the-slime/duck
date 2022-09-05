@@ -1,4 +1,15 @@
-module UI.Repository.FileTree.View where
+module UI.Repository.FileTree.View
+  ( AllFilesAPIResult
+  , PresentationalProps
+  , Props
+  , RESTFileInfo
+  , dummyInfo
+  , getAllFiles
+  , mkPresentationalView
+  , mkView
+  , renderFile
+  , toTree
+  ) where
 
 import Yoga.Prelude.View
 
@@ -11,9 +22,9 @@ import Data.Maybe (isNothing)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Traversable (traverse)
-import Data.Tree (Tree, mkLeaf)
-import Data.Tree.Zipper (Loc)
-import Data.Tree.Zipper as Loc
+import Yoga.Tree (Tree, mkLeaf)
+import Yoga.Tree.Zipper (Loc)
+import Yoga.Tree.Zipper as Loc
 import Data.Tuple (fst, snd)
 import Effect.Aff (Aff, sequential)
 import Fahrtwind (background', borderBottom, borderCol', cursorDefault, disabled, flexCol, flexGrow, flexRow, flexShrink, gap, height, heightFull, hover, invisible, itemsCenter, justifyBetween, mL, mY, maxWidth, minWidth, overflowHidden, overflowYScroll, pL, pR, pX, pY, positionAbsolute, positionRelative, roundedDefault, textCol', textOverflowEllipsis, textSm, userSelectNone, widthAndHeight, widthFull)

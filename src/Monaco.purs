@@ -46,6 +46,8 @@ foreign import purescriptSyntax ∷ MonarchLanguage
 
 foreign import registerLanguage ∷ String → Effect Unit
 
+foreign import registerCompletionItemProviderImpl ∷ String → Effect Unit
+
 foreign import setMonarchTokensProvider ∷
   String → MonarchLanguage → Effect Unit
 

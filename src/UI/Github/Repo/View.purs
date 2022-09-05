@@ -2,8 +2,8 @@ module UI.Github.Repo.View where
 
 import Yoga.Prelude.View
 
-import Data.Tree (Tree)
-import Data.Tree.Zipper as Loc
+import Yoga.Tree (Tree)
+import Yoga.Tree.Zipper as Loc
 import Fahrtwind (background', block, heightFull, mL, positionAbsolute, positionRelative, width, widthFull)
 import Network.RemoteData as RD
 import Plumage.Util.HTML as P

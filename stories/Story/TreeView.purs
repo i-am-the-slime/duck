@@ -3,7 +3,7 @@ module Story.TreeView (default, treeView) where
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Data.Tree.Zipper as Loc
+import Yoga.Tree.Zipper as Loc
 import Data.Tuple.Nested ((/\))
 import Effect (Effect)
 import Fahrtwind (heightScreen)

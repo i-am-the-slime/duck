@@ -94,10 +94,6 @@ mkView = do
       startLS.send (StartPureScriptLanguageServer { folder: "/tmp/duck-worksheet/" })
       mempty
 
-    useEffect startLS.data do
-      let _ = spy "deta" startLS.data
-      mempty
-
 
     useEffect loadFileIPC.data do
       for_ (loadFileIPC.data) (traverse_ editor.setValue)

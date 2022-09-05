@@ -15,6 +15,7 @@ import Data.String as String
 import Data.Tuple.Nested ((/\))
 import Story.Ctx.Types (OnMessage)
 import UI.Hook.UseGetFileInRepo (FileInRepoResponse)
+import UI.Hook.UseRemoteData (useRemoteData)
 import Yoga.JSON (writeJSON)
 
 getMockSolutionDefinition ∷ OnMessage
@@ -30,16 +31,16 @@ getMockSolutionDefinition = case _ of
   exampleProject =
     { name: "some-project"
     , projects:
-        [ ( SpagoApp
-              { entrypoints:
-                  [ { type: Test
-                    , build_command: Nothing
-                    , spago_file: "spago.dhall"
-                    }
-                  ]
-              , root: "."
-              }
-          )
+        [ SpagoApp
+            { entrypoints:
+                [ { type: Test
+                  , build_command: Nothing
+                  , spago_file: "spago.dhall"
+                  }
+                ]
+            , root: "."
+            }
+
         ]
     }
 
@@ -51,6 +52,7 @@ getMockInstalledTools = case _ of
       , spago: Just (ToolPath "/Users/mark/.local/bin/spago")
       , purs: Just (ToolPath "/Users/mark/.local/bin/purs")
       , dhallToJSON: Nothing
+      , purescriptLanguageServer: Nothing
       }
   _ → pure Nothing
 

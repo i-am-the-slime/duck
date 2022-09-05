@@ -295,26 +295,27 @@ renderRepo renderImage _i (name /\ repo) context =
           ]
       ]
 
+getUserImageQuery ∷ GraphQL
 getUserImageQuery = GraphQL
   """query getUserImage($login:String!){ repositoryOwner(login: $login) { avatarUrl } }"""
 
 mkGithubUserImage ∷ UI.Component String
 mkGithubUserImage = UI.component "GithubUserImage"
   \ctx owner → React.do
-    { data: res, send } ← useGithubGraphQL @( login :: String ) @( data :: { repositoryOwner :: { avatarUrl :: String }})
+    { data: res, send } ← useGithubGraphQL @(login :: String) @(data :: { repositoryOwner :: { avatarUrl :: String }})
       ctx (Just (convertDuration (30.0 # Days))) getUserImageQuery
-    useEffectOnce do
+    useEffect owner do
       send { login: owner }
       mempty
-    pure $ case res # RD.toMaybe of
+    pure $ case RD.toMaybe res of
       Just ({ data: { repositoryOwner: { avatarUrl } } }) →
         Block.image
-          { css: roundedMd
-          , width: 48
-          , height: 48
-          , src: avatarUrl
-          , fallbackSrc: notFoundImage
-          }
+            { css: roundedMd
+            , width: 48
+            , height: 48
+            , src: avatarUrl
+            , fallbackSrc: notFoundImage
+            }
       Nothing →
         P.div_
           ( widthAndHeight 48 <> roundedMd <> background'

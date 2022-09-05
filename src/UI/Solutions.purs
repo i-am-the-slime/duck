@@ -2,9 +2,10 @@ module UI.Solutions where
 
 import Yoga.Prelude.View hiding (Component)
 
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.Message.Types (MessageToMain(..))
 import Biz.PureScriptSolutionDefinition.Types (PureScriptSolutionDefinition)
 import Data.Lens.Barlow (barlow)
+import Effect.Class.Console as Console
 import Fahrtwind (divideY, mT, pL, pR, text2xl, textCol', widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicons
 import Fahrtwind.Style.Divide (divideCol')
@@ -45,7 +46,7 @@ mkView = do
           ]
     let
       toolbar = Block.cluster_
-        [ toolbarIcon "New solution" Heroicons.plus mempty
+        [ toolbarIcon "New solution" Heroicons.plus (Console.log "implement me")
         ]
 
     let

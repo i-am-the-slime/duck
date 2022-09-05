@@ -2,6 +2,7 @@ import { languages, editor as editorImpl, KeyMod, KeyCode } from 'monaco-editor/
 
 self.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {
+    console.log("Get worker URL", moduleId, label);
     if (label === 'json') {
       return './vs/language/json/json.worker.js';
     }
@@ -14,11 +15,14 @@ self.MonacoEnvironment = {
     if (label === 'typescript' || label === 'javascript') {
       return './vs/language/typescript/ts.worker.js';
     }
+    console.log("Loading Editor", { label, moduleId })
     return './vs/editor/editor.worker.js';
   }
 }
 
 export const editor = () => editorImpl
+
+
 
 export const createEditorImpl = options => element => editor => () =>
   editor.create(element, options);
@@ -38,7 +42,16 @@ export const setTheme = (theme) => () =>
 
 export const layout = m => () => m.layout()
 
-export const registerLanguage = languageId => () => languages.register({ id: languageId });
+export const registerCompletionItemProviderImpl = completionItemProvider => languageId =>
+  () => languages.registerCompletionItemProvider(languageId, completionItemProvider)
+
+export const registerLanguage = languageId => () =>
+  languages.register({ id: languageId })
+
+
+editorImpl.createWebWorker(
+  { moduleId: 'vs/language/purescript/purescript.worker.js', label: 'purescript' }
+);
 
 export const remeasureFonts = editor => () => editor.remeasureFonts()
 

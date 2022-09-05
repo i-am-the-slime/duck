@@ -4,20 +4,20 @@ import Prelude
 
 import Biz.PureScriptSolution.Types (PureScriptSolution)
 import Biz.PureScriptSolution.Types as Solution
-import Biz.PureScriptSolutionDefinition.Types (EntryPointType(..), Entrypoint, PureScriptProjectDefinition, PureScriptSolutionDefinition)
+import Biz.PureScriptSolutionDefinition.Types (EntryPointType(..), Entrypoint, PureScriptSolutionDefinition)
 import Biz.PureScriptSolutionDefinition.Types as Definition
 import Biz.Spago.Types as Spago
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NEA
 import Data.Either (Either(..), either, note)
 import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Semigroup.Foldable (intercalateMap)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Traversable (traverse)
-import Data.Tuple.Nested ((/\))
 import Effect.Aff (Aff, error, throwError)
 import Effect.Class (liftEffect)
-import Node.ChildProcess (ExecOptions, Exit(..), SpawnOptions, defaultExecOptions, defaultSpawnOptions)
+import Node.ChildProcess (Exit(..), defaultSpawnOptions)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff (readTextFile, writeTextFile)
 import Node.FS.Sync as FS
@@ -26,6 +26,7 @@ import Node.Path as Path
 import Record (merge)
 import Sunde (spawn)
 import Yoga.JSON (readJSON, writeJSON)
+import Yoga.JSON.Error (renderHumanError)
 
 resolveSolutionDefinition ∷
   FilePath → PureScriptSolutionDefinition → Aff PureScriptSolution
@@ -36,8 +37,7 @@ resolveSolutionDefinition path def = do
   toProject = case _ of
     Definition.SpagoApp app → do
       entrypoints ← app.entrypoints # traverse \ep@{ spago_file } → do
-        project_configuration ← parseSpagoDhall
-          { root: app.root, spago_file }
+        project_configuration ← parseSpagoDhall { root: app.root, spago_file }
         pure $ ep # merge { project_configuration }
       pure $ Solution.SpagoAppProject
         (app # merge { entrypoints })
@@ -70,7 +70,11 @@ resolveSolutionDefinition path def = do
       , stdin: Just spagoDhall
       }
       defaultSpawnOptions
-    either (const $ throwError $ error "Invalid spago dhall") pure
+    either
+      ( \e → throwError $ error
+          ("Invalid spago dhall:\n" <> intercalateMap "\n" renderHumanError e)
+      )
+      pure
       (readJSON spagoJSON)
 
 createNewPureScriptSolution ∷ FilePath → PureScriptSolutionDefinition → Aff Unit

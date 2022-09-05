@@ -40,7 +40,7 @@ mkView = do
           (GraphQL "query { viewer { login } }")
 
     useEffect isLoggedIn $ mempty <$ do
-      when (userInfoRD # RD.toMaybe # isNothing) do loadUserInfo {}
+      when (userInfoRD # RD.toMaybe # isNothing) do loadUserInfo ({} :: Record UserInfoQueryVariables)
 
     pure
       if isLoggedIn then
@@ -48,8 +48,8 @@ mkView = do
       else
         githubLogin { onComplete: checkIsLoggedIn }
 
-type UserInfoQueryVariables :: forall k. Row k
 type UserInfoQueryVariables = ()
+
 type UserInfoQueryResult =
   (data ∷ { viewer ∷ { login ∷ String } })
 
@@ -113,7 +113,6 @@ mkGithubAvatarPresentational = do
                   ]
               ]
           ]
-
       , renderInPopOver
           ( R.div'
               </*

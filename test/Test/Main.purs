@@ -10,5 +10,5 @@ import Test.Spec.Runner (runSpec)
 
 main ∷ Effect Unit
 main = launchAff_ do
-  spec ← discover "Test\\.Spagoviz\\.*.*\\.*Spec"
+  spec ← discover "Test\\.Duck\\.*.*\\.*Spec"
   runSpec [ consoleReporter ] spec

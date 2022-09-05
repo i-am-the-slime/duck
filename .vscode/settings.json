@@ -2,6 +2,9 @@
   "purescript.buildCommand": "spago -x stories.dhall build --purs-args \"-g sourcemaps --json-errors\"",
   "purescript.formatter": "purs-tidy",
   "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#08213b",
     "activityBar.activeBorder": "#a8175e",

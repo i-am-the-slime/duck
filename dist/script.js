@@ -8277,8 +8277,8 @@ var traverse_ = function(dictApplicative) {
   return function(dictFoldable) {
     var foldr22 = foldr(dictFoldable);
     return function(f3) {
-      return foldr22(function($449) {
-        return applySecond2(f3($449));
+      return foldr22(function($454) {
+        return applySecond2(f3($454));
       })(pure17(unit));
     };
   };
@@ -8294,17 +8294,17 @@ var intercalate2 = function(dictFoldable) {
     return function(sep2) {
       return function(xs) {
         var go = function(v) {
-          return function(x2) {
+          return function(v1) {
             if (v.init) {
               return {
                 init: false,
-                acc: x2
+                acc: v1
               };
             }
             ;
             return {
               init: false,
-              acc: append3(v.acc)(append3(sep2)(x2))
+              acc: append3(v.acc)(append3(sep2)(v1))
             };
           };
         };
@@ -8318,32 +8318,32 @@ var intercalate2 = function(dictFoldable) {
 };
 var foldableMaybe = {
   foldr: function(v) {
-    return function(z) {
-      return function(v1) {
-        if (v1 instanceof Nothing) {
-          return z;
+    return function(v1) {
+      return function(v2) {
+        if (v2 instanceof Nothing) {
+          return v1;
         }
         ;
-        if (v1 instanceof Just) {
-          return v(v1.value0)(z);
+        if (v2 instanceof Just) {
+          return v(v2.value0)(v1);
         }
         ;
-        throw new Error("Failed pattern match at Data.Foldable (line 138, column 1 - line 144, column 27): " + [v.constructor.name, z.constructor.name, v1.constructor.name]);
+        throw new Error("Failed pattern match at Data.Foldable (line 138, column 1 - line 144, column 27): " + [v.constructor.name, v1.constructor.name, v2.constructor.name]);
       };
     };
   },
   foldl: function(v) {
-    return function(z) {
-      return function(v1) {
-        if (v1 instanceof Nothing) {
-          return z;
+    return function(v1) {
+      return function(v2) {
+        if (v2 instanceof Nothing) {
+          return v1;
         }
         ;
-        if (v1 instanceof Just) {
-          return v(z)(v1.value0);
+        if (v2 instanceof Just) {
+          return v(v1)(v2.value0);
         }
         ;
-        throw new Error("Failed pattern match at Data.Foldable (line 138, column 1 - line 144, column 27): " + [v.constructor.name, z.constructor.name, v1.constructor.name]);
+        throw new Error("Failed pattern match at Data.Foldable (line 138, column 1 - line 144, column 27): " + [v.constructor.name, v1.constructor.name, v2.constructor.name]);
       };
     };
   },
@@ -8599,9 +8599,9 @@ var foldl2 = /* @__PURE__ */ foldl(foldableArray);
 var concatMap = /* @__PURE__ */ flip(/* @__PURE__ */ bind(bindArray));
 var mapMaybe = function(f3) {
   return concatMap(function() {
-    var $185 = maybe([])(singleton2);
-    return function($186) {
-      return $185(f3($186));
+    var $187 = maybe([])(singleton2);
+    return function($188) {
+      return $187(f3($188));
     };
   }());
 };
@@ -8999,58 +8999,58 @@ var toList = function(v) {
   return new Cons(v.value0, v.value1);
 };
 var listMap = function(f3) {
-  var chunkedRevMap = function($copy_chunksAcc) {
-    return function($copy_v) {
-      var $tco_var_chunksAcc = $copy_chunksAcc;
+  var chunkedRevMap = function($copy_v) {
+    return function($copy_v1) {
+      var $tco_var_v = $copy_v;
       var $tco_done = false;
       var $tco_result;
-      function $tco_loop(chunksAcc, v) {
-        if (v instanceof Cons && (v.value1 instanceof Cons && v.value1.value1 instanceof Cons)) {
-          $tco_var_chunksAcc = new Cons(v, chunksAcc);
-          $copy_v = v.value1.value1.value1;
+      function $tco_loop(v, v1) {
+        if (v1 instanceof Cons && (v1.value1 instanceof Cons && v1.value1.value1 instanceof Cons)) {
+          $tco_var_v = new Cons(v1, v);
+          $copy_v1 = v1.value1.value1.value1;
           return;
         }
         ;
-        var unrolledMap = function(v1) {
-          if (v1 instanceof Cons && (v1.value1 instanceof Cons && v1.value1.value1 instanceof Nil)) {
-            return new Cons(f3(v1.value0), new Cons(f3(v1.value1.value0), Nil.value));
+        var unrolledMap = function(v2) {
+          if (v2 instanceof Cons && (v2.value1 instanceof Cons && v2.value1.value1 instanceof Nil)) {
+            return new Cons(f3(v2.value0), new Cons(f3(v2.value1.value0), Nil.value));
           }
           ;
-          if (v1 instanceof Cons && v1.value1 instanceof Nil) {
-            return new Cons(f3(v1.value0), Nil.value);
+          if (v2 instanceof Cons && v2.value1 instanceof Nil) {
+            return new Cons(f3(v2.value0), Nil.value);
           }
           ;
           return Nil.value;
         };
-        var reverseUnrolledMap = function($copy_v1) {
-          return function($copy_acc) {
-            var $tco_var_v1 = $copy_v1;
+        var reverseUnrolledMap = function($copy_v2) {
+          return function($copy_v3) {
+            var $tco_var_v2 = $copy_v2;
             var $tco_done1 = false;
             var $tco_result2;
-            function $tco_loop2(v1, acc) {
-              if (v1 instanceof Cons && (v1.value0 instanceof Cons && (v1.value0.value1 instanceof Cons && v1.value0.value1.value1 instanceof Cons))) {
-                $tco_var_v1 = v1.value1;
-                $copy_acc = new Cons(f3(v1.value0.value0), new Cons(f3(v1.value0.value1.value0), new Cons(f3(v1.value0.value1.value1.value0), acc)));
+            function $tco_loop2(v2, v3) {
+              if (v2 instanceof Cons && (v2.value0 instanceof Cons && (v2.value0.value1 instanceof Cons && v2.value0.value1.value1 instanceof Cons))) {
+                $tco_var_v2 = v2.value1;
+                $copy_v3 = new Cons(f3(v2.value0.value0), new Cons(f3(v2.value0.value1.value0), new Cons(f3(v2.value0.value1.value1.value0), v3)));
                 return;
               }
               ;
               $tco_done1 = true;
-              return acc;
+              return v3;
             }
             ;
             while (!$tco_done1) {
-              $tco_result2 = $tco_loop2($tco_var_v1, $copy_acc);
+              $tco_result2 = $tco_loop2($tco_var_v2, $copy_v3);
             }
             ;
             return $tco_result2;
           };
         };
         $tco_done = true;
-        return reverseUnrolledMap(chunksAcc)(unrolledMap(v));
+        return reverseUnrolledMap(v)(unrolledMap(v1));
       }
       ;
       while (!$tco_done) {
-        $tco_result = $tco_loop($tco_var_chunksAcc, $copy_v);
+        $tco_result = $tco_loop($tco_var_v, $copy_v1);
       }
       ;
       return $tco_result;
@@ -9067,28 +9067,28 @@ var foldableList = {
   foldr: function(f3) {
     return function(b) {
       var rev = function() {
-        var go = function($copy_acc) {
-          return function($copy_v) {
-            var $tco_var_acc = $copy_acc;
+        var go = function($copy_v) {
+          return function($copy_v1) {
+            var $tco_var_v = $copy_v;
             var $tco_done = false;
             var $tco_result;
-            function $tco_loop(acc, v) {
-              if (v instanceof Nil) {
+            function $tco_loop(v, v1) {
+              if (v1 instanceof Nil) {
                 $tco_done = true;
-                return acc;
+                return v;
               }
               ;
-              if (v instanceof Cons) {
-                $tco_var_acc = new Cons(v.value0, acc);
-                $copy_v = v.value1;
+              if (v1 instanceof Cons) {
+                $tco_var_v = new Cons(v1.value0, v);
+                $copy_v1 = v1.value1;
                 return;
               }
               ;
-              throw new Error("Failed pattern match at Data.List.Types (line 107, column 7 - line 107, column 23): " + [acc.constructor.name, v.constructor.name]);
+              throw new Error("Failed pattern match at Data.List.Types (line 107, column 7 - line 107, column 23): " + [v.constructor.name, v1.constructor.name]);
             }
             ;
             while (!$tco_done) {
-              $tco_result = $tco_loop($tco_var_acc, $copy_v);
+              $tco_result = $tco_loop($tco_var_v, $copy_v1);
             }
             ;
             return $tco_result;
@@ -9096,9 +9096,9 @@ var foldableList = {
         };
         return go(Nil.value);
       }();
-      var $281 = foldl(foldableList)(flip(f3))(b);
-      return function($282) {
-        return $281(rev($282));
+      var $284 = foldl(foldableList)(flip(f3))(b);
+      return function($285) {
+        return $284(rev($285));
       };
     };
   },
@@ -9137,9 +9137,9 @@ var foldableList = {
     var mempty4 = mempty(dictMonoid);
     return function(f3) {
       return foldl(foldableList)(function(acc) {
-        var $283 = append22(acc);
-        return function($284) {
-          return $283(f3($284));
+        var $286 = append22(acc);
+        return function($287) {
+          return $286(f3($287));
         };
       })(mempty4);
     };
@@ -9228,9 +9228,9 @@ var plusList = /* @__PURE__ */ function() {
 }();
 var applicativeNonEmptyList = {
   pure: /* @__PURE__ */ function() {
-    var $312 = singleton3(plusList);
-    return function($313) {
-      return NonEmptyList($312($313));
+    var $315 = singleton3(plusList);
+    return function($316) {
+      return NonEmptyList($315($316));
     };
   }(),
   Apply0: function() {
@@ -9264,9 +9264,9 @@ var unsafeCrashWith = function(msg) {
 
 // output/Data.List.NonEmpty/index.js
 var singleton5 = /* @__PURE__ */ function() {
-  var $199 = singleton3(plusList);
-  return function($200) {
-    return NonEmptyList($199($200));
+  var $200 = singleton3(plusList);
+  return function($201) {
+    return NonEmptyList($200($201));
   };
 }();
 var head3 = function(v) {
@@ -9808,9 +9808,9 @@ var writeImpl = function(dict) {
   return dict.writeImpl;
 };
 var writeJSON = function(dictWriteForeign) {
-  var $390 = writeImpl(dictWriteForeign);
-  return function($391) {
-    return _unsafeStringify($390($391));
+  var $391 = writeImpl(dictWriteForeign);
+  return function($392) {
+    return _unsafeStringify($391($392));
   };
 };
 var writeForeignArray = function(dictWriteForeign) {
@@ -9877,9 +9877,9 @@ var writeForeignEither = function(dictWriteForeign) {
 var writeForeignObject = function(dictWriteForeign) {
   return {
     writeImpl: function() {
-      var $400 = mapWithKey($$const(writeImpl(dictWriteForeign)));
-      return function($401) {
-        return unsafeToForeign($400($401));
+      var $401 = mapWithKey($$const(writeImpl(dictWriteForeign)));
+      return function($402) {
+        return unsafeToForeign($401($402));
       };
     }()
   };
@@ -9957,9 +9957,9 @@ var sequenceCombining = function(dictMonoid) {
           throw new Error("Failed pattern match at Yoga.JSON (line 582, column 5 - line 586, column 38): " + [acc.constructor.name, v.constructor.name]);
         };
       };
-      var $411 = foldl3(fn)(new Right(mempty4));
-      return function($412) {
-        return except2($411($412));
+      var $412 = foldl3(fn)(new Right(mempty4));
+      return function($413) {
+        return except2($412($413));
       };
     };
   };
@@ -9972,12 +9972,12 @@ var readForeignMaybe = function(dictReadForeign) {
   return {
     readImpl: function() {
       var readNullOrUndefined = function(v) {
-        return function(value2) {
-          if (isNull(value2) || isUndefined(value2)) {
+        return function(v1) {
+          if (isNull(v1) || isUndefined(v1)) {
             return pure3(Nothing.value);
           }
           ;
-          return map1(Just.create)(v(value2));
+          return map1(Just.create)(v(v1));
         };
       };
       return readNullOrUndefined(readImpl(dictReadForeign));
@@ -10027,15 +10027,15 @@ var readForeignObject = function(dictReadForeign) {
             throw new Error("Failed pattern match at Yoga.JSON (line 254, column 9 - line 258, column 42): " + [acc.constructor.name, v2.constructor.name]);
           };
         };
-        var $422 = foldl2(fn)(new Right(empty2));
-        return function($423) {
-          return except2($422(toUnfoldable3($423)));
+        var $423 = foldl2(fn)(new Right(empty2));
+        return function($424) {
+          return except2($423(toUnfoldable3($424)));
         };
       }();
       return composeKleisliFlipped2(function() {
-        var $424 = mapWithKey(readProp1);
-        return function($425) {
-          return gatherErrors($424($425));
+        var $425 = mapWithKey(readProp1);
+        return function($426) {
+          return gatherErrors($425($426));
         };
       }())(readObject$prime);
     }()
@@ -10052,9 +10052,9 @@ var readAtIdx = function(dictReadForeign) {
 var readForeignArray = function(dictReadForeign) {
   return {
     readImpl: composeKleisliFlipped2(function() {
-      var $434 = mapWithIndex3(readAtIdx(dictReadForeign));
-      return function($435) {
-        return sequenceCombining1($434($435));
+      var $435 = mapWithIndex3(readAtIdx(dictReadForeign));
+      return function($436) {
+        return sequenceCombining1($435($436));
       };
     }())(readArray2)
   };
@@ -10063,30 +10063,30 @@ var read$prime = function(dictReadForeign) {
   return readImpl(dictReadForeign);
 };
 var read3 = function(dictReadForeign) {
-  var $436 = readImpl(dictReadForeign);
-  return function($437) {
-    return runExcept($436($437));
+  var $437 = readImpl(dictReadForeign);
+  return function($438) {
+    return runExcept($437($438));
   };
 };
 var parseJSON = /* @__PURE__ */ function() {
-  var $440 = lmap2(function($443) {
-    return pure1(ForeignError.create(message($443)));
+  var $441 = lmap2(function($444) {
+    return pure1(ForeignError.create(message($444)));
   });
-  var $441 = runEffectFn1(_parseJSON);
-  return function($442) {
-    return ExceptT(Identity($440(unsafePerformEffect($$try($441($442))))));
+  var $442 = runEffectFn1(_parseJSON);
+  return function($443) {
+    return ExceptT(Identity($441(unsafePerformEffect($$try($442($443))))));
   };
 }();
 var readJSON = function(dictReadForeign) {
-  var $444 = composeKleisliFlipped2(readImpl(dictReadForeign))(parseJSON);
-  return function($445) {
-    return runExcept($444($445));
+  var $445 = composeKleisliFlipped2(readImpl(dictReadForeign))(parseJSON);
+  return function($446) {
+    return runExcept($445($446));
   };
 };
 var readJSON_ = function(dictReadForeign) {
-  var $446 = readJSON(dictReadForeign);
-  return function($447) {
-    return hush($446($447));
+  var $447 = readJSON(dictReadForeign);
+  return function($448) {
+    return hush($447($448));
   };
 };
 var getFields = function(dict) {
@@ -28689,8 +28689,8 @@ var uncons3 = function(s2) {
   ;
   var cu1 = fromEnum2(charAt(1)(s2));
   var cu0 = fromEnum2(charAt(0)(s2));
-  var $42 = isLead(cu0) && isTrail(cu1);
-  if ($42) {
+  var $43 = isLead(cu0) && isTrail(cu1);
+  if ($43) {
     return new Just({
       head: unsurrogate(cu0)(cu1),
       tail: drop2(2)(s2)
@@ -28712,11 +28712,11 @@ var toCodePointArrayFallback = function(s2) {
 };
 var unsafeCodePointAt0Fallback = function(s2) {
   var cu0 = fromEnum2(charAt(0)(s2));
-  var $46 = isLead(cu0) && length2(s2) > 1;
-  if ($46) {
+  var $47 = isLead(cu0) && length2(s2) > 1;
+  if ($47) {
     var cu1 = fromEnum2(charAt(1)(s2));
-    var $47 = isTrail(cu1);
-    if ($47) {
+    var $48 = isTrail(cu1);
+    if ($48) {
       return unsurrogate(cu0)(cu1);
     }
     ;
@@ -28728,9 +28728,9 @@ var unsafeCodePointAt0Fallback = function(s2) {
 var unsafeCodePointAt0 = /* @__PURE__ */ _unsafeCodePointAt0(unsafeCodePointAt0Fallback);
 var toCodePointArray = /* @__PURE__ */ _toCodePointArray(toCodePointArrayFallback)(unsafeCodePointAt0);
 var fromCharCode2 = /* @__PURE__ */ function() {
-  var $74 = toEnumWithDefaults(boundedEnumChar)(bottom(boundedChar))(top(boundedChar));
-  return function($75) {
-    return singleton4($74($75));
+  var $75 = toEnumWithDefaults(boundedEnumChar)(bottom(boundedChar))(top(boundedChar));
+  return function($76) {
+    return singleton4($75($76));
   };
 }();
 var singletonFallback = function(v) {
@@ -28966,7 +28966,7 @@ var genericEnumSumRepConstruc = function(dictIsSymbol) {
             return pure4(NoArguments.value);
           }
           ;
-          return fail3(ForeignError.create("Enum string " + (s2 + (" did not match expected string " + name3))));
+          return fail3(ForeignError.create("Enum string " + (s2 + (" did not match expected string " + options.toConstructorName(name3)))));
         });
       };
     },

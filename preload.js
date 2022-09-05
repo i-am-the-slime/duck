@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     return () => ipcRenderer.removeListener(channel, subscription)
   },
   sendToMain: evt => {
-    console.log("I should send", evt)
+    // console.log("I should send", evt)
     ipcRenderer.send(evt.type, evt)
   }
 })
