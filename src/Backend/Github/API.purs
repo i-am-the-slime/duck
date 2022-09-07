@@ -3,29 +3,19 @@ module Backend.Github.API where
 import Prelude
 
 import Affjax as AX
-import Affjax as Affjax
 import Affjax.Node as AN
 import Affjax.RequestBody as RequestBody
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat as ResponseFormat
 import Backend.Github.API.Types (GithubGraphQLQuery, GithubGraphQLResponse(..), unGithubGraphQLQuery)
 import Biz.OAuth.Types (AccessToken(..), GithubAccessToken, TokenType(..))
-import Data.Argonaut.Core as J
 import Data.Either (Either(..))
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (un)
-import Debug (spy)
-import Effect.Aff (Aff, attempt, throwError)
+import Effect.Aff (Aff, throwError)
 import Effect.Aff as Aff
 import Effect.Class.Console as Console
-import Foreign (Foreign)
-import Foreign.Object as Object
-import Unsafe.Coerce (unsafeCoerce)
-import Yoga.Fetch (postMethod)
-import Yoga.Fetch as F
-import Yoga.Fetch.Impl.Node (nodeFetch)
-import Yoga.JSON (readJSON_)
 
 sendRequest ∷ GithubAccessToken → GithubGraphQLQuery → Aff GithubGraphQLResponse
 sendRequest { access_token, token_type } query = do
@@ -47,9 +37,4 @@ sendRequest { access_token, token_type } query = do
       Console.error (AX.printError err)
       throwError (Aff.error $ AX.printError err)
     Right response → do
-      -- let
-      --   _ = spy "dad bod"
-      --     ((readJSON_ ∷ _ → _ { errors ∷ Foreign }) (response.body))
-      --   _ = spy "mom bod"
-      --     ((readJSON_ ∷ _ → _ { data ∷ Foreign }) (response.body))
       pure (GithubGraphQLResponse $ response.body)

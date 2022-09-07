@@ -4,8 +4,6 @@ import Yoga.Prelude.View
 
 import Biz.Github.Types (Login(..), Repository(..))
 import Data.Array as Array
-import Debug (spy)
-import Fahrtwind (widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Framer.Motion as M
 import Plumage.Util.HTML as P
@@ -50,7 +48,6 @@ mkRouteView = React.component "HeaderBarRoute" \route → React.do
     mempty
 
   useEffect breadcrumb.xOverflows do
-    let _ = spy "xoverflows" breadcrumb.xOverflows
     if (showDots == Just route) then do
       unless (breadcrumb.xOverflows) $ setShowDots Nothing
     else when (breadcrumb.xOverflows) do

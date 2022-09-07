@@ -7,12 +7,9 @@ import Biz.OAuth.Types (AccessToken(..), ScopeList(..), TokenType(..))
 import Data.Array (foldl, singleton)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Seconds(..))
-import Debug (spy)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Class.Console as Console
-import Effect.Ref as Ref
-import ElectronAPI (ElectronListener)
 import React.Basic (JSX)
 import React.Basic.DOM (text)
 import Story.Ctx.OnMessageMocks (getMockGithubUserQuery, getMockInstalledTools, getMockIsLoggedIntoGithub, getMockLoadWorksheetFile, getMockOwnerImage, getMockReadme, getMockRegistry, getMockRepoDetails, getMockSolutionDefinition)
@@ -63,7 +60,7 @@ mkStoryCtx onMessage = do
       case resʔ of
         Nothing → do
           Console.debug "Unhandled message"
-          let _ = spy "message" msg
+          -- let _ = spy "message" msg
           pure $ unsafeCoerce {}
         Just r → pure r
   pure

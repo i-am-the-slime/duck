@@ -109,8 +109,6 @@ loadSpagoProject window = do
           -- parsedʔ ← parseDhall2 spagoDhall
           -- packagesDhall ← readTextFile UTF8 packagesPath
           -- parsedPackagesʔ <- parsePackagesDhall packagesDhall
-          -- let _ = spy "parsed" parsedʔ
-          -- let _ = spy "parsed" parsedPackagesʔ
           { stdout: spagoJSON } ← spawn
             { cmd: "dhall-to-json"
             , args: []

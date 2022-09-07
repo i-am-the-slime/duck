@@ -3,6 +3,7 @@ module Dhall.Types where
 import Prelude
 
 import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 import Foreign.Object (Object)
@@ -24,14 +25,16 @@ instance Show DhallLiteral where
 
 data DhallExpression
   = LiteralExpr DhallLiteral
-  | LetInExpr
-      { name ∷ String
-      , value ∷ DhallExpression
-      , with ∷ Array { name ∷ String, value ∷ DhallLiteral }
-      }
+  | LetInExpr LetInBinding
 
 derive instance Eq DhallExpression
 derive instance Generic DhallExpression _
+
+type LetInBinding =
+  { name ∷ String
+  , value ∷ DhallLiteral
+  , with ∷ Array { name ∷ String, value ∷ DhallLiteral }
+  }
 
 instance Show DhallExpression where
   show x = genericShow x
@@ -54,7 +57,7 @@ derive newtype instance Show LocalImport
 derive newtype instance WriteForeign LocalImport
 derive newtype instance ReadForeign LocalImport
 
-newtype RemoteImport = RemoteImport String
+newtype RemoteImport = RemoteImport { url ∷ String, hash ∷ Maybe String }
 
 derive instance Newtype RemoteImport _
 derive instance Eq RemoteImport

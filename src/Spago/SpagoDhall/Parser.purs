@@ -21,6 +21,7 @@ parseSpagoDhall s = runParser s do
   packages ← getPackages rec
   sources ← getSources rec
   name ← getName rec
+  DhallParser.skipSpacesAndComments
   eof
   pure $
     { leadingComment
