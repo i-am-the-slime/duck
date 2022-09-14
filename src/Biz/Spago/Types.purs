@@ -2,25 +2,8 @@ module Biz.Spago.Types where
 
 import Prelude
 
-import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype)
-import Foreign.Object (Object)
-import Biz.Github.Types (Repository)
 import Yoga.JSON (class ReadForeign, class WriteForeign)
-
-type ProjectConfig =
-  { name ∷ ProjectName
-  , repository ∷ Maybe Repository
-  , dependencies ∷ Array ProjectName
-  , sources ∷ Array SourceGlob
-  , packages ∷ Object Package
-  }
-
-type Package =
-  { repo ∷ Repository
-  , version ∷ Version
-  , dependencies ∷ Array ProjectName
-  }
 
 newtype ProjectName = ProjectName String
 
@@ -33,6 +16,7 @@ derive newtype instance ReadForeign ProjectName
 
 newtype SourceGlob = SourceGlob String
 
+derive instance Newtype SourceGlob _
 derive newtype instance Show SourceGlob
 derive newtype instance Eq SourceGlob
 derive newtype instance Ord SourceGlob

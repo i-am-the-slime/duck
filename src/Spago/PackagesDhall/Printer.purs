@@ -3,14 +3,13 @@ module Spago.PackagesDhall.Printer where
 import Prelude
 
 import Biz.Github.Types (Repository(..))
-import Biz.Spago.Types (Version(..))
+import Biz.Spago.Types (ProjectName(..), Version(..))
 import Data.Foldable (foldMap)
 import Data.Newtype (un)
 import Dodo (Doc, break, flexGroup, foldWithSeparator, indent, spaceBreak, text)
 import Dodo.Ansi (GraphicsParam)
 import Dodo.Common (leadingComma, pursCurlies, pursSquares)
 import Spago.PackagesDhall.Types (Change(..), PackagesDhall)
-import Spago.SpagoDhall.Types (DependencyName(..))
 
 packagesDhallDoc ∷ PackagesDhall → Doc GraphicsParam
 packagesDhallDoc pd =
@@ -39,16 +38,16 @@ packagesDhallDoc pd =
         ( flexGroup $ indent
             $ case change of
                 RepoChange (Repository repo) →
-                  withEntry ((un DependencyName name <> ".repo"))
+                  withEntry ((un ProjectName name <> ".repo"))
                     (text $ show repo)
                 VersionChange (Version version) →
-                  withEntry ((un DependencyName name <> ".version"))
+                  withEntry ((un ProjectName name <> ".version"))
                     (text $ show version)
                 DependenciesChange deps →
-                  withEntry ((un DependencyName name <> ".dependencies")) $
+                  withEntry ((un ProjectName name <> ".dependencies")) $
                     dependencies deps
                 CompleteChange { repo, version, dependencies: deps } →
-                  withEntry ((un DependencyName name))
+                  withEntry ((un ProjectName name))
                     $ flexGroup
                     $ pursCurlies
                     $ foldWithSeparator leadingComma
@@ -78,4 +77,4 @@ packagesDhallDoc pd =
       (flexGroup $ indent content)
   dependencies deps =
     pursSquares $ foldWithSeparator leadingComma $
-      un DependencyName >>> show >>> text <$> deps
+      un ProjectName >>> show >>> text <$> deps

@@ -3,12 +3,11 @@ module Biz.PureScriptSolution.Types where
 import Prelude
 
 import Biz.PureScriptSolutionDefinition.Types (EntryPointType)
-import Biz.Spago.Types (ProjectConfig)
-import Biz.Spago.Types as Spago
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Node.Path (FilePath)
+import Spago.SpagoDhall.Types (SpagoDhall)
 import Type.Row (type (+))
 
 type PureScriptSolution =
@@ -21,7 +20,7 @@ type SpagoProjectInfo r =
   , entrypoints ∷
       Array
         { spago_file ∷ FilePath
-        , project_configuration ∷ Spago.ProjectConfig
+        , project_configuration ∷ SpagoDhall
         , build_command ∷ Maybe String
         , type ∷ EntryPointType
         }
@@ -39,7 +38,7 @@ instance Show PureScriptProject where
 derive instance Eq PureScriptProject
 derive instance Ord PureScriptProject
 
-type SpagoProjectData r = (config ∷ ProjectConfig | r)
+type SpagoProjectData r = (config ∷ SpagoDhall | r)
 
 type SpagoLibData =
   ( versionInPackageSet ∷ Maybe String

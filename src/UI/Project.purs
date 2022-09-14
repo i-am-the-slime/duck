@@ -2,35 +2,33 @@ module UI.Project where
 
 import Prelude
 
-import Biz.Github.Types (Repository(..))
 import Biz.Github.Types as Github
-import Biz.Spago.Types (Version(..))
 import Biz.Spago.Types as Spago
 import Data.Maybe (Maybe(..))
-import Fahrtwind (background', borderBottom, borderCol', divideY, hover, mL, mT, mXY, pXY, pY', roundedDefault, roundedLg, textCol', textSm, textXl, transition, underline, widthAndHeight)
+import Fahrtwind (background', borderBottom, borderCol', divideY, hover, mL, mT, pXY, pY', roundedDefault, roundedLg, textCol', textXl, transition, widthAndHeight)
 import Fahrtwind as F
 import Fahrtwind.Icon.Heroicons as Heroicons
-import Foreign.Object (Object)
-import Foreign.Object as Object
 import Plumage.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
 import Plumage.Atom.PopOver.Types as Place
 import Plumage.Hooks.UsePopOver (usePopOver)
 import Plumage.Prelude.Style (Style, StyleProperty, css, nested)
 import Plumage.Util.HTML as H
 import React.Basic (JSX)
+import React.Basic.DOM (text)
 import React.Basic.DOM as R
 import React.Basic.Emotion (var)
 import React.Basic.Emotion as E
 import React.Basic.Events (handler_)
 import React.Basic.Hooks as React
+import Spago.SpagoDhall.Types (SpagoDhall)
 import UI.Component as UI
 import UI.Container (popOverId)
 import UI.Style (popOverMenuEntryStyle)
 import Yoga.Block as Block
 import Yoga.Block.Container.Style (col)
-import Yoga.Prelude.View (foldMap, guard, null, pure, (#), ($), (/>), (<#>), (</), (</*), (<>))
+import Yoga.Prelude.View (foldMap, guard, null, pure, (#), ($), (/>), (</), (</*), (<>))
 
-mkView ∷ UI.Component Spago.ProjectConfig
+mkView ∷ UI.Component SpagoDhall
 mkView = do
   projectName ← mkProjectName
   UI.component "Project" \_ props → React.do
@@ -38,14 +36,14 @@ mkView = do
       { name
       , repository
       , dependencies
-      , sources: _sources
+      , sources
       , packages
       } = props
     pure $
       Block.box_
         [ Block.stack { space: var "--s2" }
             [ Block.stack_
-                [ projectName name
+                [ projectName (name ∷ Spago.ProjectName)
                 , repository # foldMap \(Github.Repository repo) → R.h3_
                     [ R.text repo ]
                 ]
@@ -54,26 +52,26 @@ mkView = do
                     [ R.text "Dependencies" ]
                 , R.span' </ { id: "dependencies" } />
                     [ R.ul_
-                        ( dependencies <#> renderDependency packages
+                        ( dependencies <#> renderDependency
                         )
                     ]
                 ]
             ]
         ]
 
-renderDependency ∷ Object Spago.Package → Spago.ProjectName → JSX
-renderDependency packages (Spago.ProjectName depName) = R.li_ $ pure do
-  case packages # Object.lookup depName of
-    Nothing → R.text depName
-    Just { repo: Repository repo, version: Version version } →
-      Block.cluster
-        { wrapper: R.div' </* { css: mXY 0 <> pXY 0 }
-        }
-        [ R.a' </* { css: hover underline, href: repo } />
-            [ R.text depName ]
-        , R.code' </* { css: textSm <> textCol' col.textPaler3 } />
-            [ R.text version ]
-        ]
+renderDependency ∷ Spago.ProjectName → JSX
+renderDependency (Spago.ProjectName depName) = R.li_ $ pure $
+  text depName
+
+-- Just { repo: Repository repo, version: Version version } →
+--   Block.cluster
+--     { wrapper: R.div' </* { css: mXY 0 <> pXY 0 }
+--     }
+--     [ R.a' </* { css: hover underline, href: repo } />
+--         [ R.text depName ]
+--     , R.code' </* { css: textSm <> textCol' col.textPaler3 } />
+--         [ R.text version ]
+--     ]
 
 mkProjectName ∷ UI.Component Spago.ProjectName
 mkProjectName =

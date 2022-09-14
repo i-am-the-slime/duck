@@ -29680,12 +29680,18 @@ var writeForeignPureScriptPro = {
 var pureScriptSolutionFileName = ".purescript-solution.json";
 
 // output/Biz.Spago.Types/index.js
-var writeForeignVersion = writeForeignString;
 var writeForeignSourceGlob = writeForeignString;
 var writeForeignProjectName = writeForeignString;
-var readForeignVersion = readForeignString;
 var readForeignSourceGlob = readForeignString;
 var readForeignProjectName = readForeignString;
+
+// output/Dhall.Types/index.js
+var writeForeignLocalImport = writeForeignString;
+var readForeignLocalImport = readForeignString;
+
+// output/Spago.SpagoDhall.Types/index.js
+var writeForeignDependencyNam = writeForeignString;
+var readForeignDependencyName = readForeignString;
 
 // output/Biz.IPC.Message.Types/index.js
 var writeImpl6 = /* @__PURE__ */ writeImpl(writeForeignString);
@@ -29733,25 +29739,26 @@ var dependenciesIsSymbol = {
     return "dependencies";
   }
 };
+var leadingCommentIsSymbol = {
+  reflectSymbol: function() {
+    return "leadingComment";
+  }
+};
+var readForeignMaybe2 = /* @__PURE__ */ readForeignMaybe(readForeignString);
+var licenseIsSymbol = {
+  reflectSymbol: function() {
+    return "license";
+  }
+};
 var nameIsSymbol = {
   reflectSymbol: function() {
     return "name";
   }
 };
-var readForeignFieldsCons1 = /* @__PURE__ */ readForeignFieldsCons(nameIsSymbol);
+var readForeignFieldsCons2 = /* @__PURE__ */ readForeignFieldsCons(nameIsSymbol);
 var packagesIsSymbol = {
   reflectSymbol: function() {
     return "packages";
-  }
-};
-var repoIsSymbol = {
-  reflectSymbol: function() {
-    return "repo";
-  }
-};
-var versionIsSymbol = {
-  reflectSymbol: function() {
-    return "version";
   }
 };
 var repositoryIsSymbol = {
@@ -29769,7 +29776,6 @@ var LoadSpagoProjectResponseIsSymbol = {
     return "LoadSpagoProjectResponse";
   }
 };
-var readForeignMaybe2 = /* @__PURE__ */ readForeignMaybe(readForeignString);
 var UserSelectedFileIsSymbol = {
   reflectSymbol: function() {
     return "UserSelectedFile";
@@ -29892,9 +29898,8 @@ var StartPureScriptLanguageServerResponseIsSymbol = {
 };
 var writeForeignRecord4 = /* @__PURE__ */ writeForeignRecord();
 var writeForeignRecord1 = /* @__PURE__ */ writeForeignRecord4(writeForeignFieldsNilRowR);
-var writeForeignFieldsCons2 = /* @__PURE__ */ writeForeignFieldsCons(dependenciesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignProjectName));
-var writeForeignFieldsCons1 = /* @__PURE__ */ writeForeignFieldsCons(nameIsSymbol);
 var writeForeignMaybe3 = /* @__PURE__ */ writeForeignMaybe(writeForeignString);
+var writeForeignFieldsCons2 = /* @__PURE__ */ writeForeignFieldsCons(nameIsSymbol);
 var writeGenericTaggedSumRepC22 = /* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignMaybe3));
 var writeForeignEither2 = /* @__PURE__ */ writeForeignEither(writeForeignString);
 var LoadSpagoProjectIsSymbol = {
@@ -30521,7 +30526,7 @@ var genericMessageToRenderer_ = {
   }
 };
 var writeForeignMessageToRend = {
-  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericMessageToRenderer_)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignVariant()(/* @__PURE__ */ writeForeignVariantCons(invalidSpagoDhallIsSymbol)(writeForeignString)()(/* @__PURE__ */ writeForeignVariantCons(noSpagoDhallIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(nothingSelectedIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(validSpagoDhallIsSymbol)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(/* @__PURE__ */ writeForeignFieldsCons1(writeForeignProjectName)(/* @__PURE__ */ writeForeignFieldsCons(packagesIsSymbol)(/* @__PURE__ */ writeForeignObject(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(/* @__PURE__ */ writeForeignFieldsCons(repoIsSymbol)(writeForeignRepository)(/* @__PURE__ */ writeForeignFieldsCons(versionIsSymbol)(writeForeignVersion)(writeForeignFieldsNilRowR)()()())()()())()()())))(/* @__PURE__ */ writeForeignFieldsCons(repositoryIsSymbol)(/* @__PURE__ */ writeForeignMaybe(writeForeignRepository))(/* @__PURE__ */ writeForeignFieldsCons(sourcesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignSourceGlob))(writeForeignFieldsNilRowR)()()())()()())()()())()()())()()()))()(writeForeignVariantNilRow)))))))(LoadSpagoProjectResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC22(UserSelectedFileIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignGetInstalledT))(GetInstalledToolsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignArray(/* @__PURE__ */ writeForeignTuple(writeForeignString)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons1(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(projectsIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignPureScriptPro))(writeForeignFieldsNilRowR)()()())()()())))))(GetPureScriptSolutionDefinitionsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC1(GetIsLoggedIntoGithubResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither(writeForeignNoGithubToken)(writeForeignGithubGraphQL)))(GithubGraphQLResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignDeviceCodeRes)))(GithubLoginGetDeviceCodeResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignEither(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(errorIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_descriptionIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_uriIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()())()()()))(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(access_tokenIsSymbol)(writeForeignAccessToken)(/* @__PURE__ */ writeForeignFieldsCons(scopeIsSymbol)(writeForeignScopeList)(/* @__PURE__ */ writeForeignFieldsCons(token_typeIsSymbol)(writeForeignTokenType)(writeForeignFieldsNilRowR)()()())()()())()()())))))(GithubPollAccessTokenResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(CopyToClipboardResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(GetClipboardTextResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignSpagoGlobalCa)))(GetSpagoGlobalCacheResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(stderrIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(stdoutIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()))))(RunCommandResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignRunCommandUpd))(RunCommandUpdateResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC22(StoreTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignString)))(LoadTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignRecord1)))(StartPureScriptLanguageServerResponseIsSymbol)))))))))))))))))(defaultOptions)
+  writeImpl: /* @__PURE__ */ genericWriteForeignTaggedSum(genericMessageToRenderer_)(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignVariant()(/* @__PURE__ */ writeForeignVariantCons(invalidSpagoDhallIsSymbol)(writeForeignString)()(/* @__PURE__ */ writeForeignVariantCons(noSpagoDhallIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(nothingSelectedIsSymbol)(writeForeignRecord1)()(/* @__PURE__ */ writeForeignVariantCons(validSpagoDhallIsSymbol)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(dependenciesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignDependencyNam))(/* @__PURE__ */ writeForeignFieldsCons(leadingCommentIsSymbol)(writeForeignMaybe3)(/* @__PURE__ */ writeForeignFieldsCons(licenseIsSymbol)(writeForeignMaybe3)(/* @__PURE__ */ writeForeignFieldsCons2(writeForeignProjectName)(/* @__PURE__ */ writeForeignFieldsCons(packagesIsSymbol)(writeForeignLocalImport)(/* @__PURE__ */ writeForeignFieldsCons(repositoryIsSymbol)(/* @__PURE__ */ writeForeignMaybe(writeForeignRepository))(/* @__PURE__ */ writeForeignFieldsCons(sourcesIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignSourceGlob))(writeForeignFieldsNilRowR)()()())()()())()()())()()())()()())()()())()()()))()(writeForeignVariantNilRow)))))))(LoadSpagoProjectResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC22(UserSelectedFileIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignGetInstalledT))(GetInstalledToolsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignArray(/* @__PURE__ */ writeForeignTuple(writeForeignString)(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons2(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(projectsIsSymbol)(/* @__PURE__ */ writeForeignArray(writeForeignPureScriptPro))(writeForeignFieldsNilRowR)()()())()()())))))(GetPureScriptSolutionDefinitionsResponseIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC1(GetIsLoggedIntoGithubResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither(writeForeignNoGithubToken)(writeForeignGithubGraphQL)))(GithubGraphQLResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignDeviceCodeRes)))(GithubLoginGetDeviceCodeResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignEither(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(errorIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_descriptionIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(error_uriIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()())()()()))(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(access_tokenIsSymbol)(writeForeignAccessToken)(/* @__PURE__ */ writeForeignFieldsCons(scopeIsSymbol)(writeForeignScopeList)(/* @__PURE__ */ writeForeignFieldsCons(token_typeIsSymbol)(writeForeignTokenType)(writeForeignFieldsNilRowR)()()())()()())()()())))))(GithubPollAccessTokenResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(CopyToClipboardResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC3(GetClipboardTextResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignSpagoGlobalCa)))(GetSpagoGlobalCacheResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(/* @__PURE__ */ writeForeignRecord4(/* @__PURE__ */ writeForeignFieldsCons(stderrIsSymbol)(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons(stdoutIsSymbol)(writeForeignString)(writeForeignFieldsNilRowR)()()())()()()))))(RunCommandResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(writeForeignRunCommandUpd))(RunCommandUpdateResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC22(StoreTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepS(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignString)))(LoadTextFileResultIsSymbol))(/* @__PURE__ */ writeGenericTaggedSumRepC(/* @__PURE__ */ writeGenericTaggedSumRepA(/* @__PURE__ */ writeForeignEither2(writeForeignRecord1)))(StartPureScriptLanguageServerResponseIsSymbol)))))))))))))))))(defaultOptions)
 };
 var genericMessageToMain_ = {
   to: function(x2) {
@@ -30652,7 +30657,7 @@ var genericMessageToMain_ = {
   }
 };
 var readForeignMessageToMain = {
-  readImpl: /* @__PURE__ */ genericReadForeignTaggedSum(genericMessageToMain_)(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(LoadSpagoProjectIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(directoryIsSymbol)(readForeignBoolean)(/* @__PURE__ */ readForeignFieldsCons(filtersIsSymbol)(/* @__PURE__ */ readForeignArray(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(extensionsIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignArray2))(/* @__PURE__ */ readForeignFieldsCons1(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())))(readForeignFieldsNilRowRo)()())()())))(ShowOpenDialogIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetInstalledToolsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetPureScriptSolutionDefinitionsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetIsLoggedIntoGithubIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignGithubGraphQLQ))(QueryGithubGraphQLIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GithubLoginGetDeviceCodeIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignDeviceCode))(GithubPollAccessTokenIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo13(CopyToClipboardIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetClipboardTextIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetSpagoGlobalCacheIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(argsIsSymbol)(readForeignArray2)(/* @__PURE__ */ readForeignFieldsCons(toolIsSymbol)(readForeignTool)(/* @__PURE__ */ readForeignFieldsCons(workingDirIsSymbol)(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())()())))(RunCommandIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(contentIsSymbol)(readForeignString)(/* @__PURE__ */ readForeignFieldsCons(pathIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())()())))(StoreTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo13(LoadTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(folderIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())))(StartPureScriptLanguageServerIsSymbol))))))))))))))))(defaultOptions)
+  readImpl: /* @__PURE__ */ genericReadForeignTaggedSum(genericMessageToMain_)(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(LoadSpagoProjectIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(directoryIsSymbol)(readForeignBoolean)(/* @__PURE__ */ readForeignFieldsCons(filtersIsSymbol)(/* @__PURE__ */ readForeignArray(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(extensionsIsSymbol)(/* @__PURE__ */ readForeignMaybe(readForeignArray2))(/* @__PURE__ */ readForeignFieldsCons2(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())))(readForeignFieldsNilRowRo)()())()())))(ShowOpenDialogIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetInstalledToolsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetPureScriptSolutionDefinitionsIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetIsLoggedIntoGithubIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignGithubGraphQLQ))(QueryGithubGraphQLIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GithubLoginGetDeviceCodeIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(readForeignDeviceCode))(GithubPollAccessTokenIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo13(CopyToClipboardIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetClipboardTextIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo(GetSpagoGlobalCacheIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(argsIsSymbol)(readForeignArray2)(/* @__PURE__ */ readForeignFieldsCons(toolIsSymbol)(readForeignTool)(/* @__PURE__ */ readForeignFieldsCons(workingDirIsSymbol)(readForeignMaybe2)(readForeignFieldsNilRowRo)()())()())()())))(RunCommandIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(contentIsSymbol)(readForeignString)(/* @__PURE__ */ readForeignFieldsCons(pathIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())()())))(StoreTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepSu(/* @__PURE__ */ readGenericTaggedSumRepCo13(LoadTextFileIsSymbol))(/* @__PURE__ */ readGenericTaggedSumRepCo1(/* @__PURE__ */ readGenericTaggedSumRepAr(/* @__PURE__ */ readForeignRecord3(/* @__PURE__ */ readForeignFieldsCons(folderIsSymbol)(readForeignString)(readForeignFieldsNilRowRo)()())))(StartPureScriptLanguageServerIsSymbol))))))))))))))))(defaultOptions)
 };
 
 // output/Biz.OperatingSystem.Types/index.js
@@ -34569,7 +34574,7 @@ var sendRequest = function(v) {
         return pure9(errorOrResponse.value0.body);
       }
       ;
-      throw new Error("Failed pattern match at Backend.Github.API (line 45, column 3 - line 55, column 51): " + [errorOrResponse.constructor.name]);
+      throw new Error("Failed pattern match at Backend.Github.API (line 35, column 3 - line 40, column 51): " + [errorOrResponse.constructor.name]);
     });
   };
 };
@@ -36498,13 +36503,20 @@ var mapFlipped1 = /* @__PURE__ */ mapFlipped(functorAff);
 var showOpenDialog1 = /* @__PURE__ */ showOpenDialog();
 var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
 var lmap4 = /* @__PURE__ */ lmap(bifunctorEither);
-var readForeignRecord5 = /* @__PURE__ */ readForeignRecord();
-var readForeignFieldsCons2 = /* @__PURE__ */ readForeignFieldsCons({
+var readForeignMaybe3 = /* @__PURE__ */ readForeignMaybe(readForeignString);
+var readJSON5 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
   reflectSymbol: function() {
     return "dependencies";
   }
-})(/* @__PURE__ */ readForeignArray(readForeignProjectName));
-var readJSON5 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord5(/* @__PURE__ */ readForeignFieldsCons2(/* @__PURE__ */ readForeignFieldsCons({
+})(/* @__PURE__ */ readForeignArray(readForeignDependencyName))(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "leadingComment";
+  }
+})(readForeignMaybe3)(/* @__PURE__ */ readForeignFieldsCons({
+  reflectSymbol: function() {
+    return "license";
+  }
+})(readForeignMaybe3)(/* @__PURE__ */ readForeignFieldsCons({
   reflectSymbol: function() {
     return "name";
   }
@@ -36512,15 +36524,7 @@ var readJSON5 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord5(/* @
   reflectSymbol: function() {
     return "packages";
   }
-})(/* @__PURE__ */ readForeignObject(/* @__PURE__ */ readForeignRecord5(/* @__PURE__ */ readForeignFieldsCons2(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "repo";
-  }
-})(readForeignRepository)(/* @__PURE__ */ readForeignFieldsCons({
-  reflectSymbol: function() {
-    return "version";
-  }
-})(readForeignVersion)(readForeignFieldsNilRowRo)()())()())()())))(/* @__PURE__ */ readForeignFieldsCons({
+})(readForeignLocalImport)(/* @__PURE__ */ readForeignFieldsCons({
   reflectSymbol: function() {
     return "repository";
   }
@@ -36528,7 +36532,7 @@ var readJSON5 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord5(/* @
   reflectSymbol: function() {
     return "sources";
   }
-})(/* @__PURE__ */ readForeignArray(readForeignSourceGlob))(readForeignFieldsNilRowRo)()())()())()())()())()()));
+})(/* @__PURE__ */ readForeignArray(readForeignSourceGlob))(readForeignFieldsNilRowRo)()())()())()())()())()())()())()()));
 var $$for2 = /* @__PURE__ */ $$for(applicativeAff)(traversableArray);
 var sendToWebContents2 = /* @__PURE__ */ sendToWebContents(/* @__PURE__ */ writeForeignRecord()(/* @__PURE__ */ writeForeignFieldsCons({
   reflectSymbol: function() {
@@ -36584,11 +36588,11 @@ var showOpenDialog2 = function(window2) {
 var runCommandLong = function(respondWith) {
   return function(v) {
     var partial = function() {
-      var $158 = respondWith({
+      var $154 = respondWith({
         isPartial: true
       });
-      return function($159) {
-        return launchAff_($158(RunCommandUpdateResult.create($159)));
+      return function($155) {
+        return launchAff_($154(RunCommandUpdateResult.create($155)));
       };
     }();
     var fail6 = respondWith({
@@ -36612,11 +36616,11 @@ var runCommandLong = function(respondWith) {
         if (toolPath\u0294 instanceof Just) {
           return liftEffect7(function __do2() {
             var _kill = runToolAndSendOutput({
-              onStdout: function($160) {
-                return partial(StdoutData.create($160));
+              onStdout: function($156) {
+                return partial(StdoutData.create($156));
               },
-              onStderr: function($161) {
-                return partial(StderrData.create($161));
+              onStderr: function($157) {
+                return partial(StderrData.create($157));
               },
               onExit: done
             })({
@@ -36628,11 +36632,11 @@ var runCommandLong = function(respondWith) {
           });
         }
         ;
-        throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 165, column 7 - line 174, column 20): " + [toolPath\u0294.constructor.name]);
+        throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 163, column 7 - line 172, column 20): " + [toolPath\u0294.constructor.name]);
       });
     }
     ;
-    throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 161, column 3 - line 174, column 20): " + [operatingSystem\u0294.constructor.name]);
+    throw new Error("Failed pattern match at Biz.IPC.MessageToMainHandler (line 159, column 3 - line 172, column 20): " + [operatingSystem\u0294.constructor.name]);
   };
 };
 var loadTextFile = function(arg) {
@@ -36647,14 +36651,14 @@ var loadSpagoProject = function(window2) {
         return pure16(nothingSelected);
       };
       if (!result.canceled) {
-        var $138 = fromArray(result.filePaths);
-        if ($138 instanceof Just) {
-          var spagoPath = concat5([head2($138.value0), "spago.dhall"]);
+        var $134 = fromArray(result.filePaths);
+        if ($134 instanceof Just) {
+          var spagoPath = concat5([head2($134.value0), "spago.dhall"]);
           return bind10(liftEffect7(exists(spagoPath)))(function(pathExists\u0294) {
-            var packagesPath = concat5([head2($138.value0), "packages.dhall"]);
+            var packagesPath = concat5([head2($134.value0), "packages.dhall"]);
             return bind10(liftEffect7(exists(packagesPath)))(function(path2Exists\u0294) {
-              var $139 = !pathExists\u0294 || !path2Exists\u0294;
-              if ($139) {
+              var $135 = !pathExists\u0294 || !path2Exists\u0294;
+              if ($135) {
                 return pure16(noSpagoDhall);
               }
               ;

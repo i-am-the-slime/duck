@@ -3,26 +3,25 @@ module Spago.PackagesDhall.Parser where
 import Prelude
 
 import Biz.Github.Types (Repository(..))
-import Biz.Spago.Types (Version(..))
+import Biz.Spago.Types (ProjectName(..), SourceGlob(..), Version(..))
 import Data.Either (Either)
 import Data.Maybe (Maybe(..), maybe)
 import Data.String (Pattern(..), contains, stripSuffix)
 import Data.Traversable (traverse)
 import Dhall.Parser as DhallParser
-import Dhall.Types (DhallLiteral(..), Glob(..), LetInBinding, LocalImport, RemoteImport(..))
+import Dhall.Types (DhallLiteral(..), LetInBinding, LocalImport, RemoteImport(..))
 import Foreign.Object (Object)
 import Foreign.Object as Object
 import Parsing (ParseError, Parser, fail, runParser)
 import Parsing.String (eof)
 import Spago.PackagesDhall.Types (Change(..), PackagesDhall)
-import Spago.SpagoDhall.Types (DependencyName(..))
 
 parsePackagesDhall ∷ String → Either ParseError PackagesDhall
 parsePackagesDhall s = runParser s do
   leadingComment ← DhallParser.multiLineComment
   DhallParser.skipSpacesAndComments
   { packageSet, changes } ← do
-    binding ← DhallParser.dhallLetInBinding unit
+    binding ← DhallParser.dhallLetInBinding
     parsePackageSet binding
   DhallParser.skipSpacesAndComments
   eof
@@ -34,7 +33,7 @@ parsePackagesDhall s = runParser s do
     { url, hash } ← case value of
       DhallRemoteImport (RemoteImport { url, hash }) → pure { url, hash }
       _ → fail "Only remote imports allowed for upstream"
-    changes ∷ Array { name ∷ DependencyName, change ∷ Change } ←
+    changes ∷ Array { name ∷ ProjectName, change ∷ Change } ←
       with # traverse parseChange
 
     pure
@@ -49,7 +48,7 @@ parsePackagesDhall s = runParser s do
               deps ←
                 ( arr # traverse
                     case _ of
-                      DhallString str → pure $ DependencyName str
+                      DhallString str → pure $ ProjectName str
                       _ → fail $ "Can't have non-string dependency"
 
                 )
@@ -77,14 +76,14 @@ parsePackagesDhall s = runParser s do
             , change: CompleteChange { dependencies, repo, version }
             }
         _ → fail ("Invalid change " <> name)
-      pure { name: DependencyName name, change }
+      pure { name: ProjectName name, change }
 
-getDependencies ∷ Object DhallLiteral → Parser String (Array DependencyName)
+getDependencies ∷ Object DhallLiteral → Parser String (Array ProjectName)
 getDependencies = Object.lookup "dependencies" >>> maybe
   (fail "Couldn't find dependencies in dhall file")
   case _ of
     DhallArray arr → arr # traverse case _ of
-      DhallString str → pure (DependencyName str)
+      DhallString str → pure (ProjectName str)
       _ → fail "All dependencies must be strings"
     _ → fail $ "Dependencies can only be an array of strings."
 
@@ -102,11 +101,11 @@ getName = Object.lookup "name" >>> maybe
     DhallString name → pure name
     _ → fail $ "Packages can only be a simple local import"
 
-getSources ∷ Object DhallLiteral → Parser String (Array Glob)
+getSources ∷ Object DhallLiteral → Parser String (Array SourceGlob)
 getSources = Object.lookup "sources" >>> maybe
   (fail "Couldn't find sources in dhall file")
   case _ of
     DhallArray arr → arr # traverse case _ of
-      DhallString str → pure (Glob str)
+      DhallString str → pure (SourceGlob str)
       _ → fail "All sources must be strings"
     _ → fail $ "Sources can only be an array of strings."

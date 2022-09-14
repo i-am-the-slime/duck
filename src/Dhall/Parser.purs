@@ -6,7 +6,8 @@ import Data.String (trim)
 import Data.String.CodeUnits as SCU
 import Data.String.Utils (endsWith)
 import Data.Tuple.Nested ((/\))
-import Dhall.Types (DhallLiteral(..), LetInBinding, LocalImport(..), RemoteImport(..))
+import Debug (spy)
+import Dhall.Types (DhallLiteral(..), LocalImport(..), RemoteImport(..), LetInBinding)
 import Foreign.Object (Object)
 import Foreign.Object as Object
 import Parsing (Parser, fail)
@@ -44,6 +45,16 @@ dhallLiteral _ = do
     <|> (DhallArray <$> dhallArray unit)
     <|> (DhallRecord <$> dhallRecord unit)
 
+dhallLiteralNoRecord ∷ Unit → Parser String DhallLiteral
+dhallLiteralNoRecord _ =
+  dhallString
+    <|> dhallBoolean
+    <|> (DhallLocalImport <$> dhallLocalImport)
+    <|> (DhallRemoteImport <$> dhallRemoteImport)
+    <|> (DhallArray <$> dhallArray unit)
+
+-- <|> try (DhallRecord <$> dhallRecord unit)
+
 dhallArray ∷ Unit → Parser String (Array DhallLiteral)
 dhallArray _ = try emptyArray <|> nonEmptyArray
   where
@@ -66,10 +77,8 @@ dhallString = void (char '\"') *> stringUntil (char '\"') <#>
 
 dhallBoolean ∷ Parser String DhallLiteral
 dhallBoolean =
-  string "True"
-    $> (DhallBoolean true)
-    <|> string "False"
-      $> (DhallBoolean false)
+  string "True" $> (DhallBoolean true) <|>
+    (string "False" $> (DhallBoolean false))
 
 dhallLocalImport ∷ Parser String LocalImport
 dhallLocalImport = LocalImport <$> do
@@ -96,7 +105,10 @@ dhallRemoteImport = RemoteImport <$> do
   pure { url, hash }
 
 dhallRecord ∷ Unit → Parser String (Object DhallLiteral)
-dhallRecord _ = try emptyRecord <|> try nonEmptyRecord
+dhallRecord _ = dhallRecordOf (dhallLiteralNoRecord unit)
+
+dhallRecordOf ∷ ∀ a. Parser String a → Parser String (Object a)
+dhallRecordOf valueParser = try emptyRecord <|> nonEmptyRecord
   where
   emptyRecord = do
     _ ← (char '{' *> notFollowedBy (char '-'))
@@ -111,21 +123,30 @@ dhallRecord _ = try emptyRecord <|> try nonEmptyRecord
     skipSpacesAndComments
     key ← stringUntil (char '=') <#> trim
     skipSpacesAndComments
-    value ← dhallLiteral unit
+    value ← valueParser
     skipSpacesAndComments
     pure (key /\ value)
 
-dhallLetInBinding ∷ Unit → Parser String LetInBinding
-dhallLetInBinding _ = do
+dhallLetInBindingOf ∷
+  ∀ a.
+  ({ name ∷ String, value ∷ DhallLiteral } → Parser String a) →
+  Parser String a
+dhallLetInBindingOf innerParser = do
   void $ string "let"
   void whiteSpace
   name ← stringUntil (char '=') <#> trim
+  let _ = spy "help" name
   skipSpacesAndComments
   value ← dhallLiteral unit
   skipSpacesAndComments
   _ ← string "in"
+  let _ = spy "help" value
   void whiteSpace
   skipSpacesAndComments
+  innerParser { name, value }
+
+dhallLetInBinding ∷ Parser String LetInBinding
+dhallLetInBinding = dhallLetInBindingOf \{ name, value } → do
   void $ string name
   with ← Array.many (try $ skipSpacesAndComments *> withExpr)
   pure { name, value, with }
@@ -138,6 +159,28 @@ withExpr = do
   skipSpacesAndComments
   value ← dhallLiteral unit
   pure { name, value }
+
+recordMergeExpr ∷
+  Parser String
+    ( Object
+        { array ∷ Array DhallLiteral
+        , variableName ∷ String
+        }
+    )
+recordMergeExpr = do
+  void $ string "//" <|> string "⫽"
+  skipSpacesAndComments
+  dhallRecordOf arrayAppendExpr
+
+arrayAppendExpr ∷
+  Parser String { variableName ∷ String, array ∷ Array DhallLiteral }
+arrayAppendExpr = do
+  variableName ← stringUntil whiteSpace
+  skipSpacesAndComments
+  void $ string "#"
+  skipSpacesAndComments
+  array ← dhallArray unit
+  pure { variableName, array }
 
 -- Helpers
 stringUntil ∷ ∀ a. Parser String a → Parser String String

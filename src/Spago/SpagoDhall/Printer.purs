@@ -2,16 +2,18 @@ module Spago.SpagoDhall.Printer where
 
 import Prelude
 
+import Biz.Spago.Types (ProjectName(..), SourceGlob(..))
+import Data.Foldable (foldMap)
 import Data.Newtype (un)
-import Dhall.Types (Glob(..), LocalImport(..))
+import Dhall.Types (LocalImport(..))
 import Dodo (Doc, break, flexGroup, foldWithSeparator, indent, spaceBreak, text)
 import Dodo.Ansi (GraphicsParam)
 import Dodo.Common (leadingComma, pursSquares)
-import Spago.SpagoDhall.Types (DependencyName(..), SpagoDhall)
+import Spago.SpagoDhall.Types (SpagoDhall)
 
 spagoDhallDoc ∷ SpagoDhall → Doc GraphicsParam
 spagoDhallDoc sd =
-  text ("{-" <> sd.leadingComment <> "-}")
+  (sd.leadingComment # foldMap \lc → (text ("{-" <> lc <> "-}")))
     <> (flexGroup (text "\n{ name =" <> indent (spaceBreak <> text name)))
     <> break
     <>
@@ -32,7 +34,7 @@ spagoDhallDoc sd =
   name = quote sd.name
   dependencies =
     pursSquares $ foldWithSeparator leadingComma $
-      un DependencyName >>> quote >>> text <$> sd.dependencies
+      un ProjectName >>> quote >>> text <$> sd.dependencies
   packages = un LocalImport sd.packages
   sources = pursSquares $ foldWithSeparator leadingComma $
-    un Glob >>> quote >>> text <$> sd.sources
+    un SourceGlob >>> quote >>> text <$> sd.sources

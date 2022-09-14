@@ -6,7 +6,6 @@ import Biz.PureScriptSolution.Types (PureScriptSolution)
 import Biz.PureScriptSolution.Types as Solution
 import Biz.PureScriptSolutionDefinition.Types (EntryPointType(..), Entrypoint, PureScriptSolutionDefinition)
 import Biz.PureScriptSolutionDefinition.Types as Definition
-import Biz.Spago.Types as Spago
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NEA
 import Data.Either (Either(..), either, note)
@@ -24,6 +23,7 @@ import Node.FS.Sync as FS
 import Node.Path (FilePath)
 import Node.Path as Path
 import Record (merge)
+import Spago.SpagoDhall.Types (SpagoDhall)
 import Sunde (spawn)
 import Yoga.JSON (readJSON, writeJSON)
 import Yoga.JSON.Error (renderHumanError)
@@ -57,7 +57,7 @@ resolveSolutionDefinition path def = do
             }
         )
 
-  parseSpagoDhall ∷ _ → Aff Spago.ProjectConfig
+  parseSpagoDhall ∷ _ → Aff SpagoDhall
   parseSpagoDhall { root, spago_file } = do
     let spagoPath = Path.concat [ path, root, spago_file ]
     pathExistsʔ ← FS.exists spagoPath # liftEffect

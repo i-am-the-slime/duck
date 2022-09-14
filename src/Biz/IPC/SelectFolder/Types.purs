@@ -2,10 +2,10 @@ module Biz.IPC.SelectFolder.Types where
 
 import Prelude
 
-import Biz.Spago.Types (ProjectConfig)
 import Data.List (intercalate)
 import Data.Variant (Variant, inj)
 import Foreign (MultipleErrors, renderForeignError)
+import Spago.SpagoDhall.Types (SpagoDhall)
 import Type.Proxy (Proxy(..))
 import Type.Row (type (+))
 
@@ -47,10 +47,11 @@ invalidSpagoDhallKey = Proxy
 type InvalidSpagoDhall others = (invalidSpagoDhall ∷ String | others)
 
 -- | validSpagoDhall
-validSpagoDhall ∷ ∀ r. ProjectConfig → Variant (ValidSpagoDhall r)
+validSpagoDhall ∷ ∀ r. SpagoDhall → Variant (ValidSpagoDhall r)
 validSpagoDhall = inj validSpagoDhallKey
 
 validSpagoDhallKey ∷ Proxy "validSpagoDhall"
 validSpagoDhallKey = Proxy
 
-type ValidSpagoDhall others = (validSpagoDhall ∷ ProjectConfig | others)
+type ValidSpagoDhall others =
+  (validSpagoDhall ∷ SpagoDhall | others)

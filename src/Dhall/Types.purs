@@ -25,7 +25,9 @@ instance Show DhallLiteral where
 
 data DhallExpression
   = LiteralExpr DhallLiteral
+  | VariableExpr String
   | LetInExpr LetInBinding
+  | InfixOperatorExpr InfixOperator DhallExpression DhallExpression
 
 derive instance Eq DhallExpression
 derive instance Generic DhallExpression _
@@ -38,15 +40,6 @@ type LetInBinding =
 
 instance Show DhallExpression where
   show x = genericShow x
-
-newtype Glob = Glob String
-
-derive instance Newtype Glob _
-derive instance Eq Glob
-derive instance Ord Glob
-derive newtype instance Show Glob
-derive newtype instance WriteForeign Glob
-derive newtype instance ReadForeign Glob
 
 newtype LocalImport = LocalImport String
 
@@ -65,3 +58,11 @@ derive instance Ord RemoteImport
 derive newtype instance Show RemoteImport
 derive newtype instance WriteForeign RemoteImport
 derive newtype instance ReadForeign RemoteImport
+
+data InfixOperator = InfixWith | InfixRecordMerge | ArrayMerge
+
+derive instance Generic InfixOperator _
+derive instance Eq InfixOperator
+derive instance Ord InfixOperator
+instance Show InfixOperator where
+  show op = genericShow op
