@@ -252,6 +252,7 @@ in  conf //
     }
 """
 
+examplePackageSetString ∷ String
 examplePackageSetString =
   """
 { ace =
