@@ -4,9 +4,9 @@ import Prelude
 
 import Biz.Github.Types (Repository(..))
 import Biz.Spago.Types (ProjectName(..), SourceGlob(..), Version(..))
-import Control.Plus (empty)
 import Data.Array (intercalate, zip)
 import Data.Either (Either(..))
+import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.String.Utils (lines, padEnd)
 import Data.Tuple.Nested ((/\))
@@ -20,6 +20,7 @@ import Spago.ExtendedSpagoDhall.Parser (parseExtendedSpagoDhall)
 import Spago.ExtendedSpagoDhall.Printer (extendedSpagoDhallDoc)
 import Spago.ExtendedSpagoDhall.Types (ExtendedSpagoDhall)
 import Spago.PackagesDhall.PackageSet.Parser (parsePackageSetDhall)
+import Spago.PackagesDhall.PackageSet.Types (PackageSet)
 import Spago.PackagesDhall.Parser as PD
 import Spago.PackagesDhall.Printer (packagesDhallDoc)
 import Spago.PackagesDhall.Types (Change(..), PackagesDhall)
@@ -42,7 +43,7 @@ spec = describe "The spago.dhall parser" do
       examplePackagesDhall
   it "Parses a package set file" do
     parsePackageSetDhall examplePackageSetString `shouldEqual` Right
-      empty
+      examplePackageSet
   it "Parses an array append expression" do
     runParser "help.me # [ \"rat\", \"boy\"]" arrayAppendExpr `shouldEqual`
       Right
@@ -288,6 +289,42 @@ examplePackageSetString =
   }
 }
 """
+
+examplePackageSet ∷ PackageSet
+examplePackageSet = Map.fromFoldable
+  [ ( ProjectName "ace" /\
+        { dependencies:
+            ProjectName <$>
+              [ "arrays"
+              , "effect"
+              , "foreign"
+              , "nullable"
+              , "prelude"
+              , "web-html"
+              , "web-uievents"
+              ]
+        , repo: Repository
+            "https://github.com/purescript-contrib/purescript-ace.git"
+        , version: Version "v9.0.0"
+        }
+    )
+  , ( ProjectName "aff" /\
+        { dependencies:
+            ProjectName <$>
+              [ "datetime"
+              , "effect"
+              , "exceptions"
+              , "functions"
+              , "parallel"
+              , "transformers"
+              , "unsafe-coerce"
+              ]
+        , repo: Repository
+            "https://github.com/purescript-contrib/purescript-aff.git"
+        , version: Version "v7.0.0"
+        }
+    )
+  ]
 
 printSideBySide ∷ String → String → String
 printSideBySide s1 s2 =

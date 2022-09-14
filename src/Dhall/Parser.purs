@@ -135,12 +135,10 @@ dhallLetInBindingOf innerParser = do
   void $ string "let"
   void whiteSpace
   name ← stringUntil (char '=') <#> trim
-  let _ = spy "letIn name" name
   skipSpacesAndComments
   value ← dhallLiteral unit
   skipSpacesAndComments
   _ ← string "in"
-  let _ = spy "letIn value" value
   void whiteSpace
   skipSpacesAndComments
   innerParser { name, value }

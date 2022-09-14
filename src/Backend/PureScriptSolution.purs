@@ -10,7 +10,6 @@ import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NEA
 import Data.Either (Either(..), either, note)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Semigroup.Foldable (intercalateMap)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Traversable (traverse)
@@ -23,10 +22,10 @@ import Node.FS.Sync as FS
 import Node.Path (FilePath)
 import Node.Path as Path
 import Record (merge)
+import Spago.SpagoDhall.Parser (parseSpagoDhall)
 import Spago.SpagoDhall.Types (SpagoDhall)
 import Sunde (spawn)
-import Yoga.JSON (readJSON, writeJSON)
-import Yoga.JSON.Error (renderHumanError)
+import Yoga.JSON (writeJSON)
 
 resolveSolutionDefinition ∷
   FilePath → PureScriptSolutionDefinition → Aff PureScriptSolution
@@ -37,14 +36,15 @@ resolveSolutionDefinition path def = do
   toProject = case _ of
     Definition.SpagoApp app → do
       entrypoints ← app.entrypoints # traverse \ep@{ spago_file } → do
-        project_configuration ← parseSpagoDhall { root: app.root, spago_file }
+        project_configuration ← parseSpagoDhallFile
+          { root: app.root, spago_file }
         pure $ ep # merge { project_configuration }
       pure $ Solution.SpagoAppProject
         (app # merge { entrypoints })
 
     Definition.SpagoLibrary lib → do
       entrypoints ← lib.entrypoints # traverse \ep@{ spago_file } → do
-        project_configuration ← parseSpagoDhall
+        project_configuration ← parseSpagoDhallFile
           { root: lib.root, spago_file }
         pure $ ep # merge { project_configuration }
       pure $ Solution.SpagoLibraryProject
@@ -57,25 +57,18 @@ resolveSolutionDefinition path def = do
             }
         )
 
-  parseSpagoDhall ∷ _ → Aff SpagoDhall
-  parseSpagoDhall { root, spago_file } = do
+  parseSpagoDhallFile ∷ _ → Aff SpagoDhall
+  parseSpagoDhallFile { root, spago_file } = do
     let spagoPath = Path.concat [ path, root, spago_file ]
     pathExistsʔ ← FS.exists spagoPath # liftEffect
     when (not pathExistsʔ) do
       throwError $ error $ "No such file: " <> spagoPath
-    spagoDhall ← readTextFile UTF8 spagoPath
-    { stdout: spagoJSON } ← spawn
-      { cmd: "dhall-to-json"
-      , args: []
-      , stdin: Just spagoDhall
-      }
-      defaultSpawnOptions
-    either
+    spagoDhallString ← readTextFile UTF8 spagoPath
+    parseSpagoDhall spagoDhallString # either
       ( \e → throwError $ error
-          ("Invalid spago dhall:\n" <> intercalateMap "\n" renderHumanError e)
+          ("Invalid spago dhall:\n" <> show e)
       )
       pure
-      (readJSON spagoJSON)
 
 createNewPureScriptSolution ∷ FilePath → PureScriptSolutionDefinition → Aff Unit
 createNewPureScriptSolution path solution =
