@@ -4,6 +4,7 @@ import Prelude
 
 import Biz.Github.Types (Repository(..))
 import Biz.Spago.Types (ProjectName(..), SourceGlob(..), Version(..))
+import Control.Plus (empty)
 import Data.Array (intercalate, zip)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
@@ -18,6 +19,7 @@ import Parsing (runParser)
 import Spago.ExtendedSpagoDhall.Parser (parseExtendedSpagoDhall)
 import Spago.ExtendedSpagoDhall.Printer (extendedSpagoDhallDoc)
 import Spago.ExtendedSpagoDhall.Types (ExtendedSpagoDhall)
+import Spago.PackagesDhall.PackageSet.Parser (parsePackageSetDhall)
 import Spago.PackagesDhall.Parser as PD
 import Spago.PackagesDhall.Printer (packagesDhallDoc)
 import Spago.PackagesDhall.Types (Change(..), PackagesDhall)
@@ -38,6 +40,9 @@ spec = describe "The spago.dhall parser" do
   it "Parses a packages.dhall file" do
     PD.parsePackagesDhall examplePackagesDhallString `shouldEqual` Right
       examplePackagesDhall
+  it "Parses a package set file" do
+    parsePackageSetDhall examplePackageSetString `shouldEqual` Right
+      empty
   it "Parses an array append expression" do
     runParser "help.me # [ \"rat\", \"boy\"]" arrayAppendExpr `shouldEqual`
       Right
