@@ -13,10 +13,10 @@ import Dhall.Parser (arrayAppendExpr)
 import Dhall.Parser as D
 import Dhall.Types (DhallLiteral(..), LocalImport(..), RemoteImport(..))
 import Dodo (plainText, print, twoSpaces)
-import Effect.Class.Console as Console
 import Foreign.Object as Object
 import Parsing (runParser)
 import Spago.ExtendedSpagoDhall.Parser (parseExtendedSpagoDhall)
+import Spago.ExtendedSpagoDhall.Printer (extendedSpagoDhallDoc)
 import Spago.ExtendedSpagoDhall.Types (ExtendedSpagoDhall)
 import Spago.PackagesDhall.Parser as PD
 import Spago.PackagesDhall.Printer (packagesDhallDoc)
@@ -107,8 +107,12 @@ spec = describe "The spago.dhall parser" do
     let
       result = print plainText (twoSpaces { pageWidth = 80 })
         (packagesDhallDoc examplePackagesDhall)
-    Console.log (printSideBySide result examplePackagesDhallString)
     result `shouldEqual` examplePackagesDhallString
+  it "Prints an extended spago.test.dhall" do
+    let
+      result = print plainText (twoSpaces { pageWidth = 80 })
+        (extendedSpagoDhallDoc exampleExtendedSpagoDhall)
+    result `shouldEqual` exampleExtendedSpagoDhallString
 
 expectedPrint ∷ String
 expectedPrint =
@@ -226,6 +230,8 @@ exampleExtendedSpagoDhall =
   , dependencies: ProjectName <$>
       [ "more"
       , "deps"
+      , "than"
+      , "before-even-break-the-line-please-immediately"
       ]
   , sources: [ SourceGlob "more/code/**/*.purs" ]
   }
@@ -234,14 +240,47 @@ exampleExtendedSpagoDhallString ∷ String
 exampleExtendedSpagoDhallString =
   """let conf = ./spago.dhall
 
-in conf // {
-    sources = conf.sources # [ "more/code/**/*.purs" ],
-    dependencies = conf.dependencies #
-      [ "more"
-      , "deps"
-      ]
-}
+in  conf //
+    { sources = conf.sources # [ "more/code/**/*.purs" ]
+    , dependencies =
+        conf.dependencies #
+          [ "more"
+          , "deps"
+          , "than"
+          , "before-even-break-the-line-please-immediately"
+          ]
+    }
+"""
 
+examplePackageSetString =
+  """
+{ ace =
+  { dependencies =
+    [ "arrays"
+    , "effect"
+    , "foreign"
+    , "nullable"
+    , "prelude"
+    , "web-html"
+    , "web-uievents"
+    ]
+  , repo = "https://github.com/purescript-contrib/purescript-ace.git"
+  , version = "v9.0.0"
+  }
+, aff =
+  { dependencies =
+    [ "datetime"
+    , "effect"
+    , "exceptions"
+    , "functions"
+    , "parallel"
+    , "transformers"
+    , "unsafe-coerce"
+    ]
+  , repo = "https://github.com/purescript-contrib/purescript-aff.git"
+  , version = "v7.0.0"
+  }
+}
 """
 
 printSideBySide ∷ String → String → String

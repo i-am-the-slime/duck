@@ -6,35 +6,77 @@ import Biz.Spago.Types (ProjectName(..), SourceGlob(..))
 import Data.Foldable (foldMap)
 import Data.Newtype (un)
 import Dhall.Types (LocalImport(..))
-import Dodo (Doc, break, flexGroup, foldWithSeparator, indent, spaceBreak, text)
+import Dodo (Doc, break, flexGroup, foldWithSeparator, indent, space, spaceBreak, text)
 import Dodo.Ansi (GraphicsParam)
-import Dodo.Common (leadingComma, pursSquares)
-import Spago.SpagoDhall.Types (SpagoDhall)
+import Dodo.Common (leadingComma, pursCurlies, pursSquares)
+import Spago.ExtendedSpagoDhall.Types (ExtendedSpagoDhall)
 
-spagoDhallDoc ∷ SpagoDhall → Doc GraphicsParam
-spagoDhallDoc sd =
-  (sd.leadingComment # foldMap \lc → (text ("{-" <> lc <> "-}")))
-    <> (flexGroup (text "\n{ name =" <> indent (spaceBreak <> text name)))
-    <> break
+extendedSpagoDhallDoc ∷ ExtendedSpagoDhall → Doc GraphicsParam
+extendedSpagoDhallDoc sd =
+  (sd.leadingComment # foldMap \lc → (text ("{-" <> lc <> "-}\n")))
     <>
       ( flexGroup
-          ( text (", dependencies =") <> flexGroup
-              (indent (spaceBreak <> flexGroup dependencies))
+          ( text "let" <> indent
+              ( space
+                  <> text name
+                  <> space
+                  <> text "="
+                  <>
+                    (indent (indent (indent spaceBreak <> import')))
+
+              )
           )
       )
     <> break
+    <> break
     <>
-      ( flexGroup
-          (text ", packages =" <> indent (spaceBreak <> text packages))
+      ( flexGroup (text "in" <> indent (space <> space <> text name))
+          <> (space <> text "//" <> break)
+          <> flexGroup
+            ( indent
+                ( indent
+                    ( pursCurlies
+                        ( ( ( text "sources =" <> flexGroup
+                                ( indent
+                                    ( indent
+                                        (spaceBreak <> sources)
+                                    )
+                                )
+                            )
+                          )
+                            <> break
+                            <>
+                              flexGroup
+                                ( text (", dependencies =") <> indent
+                                    ( flexGroup
+                                        ( indent
+                                            ( spaceBreak <> flexGroup
+                                                dependencies
+                                            )
+                                        )
+                                    )
+                                )
+                        )
+                    )
+                )
+            )
       )
-    <> (flexGroup (text "\n, sources =" <> indent (spaceBreak <> sources)))
-    <> text "\n}\n"
+    <> break
   where
   quote = show
-  name = quote sd.name
-  dependencies =
-    pursSquares $ foldWithSeparator leadingComma $
-      un ProjectName >>> quote >>> text <$> sd.dependencies
-  packages = un LocalImport sd.packages
-  sources = pursSquares $ foldWithSeparator leadingComma $
-    un SourceGlob >>> quote >>> text <$> sd.sources
+  import' = sd.baseFile.import # un LocalImport # text
+  name = sd.baseFile.name
+  dependencies = text (name <> ".dependencies") <> space <> text "#" <> indent
+    ( spaceBreak <>
+        pursSquares
+          ( foldWithSeparator leadingComma $
+              un ProjectName >>> quote >>> text <$> sd.dependencies
+          )
+    )
+  sources = text (name <> ".sources") <> space <> text "#" <> indent
+    ( spaceBreak <> pursSquares
+        ( foldWithSeparator leadingComma
+            ( un SourceGlob >>> quote >>> text <$> sd.sources
+            )
+        )
+    )
