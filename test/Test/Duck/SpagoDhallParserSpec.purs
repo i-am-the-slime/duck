@@ -9,6 +9,7 @@ import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String.Utils (lines, padEnd)
 import Data.Tuple.Nested ((/\))
+import Dhall.Parser (arrayAppendExpr)
 import Dhall.Parser as D
 import Dhall.Types (DhallLiteral(..), LocalImport(..), RemoteImport(..))
 import Dodo (plainText, print, twoSpaces)
@@ -23,7 +24,7 @@ import Spago.PackagesDhall.Types (Change(..), PackagesDhall)
 import Spago.SpagoDhall.Parser as P
 import Spago.SpagoDhall.Printer (spagoDhallDoc)
 import Spago.SpagoDhall.Types (SpagoDhall)
-import Test.Spec (Spec, describe, it, itOnly)
+import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
 spec ∷ Spec Unit
@@ -37,9 +38,14 @@ spec = describe "The spago.dhall parser" do
   it "Parses a packages.dhall file" do
     PD.parsePackagesDhall examplePackagesDhallString `shouldEqual` Right
       examplePackagesDhall
+  it "Parses an array append expression" do
+    runParser "help.me # [ \"rat\", \"boy\"]" arrayAppendExpr `shouldEqual`
+      Right
+        { variableName: "help.me", array: DhallString <$> [ "rat", "boy" ] }
   it "Parses an empty array" do
     runParser "[]" (D.dhallArray unit) `shouldEqual` Right []
     runParser "[  ]" (D.dhallArray unit) `shouldEqual` Right []
+  -- [TODO] Not sure if this should parse {} or {=}
   it "Parses an empty record" do
     runParser "{}" (D.dhallRecord unit) `shouldEqual` Right (Object.empty)
     runParser "{  }" (D.dhallRecord unit) `shouldEqual` Right (Object.empty)
@@ -215,8 +221,8 @@ examplePackagesDhall =
 
 exampleExtendedSpagoDhall ∷ ExtendedSpagoDhall
 exampleExtendedSpagoDhall =
-  { leadingComment: Just "\nWelcome to a Spago project!\n"
-  , baseFile: { import: LocalImport "./spago.dhall", name: "spago" }
+  { leadingComment: Nothing
+  , baseFile: { import: LocalImport "./spago.dhall", name: "conf" }
   , dependencies: ProjectName <$>
       [ "more"
       , "deps"
@@ -224,6 +230,7 @@ exampleExtendedSpagoDhall =
   , sources: [ SourceGlob "more/code/**/*.purs" ]
   }
 
+exampleExtendedSpagoDhallString ∷ String
 exampleExtendedSpagoDhallString =
   """let conf = ./spago.dhall
 

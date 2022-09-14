@@ -38,11 +38,11 @@ multiLineComment = do
 
 dhallLiteral ∷ Unit → Parser String DhallLiteral
 dhallLiteral _ = do
-  dhallString
-    <|> dhallBoolean
-    <|> (DhallLocalImport <$> dhallLocalImport)
-    <|> (DhallRemoteImport <$> dhallRemoteImport)
-    <|> (DhallArray <$> dhallArray unit)
+  try dhallString
+    <|> try dhallBoolean
+    <|> try (DhallLocalImport <$> dhallLocalImport)
+    <|> try (DhallRemoteImport <$> dhallRemoteImport)
+    <|> try (DhallArray <$> dhallArray unit)
     <|> (DhallRecord <$> dhallRecord unit)
 
 dhallLiteralNoRecord ∷ Unit → Parser String DhallLiteral
@@ -67,7 +67,7 @@ dhallArray _ = try emptyArray <|> nonEmptyArray
     between (char '[') (char ']') (nested `sepBy` (char ','))
   nested = do
     skipSpacesAndComments
-    value ← (dhallString <|> dhallBoolean <|> DhallRecord <$> dhallRecord unit)
+    value ← dhallLiteral unit
     skipSpacesAndComments
     pure $ value
 
@@ -135,12 +135,12 @@ dhallLetInBindingOf innerParser = do
   void $ string "let"
   void whiteSpace
   name ← stringUntil (char '=') <#> trim
-  let _ = spy "help" name
+  let _ = spy "letIn name" name
   skipSpacesAndComments
   value ← dhallLiteral unit
   skipSpacesAndComments
   _ ← string "in"
-  let _ = spy "help" value
+  let _ = spy "letIn value" value
   void whiteSpace
   skipSpacesAndComments
   innerParser { name, value }
@@ -169,15 +169,17 @@ recordMergeExpr ∷
     )
 recordMergeExpr = do
   void $ string "//" <|> string "⫽"
+  let _ = spy "got to ignore the" "//"
   skipSpacesAndComments
   dhallRecordOf arrayAppendExpr
 
 arrayAppendExpr ∷
   Parser String { variableName ∷ String, array ∷ Array DhallLiteral }
 arrayAppendExpr = do
-  variableName ← stringUntil whiteSpace
+  variableName ← stringUntil (char ' ' <|> char '\n') <#> trim
+  let _ = spy "varNameAppend" variableName
   skipSpacesAndComments
-  void $ string "#"
+  void $ char '#'
   skipSpacesAndComments
   array ← dhallArray unit
   pure { variableName, array }

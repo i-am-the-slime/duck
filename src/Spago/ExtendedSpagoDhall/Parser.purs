@@ -8,39 +8,43 @@ import Data.Maybe (maybe)
 import Data.String.Utils (endsWith)
 import Data.Traversable (traverse)
 import Debug (spy)
+import Dhall.Parser (skipSpacesAndComments)
 import Dhall.Parser as DhallParser
-import Dhall.Types (DhallLiteral(..), LocalImport(..))
+import Dhall.Types (DhallLiteral(..))
 import Foreign.Object (Object)
 import Foreign.Object as Object
 import Parsing (ParseError, Parser, fail, runParser)
-import Parsing.Combinators (optionMaybe)
-import Parsing.String (eof)
+import Parsing.Combinators (optionMaybe, try)
+import Parsing.String (eof, string)
 import Spago.ExtendedSpagoDhall.Types (ExtendedSpagoDhall)
 
 parseExtendedSpagoDhall ∷ String → Either ParseError ExtendedSpagoDhall
 parseExtendedSpagoDhall s = runParser s do
-  let _ = spy "stinky" "bil"
-  leadingComment ← optionMaybe $ DhallParser.multiLineComment
-  let _ = spy "help" leadingComment
+  leadingComment ← optionMaybe $ try $ DhallParser.multiLineComment
+  let _ = spy "parsed leading comment" leadingComment
   DhallParser.skipSpacesAndComments
-  -- { name, import', mergedRec } ← DhallParser.dhallLetInBindingOf
-  --   \{ name, value } → do
-  --     import' ← case value of
-  --       DhallLocalImport i → pure i
-  --       _ → fail "Base file must be a local import"
-  --     void $ string name
-  --     skipSpacesAndComments
-  --     mergedRec ← DhallParser.recordMergeExpr
-  --     pure { name, import', mergedRec }
-  -- dependencies ← getDependencies mergedRec
-  -- sources ← getSources mergedRec
+  { name, import', mergedRec } ← DhallParser.dhallLetInBindingOf
+    \{ name, value } → do
+      let _ = spy "parsed inner" { name, value }
+      import' ← case value of
+        DhallLocalImport i → do
+          let _ = spy "parsed import" i
+          pure i
+        _ → fail "Base file must be a local import"
+      void $ string name
+      skipSpacesAndComments
+      mergedRec ← DhallParser.recordMergeExpr
+      let _ = spy "parsed mergedRec" mergedRec
+      pure { name, import', mergedRec }
+  dependencies ← getDependencies mergedRec
+  sources ← getSources mergedRec
   DhallParser.skipSpacesAndComments
   eof
   pure $
     { leadingComment
-    , baseFile: { name: "bla", import: LocalImport "ejal" }
-    , dependencies: []
-    , sources: mempty
+    , baseFile: { name, import: import' }
+    , dependencies
+    , sources
     }
 
 getDependencies ∷
