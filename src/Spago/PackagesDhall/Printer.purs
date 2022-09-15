@@ -6,6 +6,7 @@ import Biz.Github.Types (Repository(..))
 import Biz.Spago.Types (ProjectName(..), Version(..))
 import Data.Foldable (foldMap)
 import Data.Newtype (un)
+import Dhall.Types (LocalImport(..))
 import Dodo (Doc, break, flexGroup, foldWithSeparator, indent, spaceBreak, text)
 import Dodo.Ansi (GraphicsParam)
 import Dodo.Common (leadingComma, pursCurlies, pursSquares)
@@ -37,6 +38,9 @@ packagesDhallDoc pd =
       \{ change, name } → break <>
         ( flexGroup $ indent
             $ case change of
+                LocalLocationChange (LocalImport loc) →
+                  withEntry ((un ProjectName name))
+                    (text $ loc <> " as Location")
                 RepoChange (Repository repo) →
                   withEntry ((un ProjectName name <> ".repo"))
                     (text $ show repo)

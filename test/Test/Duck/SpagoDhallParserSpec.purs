@@ -49,8 +49,8 @@ spec = describe "The spago.dhall parser" do
       Right
         { variableName: "help.me", array: DhallString <$> [ "rat", "boy" ] }
   it "Parses an empty array" do
-    runParser "[]" (D.dhallArray unit) `shouldEqual` Right []
-    runParser "[  ]" (D.dhallArray unit) `shouldEqual` Right []
+    runParser "[] : List Text" (D.dhallArray unit) `shouldEqual` Right []
+    runParser "[] : List  Text " (D.dhallArray unit) `shouldEqual` Right []
   -- [TODO] Not sure if this should parse {} or {=}
   it "Parses an empty record" do
     runParser "{}" (D.dhallRecord unit) `shouldEqual` Right (Object.empty)
@@ -102,6 +102,21 @@ spec = describe "The spago.dhall parser" do
         ( { name: "x"
           , value: DhallString "help"
           , with: [ { name: "beer", value: DhallRecord (Object.empty) } ]
+          }
+        )
+  it "Parses a let in expression with location" do
+    runParser
+      "let x = \"help\" in x\n with beer = ../something.dhall as Location"
+      D.dhallLetInBinding `shouldEqual`
+      Right
+        ( { name: "x"
+          , value: DhallString "help"
+          , with:
+              [ { name: "beer"
+                , value: DhallLocalImport
+                    (LocalImport "../something.dhall")
+                }
+              ]
           }
         )
   it "Prints a spago.dhall" do
@@ -287,6 +302,12 @@ examplePackageSetString =
   , repo = "https://github.com/purescript-contrib/purescript-aff.git"
   , version = "v7.0.0"
   }
+, no-deps =
+  { dependencies = [] : List Text
+  , repo =
+      "https://github.com/purescript-contrib/purescript-arraybuffer-types.git"
+  , version = "v3.0.2"
+  }
 }
 """
 
@@ -323,7 +344,7 @@ examplePackageSet = Map.fromFoldable
             "https://github.com/purescript-contrib/purescript-aff.git"
         , version: Version "v7.0.0"
         }
-    )
+    ), ProjectName "no-deps" /\ { dependencies: [], repo: Repository "https://github.com/purescript-contrib/purescript-arraybuffer-types.git", version: Version "v3.0.2" }
   ]
 
 printSideBySide ∷ String → String → String

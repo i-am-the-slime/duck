@@ -43,6 +43,8 @@ parsePackagesDhall s = runParser s do
     where
     parseChange { name: rawName, value } = do
       { name, change } ← case value of
+        DhallLocalImport localImport →
+          pure { name, change: LocalLocationChange localImport }
         DhallArray arr
           | Just dn ← stripSuffix (Pattern ".dependencies") rawName → do
               deps ←

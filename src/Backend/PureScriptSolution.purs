@@ -2,7 +2,7 @@ module Backend.PureScriptSolution where
 
 import Prelude
 
-import Biz.PureScriptSolution.Types (PureScriptSolution)
+import Biz.PureScriptSolution.Types (PureScriptSolution, ProjectConfiguration)
 import Biz.PureScriptSolution.Types as Solution
 import Biz.PureScriptSolutionDefinition.Types (EntryPointType(..), Entrypoint, PureScriptSolutionDefinition)
 import Biz.PureScriptSolutionDefinition.Types as Definition
@@ -13,8 +13,10 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Traversable (traverse)
+import Dhall.Types (LocalImport(..))
 import Effect.Aff (Aff, error, throwError)
 import Effect.Class (liftEffect)
+import Fetch (fetch)
 import Node.ChildProcess (Exit(..), defaultSpawnOptions)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff (readTextFile, writeTextFile)
@@ -22,6 +24,10 @@ import Node.FS.Sync as FS
 import Node.Path (FilePath)
 import Node.Path as Path
 import Record (merge)
+import Spago.PackagesDhall.PackageSet.Parser (parsePackageSetDhall)
+import Spago.PackagesDhall.PackageSet.Types (PackageSet)
+import Spago.PackagesDhall.Parser (parsePackagesDhall)
+import Spago.PackagesDhall.Types (PackagesDhall)
 import Spago.SpagoDhall.Parser (parseSpagoDhall)
 import Spago.SpagoDhall.Types (SpagoDhall)
 import Sunde (spawn)
@@ -36,7 +42,7 @@ resolveSolutionDefinition path def = do
   toProject = case _ of
     Definition.SpagoApp app → do
       entrypoints ← app.entrypoints # traverse \ep@{ spago_file } → do
-        project_configuration ← parseSpagoDhallFile
+        project_configuration ← resolveProjectConfiguration
           { root: app.root, spago_file }
         pure $ ep # merge { project_configuration }
       pure $ Solution.SpagoAppProject
@@ -44,7 +50,7 @@ resolveSolutionDefinition path def = do
 
     Definition.SpagoLibrary lib → do
       entrypoints ← lib.entrypoints # traverse \ep@{ spago_file } → do
-        project_configuration ← parseSpagoDhallFile
+        project_configuration ← resolveProjectConfiguration
           { root: lib.root, spago_file }
         pure $ ep # merge { project_configuration }
       pure $ Solution.SpagoLibraryProject
@@ -57,18 +63,49 @@ resolveSolutionDefinition path def = do
             }
         )
 
-  parseSpagoDhallFile ∷ _ → Aff SpagoDhall
-  parseSpagoDhallFile { root, spago_file } = do
-    let spagoPath = Path.concat [ path, root, spago_file ]
-    pathExistsʔ ← FS.exists spagoPath # liftEffect
-    when (not pathExistsʔ) do
-      throwError $ error $ "No such file: " <> spagoPath
-    spagoDhallString ← readTextFile UTF8 spagoPath
-    parseSpagoDhall spagoDhallString # either
-      ( \e → throwError $ error
-          ("Invalid spago dhall:\n" <> show e)
-      )
-      pure
+  resolveProjectConfiguration ∷ _ → Aff ProjectConfiguration
+  resolveProjectConfiguration { root, spago_file } = do
+    spagoDhall ∷ SpagoDhall ← getSpagoDhall path root spago_file
+    packagesDhall ∷ PackagesDhall ← getPackagesDhall path root
+      spagoDhall.packages
+    packageSet ∷ PackageSet ← getPackageSet packagesDhall.packageSet.link
+
+    pure
+      { spagoDhall: Right spagoDhall
+      , packagesDhall
+      , packageSet
+      }
+
+ensurePathExists p = do
+  pathExistsʔ ← FS.exists p # liftEffect
+  when (not pathExistsʔ) do
+    throwError $ error $ "No such file: " <> p
+
+getSpagoDhall ∷ FilePath → FilePath → FilePath → Aff SpagoDhall
+getSpagoDhall path root spago_file = do
+  let spagoPath = Path.concat [ path, root, spago_file ]
+  ensurePathExists spagoPath
+  spagoDhallString ← readTextFile UTF8 spagoPath
+  parseSpagoDhall spagoDhallString # either
+    (\e → throwError $ error ("Invalid spago dhall:\n" <> show e))
+    pure
+
+getPackagesDhall ∷ FilePath → FilePath → LocalImport → Aff _
+getPackagesDhall path root (LocalImport relPath) = do
+  packagesDhallPath ← Path.resolve [ path, root ] relPath # liftEffect
+  ensurePathExists packagesDhallPath
+  packagesDhallString ← readTextFile UTF8 packagesDhallPath
+  parsePackagesDhall packagesDhallString # either
+    (\e → throwError $ error ("Invalid packages dhall:\n" <> show e))
+    pure
+
+getPackageSet ∷ String → Aff PackageSet
+getPackageSet url = do
+  packageSetString ← fetch url {} >>= _.text
+  writeTextFile UTF8 "/tmp/package-set.dhall" packageSetString
+  parsePackageSetDhall packageSetString # either
+    (\e → throwError $ error ("Invalid package set dhall:\n" <> show e))
+    pure
 
 createNewPureScriptSolution ∷ FilePath → PureScriptSolutionDefinition → Aff Unit
 createNewPureScriptSolution path solution =

@@ -11,7 +11,7 @@ import Dhall.Types (DhallLiteral(..), LocalImport(..), RemoteImport(..), LetInBi
 import Foreign.Object (Object)
 import Foreign.Object as Object
 import Parsing (Parser, fail)
-import Parsing.Combinators (between, many, manyTill, notFollowedBy, optionMaybe, sepBy, try, (<|>))
+import Parsing.Combinators (between, many, manyTill, notFollowedBy, optionMaybe, optional, sepBy, try, (<|>))
 import Parsing.String (anyChar, char, string)
 import Parsing.String.Basic (skipSpaces, whiteSpace)
 import Parsing.Token (noneOf, oneOf)
@@ -56,12 +56,18 @@ dhallLiteralNoRecord _ =
 -- <|> try (DhallRecord <$> dhallRecord unit)
 
 dhallArray ∷ Unit → Parser String (Array DhallLiteral)
-dhallArray _ = try emptyArray <|> nonEmptyArray
+dhallArray _ =  try emptyArray <|> nonEmptyArray
   where
   emptyArray = do
-    _ ← (char '[')
+    _ ← char '['
     _ ← skipSpacesAndComments
-    _ ← (char ']')
+    _ ← char ']'
+    _ <- skipSpacesAndComments
+    _ <- string ":"
+    _ <- skipSpacesAndComments
+    _ <- string "List Text"
+    -- _ <- skipSpacesAndComments
+    -- _ <- stringUntil (char '\n' <|> char ' ')
     pure []
   nonEmptyArray = List.toUnfoldable <$>
     between (char '[') (char ']') (nested `sepBy` (char ','))
@@ -82,12 +88,15 @@ dhallBoolean =
 
 dhallLocalImport ∷ Parser String LocalImport
 dhallLocalImport = LocalImport <$> do
-  start ← string "./" <|> string "~/" <|> string "/"
+  start ← string "./" <|> string "../" <|> string "~/" <|> string "/"
   str ← many (noneOf [ ' ', '\n' ]) <#>
     (List.toUnfoldable >>> SCU.fromCharArray)
-  if (endsWith ".dhall" str) then
-    pure (start <> str)
-  else fail "Imports must end in .dhall"
+  _ ← optional $ try $ do
+    skipSpacesAndComments
+    void $ string "as"
+    skipSpacesAndComments
+    void $ string "Location"
+  pure (start <> str)
 
 dhallRemoteImport ∷ Parser String RemoteImport
 dhallRemoteImport = RemoteImport <$> do

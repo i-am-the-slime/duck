@@ -99,8 +99,8 @@ in  upstream
 -------------------------------
 -}
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.4-20220725/packages.dhall
-        sha256:e56fbdf33a5afd2a610c81f8b940b413a638931edb41532164e641bb2a9ec29c
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.4-20220901/packages.dhall
+        sha256:f1531b29c21ac437ffe5666c1b6cc76f0a9c29d3c9d107ff047aa2567744994f
 
 in  upstream
   with playwright =
@@ -776,9 +776,7 @@ in  upstream
     ]
   with react-virtuoso =
     { dependencies =
-        ( https://raw.githubusercontent.com/rowtype-yoga/purescript-react-virtuoso/main/spago.dhall
-            sha256:9c7c1ced896538360ba325dcefe912fed8c0207bc828f68ebadf5f3b83ee5012
-        ).dependencies
+      [ "effect", "functions", "prelude", "react-basic", "react-basic-dom" ]
     , repo = "https://github.com/rowtype-yoga/purescript-react-virtuoso.git"
     , version = "5be142c5a651509e9e9a68582ed1807c029ba1b5"
     }
