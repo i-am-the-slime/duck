@@ -3,7 +3,7 @@ module UI.Repository.View where
 import Yoga.Prelude.View
 
 import Fahrtwind (screenLg, screenMd, screenXl, text2xl, textLg, textXl)
-import Markdown (parseMarkdown)
+import Markdown (parseMarkDown)
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import UI.Component as UI
@@ -17,7 +17,7 @@ import Yoga.Block.Container.Style (DarkOrLightMode(..))
 mkView ∷ UI.Component GithubRepo
 mkView = UI.component "Repository" \ctx props → React.do
   readme /\ getFile ← useGetTextFileInRepo ctx
-  result ← React.useMemo readme (\_ → readme <#> parseMarkdown)
+  result ← React.useMemo readme (\_ → readme <#> parseMarkDown)
   { theme } ← useTheme
 
   useEffect props do

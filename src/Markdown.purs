@@ -1,9 +1,10 @@
-module Markdown (parseMarkdown) where
+module Markdown (parseMarkDown) where
 
 import Prelude
 
 foreign import marked ∷ String → String
 foreign import sanitize ∷ String → String
 
-parseMarkdown ∷ String → String
-parseMarkdown = sanitize <<< marked
+parseMarkDown ∷ String → String
+parseMarkDown = sanitize <<< marked
+
