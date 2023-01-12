@@ -8,11 +8,6 @@ import Data.Maybe (Maybe(..))
 import Fahrtwind (background', borderBottom, borderCol', divideY, hover, mL, mT, pXY, pY', roundedDefault, roundedLg, textCol', textXl, transition, widthAndHeight)
 import Fahrtwind as F
 import Fahrtwind.Icon.Heroicons as Heroicons
-import Plumage.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
-import Plumage.Atom.PopOver.Types as Place
-import Plumage.Hooks.UsePopOver (usePopOver)
-import Plumage.Prelude.Style (Style, StyleProperty, css, nested)
-import Plumage.Util.HTML as H
 import React.Basic (JSX)
 import React.Basic.DOM (text)
 import React.Basic.DOM as R
@@ -25,8 +20,14 @@ import UI.Component as UI
 import UI.Container (popOverId)
 import UI.Style (popOverMenuEntryStyle)
 import Yoga.Block as Block
+import Yoga.Block.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
+import Yoga.Block.Atom.PopOver.Types as Place
 import Yoga.Block.Container.Style (col)
+import Yoga.Block.Hook.UsePopOver (usePopOver)
+import Yoga.Prelude.Style (Style, StyleProperty, css, nested)
+import Yoga.Prelude.Style as H
 import Yoga.Prelude.View (foldMap, guard, null, pure, (#), ($), (/>), (</), (</*), (<>))
+import Yoga.Prelude.View as H
 
 mkView ∷ UI.Component SpagoDhall
 mkView = do
@@ -87,6 +88,7 @@ mkProjectName =
           (DismissPopOverOnClickOutsideTargetAnd [ popOverContainerRef ])
       , containerId: popOverId
       , placement: Placement Place.Below Place.End
+      , fallbackPlacements: [ Placement Place.Above Place.End ]
       }
     let
       dotsMenuHoverStyle =

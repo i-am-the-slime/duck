@@ -4,17 +4,18 @@ import Yoga.Prelude.View
 
 import Backend.Github.API.Types (GithubGraphQLResponse(..), githubGraphQLQuery)
 import Biz.GraphQL (GraphQL(..), graphQLQuery)
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..), NoGithubToken(..))
+import Biz.IPC.Message.Types (MessageToMain(..), NoGithubToken(..))
 import Data.Lens.Barlow (barlow)
 import Network.RemoteData as RD
-import Partial.Unsafe (unsafePartial)
 import React.Basic.Hooks as React
+import Type.Prelude (Proxy(..))
 import UI.Ctx.Types (Ctx)
 import UI.Hook.UseIPC (UseIPC, useIPC)
 
 useGithubUserInfo ∷ Ctx → Hook UseIPC ((Maybe String) /\ (Effect Unit))
 useGithubUserInfo ctx = React.do
-  { data: res, send } ← useIPC ctx (barlow @"%GithubGraphQLResult")
+  { data: res, send } ← useIPC ctx
+    (barlow (Proxy ∷ Proxy ("%GithubGraphQLResult")))
   let
     result = case res # RD.toMaybe of
       Nothing → Nothing

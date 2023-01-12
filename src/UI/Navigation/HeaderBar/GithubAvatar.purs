@@ -9,10 +9,6 @@ import Fahrtwind (active, background', border, borderBottom, borderCol', divideY
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Fahrtwind.Style.Divide (divideCol')
 import Network.RemoteData as RD
-import Plumage.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
-import Plumage.Atom.PopOver.Types as Place
-import Plumage.Hooks.UsePopOver (usePopOver)
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
@@ -23,7 +19,11 @@ import UI.GithubLogin.UseGithubGraphQL (useGithubGraphQL)
 import UI.GithubLogin.UseIsLoggedIntoGithub (useIsLoggedIntoGithub)
 import UI.Style (popOverMenuEntryHoverStyle, popOverMenuEntryStyle, toolbarButtonStyle, toolbarRippleCol)
 import Yoga.Block as Block
+import Yoga.Block.Atom.PopOver.Types (HookDismissBehaviour(..), Placement(..))
+import Yoga.Block.Atom.PopOver.Types as Place
 import Yoga.Block.Container.Style (col)
+import Yoga.Block.Hook.UsePopOver (usePopOver)
+import Yoga.Prelude.View as P
 
 mkView ∷ UI.Component Unit
 mkView = do
@@ -34,17 +34,25 @@ mkView = do
     useEffectAlways $ mempty <$ do
       unless isLoggedIn do checkIsLoggedIn
 
-    { data: userInfoRD, send: loadUserInfo } ←
-      useGithubGraphQL @UserInfoQueryVariables @UserInfoQueryResult
-        ctx (Just (convertDuration (30.0 # Days)))
-          (GraphQL "query { viewer { login } }")
+    { data: userInfoRD, send: loadUserInfo } ∷
+      { data ∷ _ _ { | UserInfoQueryResult }
+      , send ∷ { | UserInfoQueryVariables } → Effect Unit
+      } ←
+      useGithubGraphQL
+        -- (Proxy ∷ Proxy UserInfoQueryVariables)
+        -- (Proxy ∷ Proxy UserInfoQueryResult)
+        ctx
+        (Just (convertDuration (30.0 # Days)))
+        (GraphQL "query { viewer { login } }")
 
     useEffect isLoggedIn $ mempty <$ do
-      when (userInfoRD # RD.toMaybe # isNothing) do loadUserInfo ({} :: Record UserInfoQueryVariables)
+      when (userInfoRD # RD.toMaybe # isNothing) do
+        loadUserInfo ({} ∷ Record UserInfoQueryVariables)
 
     pure
       if isLoggedIn then
-        userInfoRD # RD.toMaybe # foldMap (githubAvatarView <<< _.data.viewer.login)
+        userInfoRD # RD.toMaybe # foldMap
+          (githubAvatarView <<< _.data.viewer.login)
       else
         githubLogin { onComplete: checkIsLoggedIn }
 
@@ -67,13 +75,16 @@ mkGithubAvatarPresentational = do
           (DismissPopOverOnClickOutsideTargetAnd [ popOverContainerRef ])
       , containerId: popOverId
       , placement: Placement Place.Below Place.End
+      , fallbackPlacements:
+          [ Placement Place.Above Place.End ]
+
       }
     let
       menuEntry text icon onClickʔ = R.div'
         </*
           { css: popOverMenuEntryStyle
               <> guard (onClickʔ # isJust) popOverMenuEntryHoverStyle
-                    <> textXs
+              <> textXs
           , onClick: handler_ (onClickʔ # fold)
           }
         />
@@ -138,5 +149,5 @@ mkGithubAvatarPresentational = do
           )
       ]
 
-foreign import duckImage :: String
-foreign import notFoundImage :: String
+foreign import duckImage ∷ String
+foreign import notFoundImage ∷ String

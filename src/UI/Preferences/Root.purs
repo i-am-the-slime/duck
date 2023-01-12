@@ -10,10 +10,10 @@ import Data.Lens.Barlow (barlow)
 import Fahrtwind (background, border, borderCol, flexCol, green, mB, roundedFull, textCol', textLg, textSm, widthAndHeight, yellow)
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..)) as RD
-import Plumage.Util.HTML as H
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
+import Type.Proxy (Proxy(..))
 import UI.Block.Card (card, clickableCard)
 import UI.Component as UI
 import UI.FilePath (renderFilePath)
@@ -28,6 +28,7 @@ import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
+import Yoga.Prelude.View (div_, span_) as H
 
 rootView ∷ JSX
 rootView = mempty
@@ -42,7 +43,8 @@ mkView = do
       (tools <#> toolView)
   where
   useGetTools ctx = React.do
-    { data: result, send: query } ← useIPC ctx (barlow @"%GetInstalledToolsResponse")
+    { data: result, send: query } ← useIPC ctx
+      (barlow (Proxy ∷ Proxy ("%GetInstalledToolsResponse")))
     toolsʔ /\ setTools ← useStateEq' Nothing
     useEffect result do
       case result of

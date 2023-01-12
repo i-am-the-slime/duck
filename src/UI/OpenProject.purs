@@ -2,12 +2,13 @@ module UI.OpenProject where
 
 import Yoga.Prelude.View hiding (Component)
 
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.Message.Types (MessageToMain(..))
 import Data.Lens.Barlow (barlow)
 import Data.Variant (match)
 import Network.RemoteData (RemoteData(..))
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
+import Type.Prelude (Proxy(..))
 import UI.Component (Component, component)
 import UI.Ctx.Types (Ctx)
 import UI.Hook.UseIPC (useIPC)
@@ -20,7 +21,7 @@ mkView = do
   projectView ← Project.mkView
   component "OpenProject" \(ctx ∷ Ctx) _ → React.do
     { data: projectConfigRD, send: openFolder } ←
-      useIPC ctx (barlow @"%LoadSpagoProjectResponse")
+      useIPC ctx (barlow (Proxy ∷ Proxy ("%LoadSpagoProjectResponse")))
 
     let
       selectButton disabled = Block.centre_

@@ -19,13 +19,13 @@ import Fahrtwind (background, background', border, borderCol', borderLeft, curso
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
-import Plumage.Util.HTML as P
 import Prim.Row (class Lacks, class Nub)
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
 import React.Basic.Hooks.Aff (useAff)
 import Record (disjointUnion)
+import Type.Prelude (Proxy(..))
 import UI.Component as UI
 import UI.Container (modalClickawayId, modalContainerId)
 import UI.Ctx.Types (Ctx)
@@ -37,6 +37,7 @@ import Yoga.Block as Block
 import Yoga.Block.Atom.Button as Button
 import Yoga.Block.Atom.Button.Types (ButtonType(..)) as ButtonStyle
 import Yoga.Block.Container.Style (col)
+import Yoga.Prelude.View as P
 
 type Props =
   { onComplete ∷ Effect Unit
@@ -47,7 +48,8 @@ useGetDeviceCode ∷
   Hook UseIPC
     (RemoteData String DeviceCodeResponse /\ (Effect Unit) /\ (Effect Unit))
 useGetDeviceCode ctx = React.do
-  { data: response, send, reset } ← useIPC ctx (barlow @"%GithubLoginGetDeviceCodeResult")
+  { data: response, send, reset } ← useIPC ctx
+    (barlow (Proxy ∷ Proxy ("%GithubLoginGetDeviceCodeResult")))
   let res = response >>= RD.fromEither
   pure (res /\ (send GithubLoginGetDeviceCode) /\ reset)
 
@@ -61,7 +63,7 @@ usePollAccessToken ∷
     )
 usePollAccessToken ctx = React.do
   { data: res, send, reset } ←
-    useIPC ctx (barlow @"%GithubPollAccessTokenResult")
+    useIPC ctx (barlow (Proxy ∷ Proxy ("%GithubPollAccessTokenResult")))
   pure (res /\ (send <<< GithubPollAccessToken) /\ reset)
 
 mkGithubLogin ∷ UI.Component Props
@@ -259,9 +261,10 @@ mkCopyToClipboardButton = UI.component "CopyToClipboardButton" \ctx toCopy →
       ]
   where
   useCopyToClipboard ctx = React.do
-    { data: res, send, reset } ← useIPC ctx (barlow @"%CopyToClipboardResult")
+    { data: res, send, reset } ← useIPC ctx
+      (barlow (Proxy ∷ Proxy ("%CopyToClipboardResult")))
     let copyToClipboard text = send $ CopyToClipboard text
-    pure (RD.toMaybe res  /\ copyToClipboard /\ reset)
+    pure (RD.toMaybe res /\ copyToClipboard /\ reset)
 
 renderCode ∷ UserCode → JSX
 renderCode user_code = Block.box_

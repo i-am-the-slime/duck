@@ -18,18 +18,15 @@ import Data.Number as Math
 import Data.String (Pattern(..), split, stripPrefix, stripSuffix)
 import Data.String as String
 import Data.Time.Duration (Days(..), convertDuration, toDuration)
-import Debug (spy)
-import Effect.Aff (Milliseconds(..), attempt)
+import Effect.Aff (Milliseconds(..))
 import Effect.Aff as Aff
 import Effect.Now as Instant
-import Effect.Unsafe (unsafePerformEffect)
 import Fahrtwind (background', borderBottom, borderCol', cursorPointer, flexCol, fontMedium, height, heightFull, hover, mB, mT, maxWidth, overflowXHidden, pR, pT, pX', pY, positionAbsolute, positionRelative, roundedDefault, roundedMd, roundedNone, textCol', textDefault, textOverflowEllipsis, textXs, transition, width, widthAndHeight, widthFull, zIndex)
 import Fahrtwind as FW
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Foreign.Object as Object
 import Network.RemoteData (RemoteData)
 import Network.RemoteData as RD
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
@@ -37,12 +34,10 @@ import React.Basic.Hooks.Aff (useAff)
 import React.Virtuoso (virtuosoImpl)
 import UI.Block.Card (styledCard, styledClickableCard)
 import UI.Component as UI
-import UI.Ctx.Types (Ctx)
 import UI.FilePath (GithubRepo, renderFilePath, renderGithubRepo)
 import UI.Github.Repo.Biz.UseGetGithubRepoInfo (RepoInfo)
 import UI.GithubLogin.UseGithubGraphQL (useGithubGraphQL)
 import UI.HeaderBar.Style (headerBarHeight)
-import UI.Hook.UseRemoteData (useRemoteData)
 import UI.Navigation.HeaderBar.GithubAvatar (notFoundImage)
 import UI.Navigation.Router (useRouter)
 import UI.Navigation.Router.Page.Github as GithubPage
@@ -55,10 +50,8 @@ import Yoga.Block.Atom.Input.Style as SizeVariant
 import Yoga.Block.Container.Style (col, colour)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
 import Yoga.Block.Quark.Skeleton.Style (skeletonBox)
-import Yoga.Fetch (fetch, getMethod, headMethod)
-import Yoga.Fetch as F
-import Yoga.Fetch.Impl.Window (windowFetch)
 import Yoga.Prelude.View as HTMLElement
+import Yoga.Prelude.View as P
 
 mkView ∷
   UI.Component
@@ -191,7 +184,7 @@ mkRepositoryFilter = do
                 ]
           , onChange: handler targetValue (traverse_ setText)
           , inputRef
-          -- , label: nonEmptyString @"Filter repositories"
+          -- , label: nonEmptyString (Proxy :: Proxy ("Filter repositories")
           }
       ]
 
@@ -233,7 +226,8 @@ mkRepoList = do
             { height: "100%"
             , background: colour.backgroundBright3
             }
-        , context: { props, now, navigate, data_, githubUserImage } :: VirtuosoContext
+        , context:
+            { props, now, navigate, data_, githubUserImage } ∷ VirtuosoContext
         , components: { "ScrollSeekPlaceholder": ssph }
         , data: data_
         , itemContent
@@ -302,20 +296,27 @@ getUserImageQuery = GraphQL
 mkGithubUserImage ∷ UI.Component String
 mkGithubUserImage = UI.component "GithubUserImage"
   \ctx owner → React.do
-    { data: res, send } ← useGithubGraphQL @(login :: String) @(data :: { repositoryOwner :: { avatarUrl :: String }})
-      ctx (Just (convertDuration (30.0 # Days))) getUserImageQuery
+    { data: res, send } ∷
+      { send ∷ { login ∷ String } → Effect Unit
+      , data ∷ _ _
+          { data ∷ { repositoryOwner ∷ { avatarUrl ∷ String } } }
+
+      } ← useGithubGraphQL
+      ctx
+      (Just (convertDuration (30.0 # Days)))
+      getUserImageQuery
     useEffect owner do
       send { login: owner }
       mempty
     pure $ case RD.toMaybe res of
       Just ({ data: { repositoryOwner: { avatarUrl } } }) →
         Block.image
-            { css: roundedMd
-            , width: 48
-            , height: 48
-            , src: avatarUrl
-            , fallbackSrc: notFoundImage
-            }
+          { css: roundedMd
+          , width: 48
+          , height: 48
+          , src: avatarUrl
+          , fallbackSrc: notFoundImage
+          }
       Nothing →
         P.div_
           ( widthAndHeight 48 <> roundedMd <> background'

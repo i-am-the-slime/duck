@@ -99,38 +99,10 @@ in  upstream
 -------------------------------
 -}
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.4-20220901/packages.dhall
-        sha256:f1531b29c21ac437ffe5666c1b6cc76f0a9c29d3c9d107ff047aa2567744994f
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.7-20230112/packages.dhall
+        sha256:3e5a439b9975949016eac07660ea2c80531ef0eb08903fcbeacc1d291a05cea0
 
 in  upstream
-  with playwright =
-    { repo = "https://github.com/i-am-the-slime/purescript-playwright.git"
-    , version = "b8eb61c28d457cf8a61123106c01a1d8024eb3f8"
-    , dependencies =
-      [ "argonaut-core"
-      , "console"
-      , "effect"
-      , "prelude"
-      , "psci-support"
-      , "aff-promise"
-      , "test-unit"
-      , "untagged-union"
-      , "node-buffer"
-      , "node-fs-aff"
-      , "aff"
-      , "either"
-      , "exceptions"
-      , "foreign"
-      , "foreign-object"
-      , "literals"
-      , "maybe"
-      , "node-streams"
-      , "ordered-collections"
-      , "refs"
-      , "strings"
-      , "transformers"
-      ]
-    }
   with milkis =
     { repo =
         "https://github.com/working-group-purescript-es/purescript-milkis.git"
@@ -448,111 +420,103 @@ in  upstream
       , "record"
       ]
     }
-  with heterogeneous =
-    { dependencies =
-      [ "either", "functors", "prelude", "record", "tuples", "variant" ]
-    , repo = "https://github.com/natefaubion/purescript-heterogeneous.git"
-    , version = "v0.5.1"
-    }
-  with interpolate =
-    { dependencies = [ "prelude" ]
-    , repo = "https://github.com/jordanmartinez/purescript-interpolate.git"
-    , version = "v3.0.1"
-    }
-  with interpolate.version = "patch-1"
-  with interpolate.repo
-       = "https://github.com/i-am-the-slime/purescript-interpolate.git"
+--  with heterogeneous =
+--    { dependencies =
+--      [ "either", "functors", "prelude", "record", "tuples", "variant" ]
+--    , repo = "https://github.com/natefaubion/purescript-heterogeneous.git"
+--    , version = "v0.5.1"
+--    }
   with morello =
     { dependencies =
       [ "console", "debug", "effect", "heterogeneous", "strings", "validation" ]
     , repo = "https://github.com/sigma-andex/purescript-morello.git"
     , version = "v0.2.0"
     }
-  with react-basic =
-    { dependencies = [ "prelude", "effect", "record" ]
-    , repo = "https://github.com/lumihq/purescript-react-basic.git"
-    , version = "v16.0.0"
-    }
-  with react-basic-dom =
-    { dependencies =
-      [ "prelude"
-      , "console"
-      , "effect"
-      , "foreign-object"
-      , "psci-support"
-      , "react-basic"
-      , "unsafe-coerce"
-      , "web-dom"
-      , "web-events"
-      , "web-file"
-      , "web-html"
-      ]
-    , repo = "https://github.com/lumihq/purescript-react-basic-dom.git"
-    , version = "4633ad95b47a5806ca559dfb3b16b5339564f0ad"
-    }
-  with react-basic-emotion =
-    { dependencies =
-      [ "colors"
-      , "console"
-      , "effect"
-      , "foreign"
-      , "foreign-object"
-      , "numbers"
-      , "prelude"
-      , "react-basic"
-      , "react-basic-hooks"
-      , "typelevel-prelude"
-      , "unsafe-reference"
-      ]
-    , repo = "https://github.com/lumihq/purescript-react-basic-emotion.git"
-    , version = "v6.0.0"
-    }
+--  with react-basic =
+--    { dependencies = [ "prelude", "effect", "record" ]
+--    , repo = "https://github.com/lumihq/purescript-react-basic.git"
+--    , version = "v16.0.0"
+--    }
+--  with react-basic-dom =
+--    { dependencies =
+--      [ "prelude"
+--      , "console"
+--      , "effect"
+--      , "foreign-object"
+--      , "psci-support"
+--      , "react-basic"
+--      , "unsafe-coerce"
+--      , "web-dom"
+--      , "web-events"
+--      , "web-file"
+--      , "web-html"
+--      ]
+--    , repo = "https://github.com/lumihq/purescript-react-basic-dom.git"
+--    , version = "4633ad95b47a5806ca559dfb3b16b5339564f0ad"
+--    }
+--  with react-basic-emotion =
+--    { dependencies =
+--      [ "colors"
+--      , "console"
+--      , "effect"
+--      , "foreign"
+--      , "foreign-object"
+--      , "numbers"
+--      , "prelude"
+--      , "react-basic"
+--      , "react-basic-hooks"
+--      , "typelevel-prelude"
+--      , "unsafe-reference"
+--      ]
+--    , repo = "https://github.com/lumihq/purescript-react-basic-emotion.git"
+--    , version = "v6.0.0"
+--    }
   with uuid =
     { dependencies = [ "effect", "maybe", "foreign-generic", "console", "spec" ]
     , repo = "https://github.com/megamaddu/purescript-uuid.git"
     , version = "7bb5a90c9b11f6a33ac7610608a650e4d58aeac9"
     }
-  with react-basic-hooks =
-    { dependencies =
-      [ "aff"
-      , "aff-promise"
-      , "bifunctors"
-      , "console"
-      , "control"
-      , "datetime"
-      , "effect"
-      , "either"
-      , "exceptions"
-      , "foldable-traversable"
-      , "functions"
-      , "indexed-monad"
-      , "integers"
-      , "maybe"
-      , "newtype"
-      , "now"
-      , "nullable"
-      , "ordered-collections"
-      , "prelude"
-      , "psci-support"
-      , "react-basic"
-      , "refs"
-      , "tuples"
-      , "type-equality"
-      , "unsafe-coerce"
-      , "unsafe-reference"
-      , "web-html"
-      ]
-    , repo = "https://github.com/spicydonuts/purescript-react-basic-hooks.git"
-    , version = "e7494bd4656b4a43c2efc69bf5f512e154f05cc1"
-    }
-  with react-basic.repo
-       =
-      "https://github.com/working-group-purescript-es/purescript-react-basic.git"
-  with react-basic.version = "es-modules"
-  with react-basic-emotion.repo
-       =
-      "https://github.com/working-group-purescript-es/purescript-react-basic-emotion.git"
-  with react-basic-emotion.version = "es-modules"
+--  with react-basic-hooks =
+--    { dependencies =
+--      [ "aff"
+--      , "aff-promise"
+--      , "bifunctors"
+--      , "console"
+--      , "control"
+--      , "datetime"
+--      , "effect"
+--      , "either"
+--      , "exceptions"
+--      , "foldable-traversable"
+--      , "functions"
+--      , "indexed-monad"
+--      , "integers"
+--      , "maybe"
+--      , "newtype"
+--      , "now"
+--      , "nullable"
+--      , "ordered-collections"
+--      , "prelude"
+--      , "psci-support"
+--      , "react-basic"
+--      , "refs"
+--      , "tuples"
+--      , "type-equality"
+--      , "unsafe-coerce"
+--      , "unsafe-reference"
+--      , "web-html"
+--      ]
+--    , repo = "https://github.com/spicydonuts/purescript-react-basic-hooks.git"
+--    , version = "e7494bd4656b4a43c2efc69bf5f512e154f05cc1"
+--    }
+--  with react-basic.repo
+--       =
+--      "https://github.com/working-group-purescript-es/purescript-react-basic.git"
+--  with react-basic.version = "es-modules"
+--  with react-basic-emotion.repo
+--       =
+--      "https://github.com/working-group-purescript-es/purescript-react-basic-emotion.git"
+--  with react-basic-emotion.version = "es-modules"
   with literals =
     { dependencies =
       [ "assert"
@@ -569,31 +533,31 @@ in  upstream
         "https://github.com/working-group-purescript-es/purescript-literals.git"
     , version = "es-modules"
     }
-  with untagged-union =
-    { dependencies =
-      [ "assert"
-      , "console"
-      , "effect"
-      , "foreign"
-      , "foreign-object"
-      , "literals"
-      , "maybe"
-      , "newtype"
-      , "psci-support"
-      , "tuples"
-      , "unsafe-coerce"
-      ]
-    , repo =
-        "https://github.com/working-group-purescript-es/purescript-untagged-union.git"
-    , version = "es-modules"
-    }
-  with react-testing-library =
-    { name = "react-testing-library"
-    , dependencies = [ "react-basic", "react-basic-hooks", "react-basic-dom" ]
-    , repo =
-        "https://github.com/i-am-the-slime/purescript-react-testing-library.git"
-    , version = "main"
-    }
+--  with untagged-union =
+--    { dependencies =
+--      [ "assert"
+--      , "console"
+--      , "effect"
+--      , "foreign"
+--      , "foreign-object"
+--      , "literals"
+--      , "maybe"
+--      , "newtype"
+--      , "psci-support"
+--      , "tuples"
+--      , "unsafe-coerce"
+--      ]
+--    , repo =
+--        "https://github.com/working-group-purescript-es/purescript-untagged-union.git"
+--    , version = "es-modules"
+--    }
+--  with react-testing-library =
+--    { name = "react-testing-library"
+--    , dependencies = [ "react-basic", "react-basic-hooks", "react-basic-dom" ]
+--    , repo =
+--        "https://github.com/i-am-the-slime/purescript-react-testing-library.git"
+--    , version = "main"
+--    }
   with record-extra =
     { repo =
         "https://github.com/working-group-purescript-es/purescript-record-extra.git"
@@ -632,156 +596,20 @@ in  upstream
     , repo = "https://github.com/natefaubion/purescript-heterogeneous.git"
     , version = "v0.5.1"
     }
-  with interpolate =
-    { dependencies = [ "prelude" ]
-    , repo = "https://github.com/jordanmartinez/purescript-interpolate.git"
-    , version = "v3.0.1"
-    }
   with morello =
     { dependencies =
       [ "console", "debug", "effect", "heterogeneous", "strings", "validation" ]
     , repo = "https://github.com/sigma-andex/purescript-morello.git"
     , version = "v0.2.0"
     }
-  with simple-json =
-    { dependencies =
-      [ "arrays"
-      , "exceptions"
-      , "foreign-object"
-      , "foreign"
-      , "nullable"
-      , "prelude"
-      , "record"
-      , "typelevel-prelude"
-      , "variant"
-      ]
-    , repo =
-        "https://github.com/working-group-purescript-es/purescript-simple-json.git"
-    , version = "v0.15.0-update"
-    }
-  with interpolate =
-    { dependencies = [ "prelude" ]
-    , repo = "https://github.com/i-am-the-slime/purescript-interpolate.git"
-    , version = "v3.0.1"
-    }
-  with interpolate.version = "patch-1"
-  with justifill =
-    { dependencies =
-      [ "aff", "effect", "maybe", "prelude", "record", "typelevel-prelude" ]
-    , repo = "https://github.com/i-am-the-slime/purescript-justifill.git"
-    , version = "v0.3.1"
-    }
-  with uncurried-transformers =
-    { dependencies =
-      [ "control"
-      , "effect"
-      , "either"
-      , "functions"
-      , "identity"
-      , "prelude"
-      , "safe-coerce"
-      , "tailrec"
-      , "transformers"
-      , "tuples"
-      ]
-    , repo =
-        "https://github.com/PureFunctor/purescript-uncurried-transformers.git"
-    , version = "v1.1.0"
-    }
-  with aff-retry =
-    { dependencies =
-      [ "aff"
-      , "arrays"
-      , "datetime"
-      , "effect"
-      , "either"
-      , "exceptions"
-      , "integers"
-      , "maybe"
-      , "newtype"
-      , "numbers"
-      , "prelude"
-      , "random"
-      , "transformers"
-      ]
-    , repo = "https://github.com/Unisay/purescript-aff-retry.git"
-    , version = "v2.0.0"
-    }
-  with fahrtwind =
-    { repo = "https://github.com/rowtype-yoga/purescript-fahrtwind.git"
-    , dependencies =
-      [ "arrays"
-      , "colors"
-      , "foreign-object"
-      , "integers"
-      , "prelude"
-      , "react-basic"
-      , "react-basic-dom"
-      , "react-basic-emotion"
-      , "tuples"
-      , "typelevel-prelude"
-      , "unsafe-coerce"
-      ]
-    , version = "6f457d26d56d15f8eb3609dd687dba19fbfd85b5"
-    }
-  with fahrtwind =
-    { repo = "https://github.com/rowtype-yoga/purescript-fahrtwind.git"
-    , dependencies =
-      [ "arrays"
-      , "colors"
-      , "foreign-object"
-      , "integers"
-      , "prelude"
-      , "react-basic"
-      , "react-basic-dom"
-      , "react-basic-emotion"
-      , "tuples"
-      , "typelevel-prelude"
-      , "unsafe-coerce"
-      ]
-    , version = "main"
-    }
-  with yoga-json.version = "9d6263b6f31276c9b6528ecf9d043fdc39c42443"
-  with yoga-json.dependencies
-       =
-    [ "arrays"
-    , "bifunctors"
-    , "bigints"
-    , "console"
-    , "control"
-    , "datetime"
-    , "effect"
-    , "either"
-    , "exceptions"
-    , "foldable-traversable"
-    , "foreign"
-    , "foreign-object"
-    , "identity"
-    , "integers"
-    , "js-date"
-    , "lists"
-    , "maybe"
-    , "newtype"
-    , "nullable"
-    , "numbers"
-    , "ordered-collections"
-    , "partial"
-    , "prelude"
-    , "record"
-    , "transformers"
-    , "tuples"
-    , "typelevel-prelude"
-    , "unsafe-coerce"
-    , "variant"
-    ]
-  with react-virtuoso =
-    { dependencies =
-      [ "effect", "functions", "prelude", "react-basic", "react-basic-dom" ]
-    , repo = "https://github.com/rowtype-yoga/purescript-react-virtuoso.git"
-    , version = "5be142c5a651509e9e9a68582ed1807c029ba1b5"
-    }
+--  with react-virtuoso =
+--   { dependencies =
+--     [ "effect", "functions", "prelude", "react-basic", "react-basic-dom" ]
+--   , repo = "https://github.com/rowtype-yoga/purescript-react-virtuoso.git"
+--   , version = "5be142c5a651509e9e9a68582ed1807c029ba1b5"
+--   }
   with datetime.version = "v6.1.0"
-  with barlow-lens.version = "vta"
+  with barlow-lens.version = "main"
   with yoga-tree =
     { dependencies =
       [ "arrays"

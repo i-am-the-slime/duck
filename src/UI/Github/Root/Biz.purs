@@ -6,6 +6,7 @@ import Biz.Github.Types (Login)
 import Biz.GraphQL (GraphQL(..))
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Days(..), convertDuration)
+import Effect (Effect)
 import React.Basic.Hooks (Hook)
 import React.Basic.Hooks as React
 import UI.Ctx.Types (Ctx)
@@ -13,7 +14,11 @@ import UI.GithubLogin.UseGithubGraphQL (UseGithubGraphQL, useGithubGraphQL)
 
 useGetUserRepos ∷ Ctx → Hook (UseGithubGraphQL QueryInput) _
 useGetUserRepos ctx = React.do
-  { data: result, send } ← useGithubGraphQL @QueryInput @QueryOutput ctx
+  { data: result, send } ∷
+    { data ∷ _ _ { | QueryOutput }
+    , send ∷ { | QueryInput } → Effect Unit
+    } ← useGithubGraphQL
+    ctx
     (Just (7.0 # Days # convertDuration))
     query
 

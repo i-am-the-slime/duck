@@ -6,7 +6,6 @@ import Biz.Github.Types (Login(..), Repository(..))
 import Data.Array as Array
 import Fahrtwind.Icon.Heroicons as Heroicon
 import Framer.Motion as M
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import UI.Component as UI
@@ -18,6 +17,7 @@ import UI.Navigation.Router.Page.Preferences as Preferences
 import UI.Navigation.Router.Types (Route(..))
 import Yoga.Block.Hook.UseOverflows (useOverflows)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
+import Yoga.Prelude.View as P
 
 mkView ∷ UI.Component Unit
 mkView = do

@@ -2,11 +2,8 @@ module UI.Github.Repo.View where
 
 import Yoga.Prelude.View
 
-import Yoga.Tree (Tree)
-import Yoga.Tree.Zipper as Loc
 import Fahrtwind (background', block, heightFull, mL, positionAbsolute, positionRelative, width, widthFull)
 import Network.RemoteData as RD
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
 import UI.Component as UI
@@ -19,6 +16,9 @@ import UI.Repository.FileTree.View (RESTFileInfo)
 import UI.Repository.FileTree.View as FileTree
 import UI.Repository.FileTree.View as Tree
 import Yoga.Block.Container.Style (col)
+import Yoga.Prelude.View as P
+import Yoga.Tree (Tree)
+import Yoga.Tree.Zipper as Loc
 
 type Props = { repo ∷ GithubRepo }
 

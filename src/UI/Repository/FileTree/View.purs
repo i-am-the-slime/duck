@@ -22,9 +22,6 @@ import Data.Maybe (isNothing)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Traversable (traverse)
-import Yoga.Tree (Tree, mkLeaf)
-import Yoga.Tree.Zipper (Loc)
-import Yoga.Tree.Zipper as Loc
 import Data.Tuple (fst, snd)
 import Effect.Aff (Aff, sequential)
 import Fahrtwind (background', borderBottom, borderCol', cursorDefault, disabled, flexCol, flexGrow, flexRow, flexShrink, gap, height, heightFull, hover, invisible, itemsCenter, justifyBetween, mL, mY, maxWidth, minWidth, overflowHidden, overflowYScroll, pL, pR, pX, pY, positionAbsolute, positionRelative, roundedDefault, textCol', textOverflowEllipsis, textSm, userSelectNone, widthAndHeight, widthFull)
@@ -35,8 +32,6 @@ import Framer.Motion as M
 import Framer.Motion.Hook (useSpringWithMotionValue)
 import MotionValue (useMotionValue)
 import MotionValue as MotionValue
-import Plumage.Prelude.Style (Style)
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
@@ -54,6 +49,11 @@ import Yoga.Fetch (fetch)
 import Yoga.Fetch as F
 import Yoga.Fetch.Impl.Window (windowFetch)
 import Yoga.JSON as JSON
+import Yoga.Prelude.Style (Style)
+import Yoga.Prelude.View as P
+import Yoga.Tree (Tree, mkLeaf)
+import Yoga.Tree.Zipper (Loc)
+import Yoga.Tree.Zipper as Loc
 
 type Props =
   { repo ∷ GithubRepo

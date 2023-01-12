@@ -13,7 +13,6 @@ import Fahrtwind (displayNone, flexCol, flexGrow, flexRow, full, height', height
 import Foreign (MultipleErrors)
 import Network.RemoteData (RemoteData(..))
 import Network.RemoteData as RD
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
@@ -36,6 +35,7 @@ import Yoga.Block.Hook.UseMediaQuery (useMediaQuery)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
 import Yoga.Block.Molecule.Sheet as Sheet
 import Yoga.JSON as JSON
+import Yoga.Prelude.View as P
 
 mkView ∷ UI.Component Unit
 mkView = do

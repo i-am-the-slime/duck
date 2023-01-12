@@ -65,6 +65,7 @@ to generate this file without the comments in this block.
   , "posix-types"
   , "prelude"
   , "profunctor-lenses"
+  , "react-aria"
   , "react-basic"
   , "react-basic-dom"
   , "react-basic-emotion"

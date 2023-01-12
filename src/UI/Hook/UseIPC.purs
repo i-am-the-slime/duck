@@ -4,7 +4,7 @@ import Prelude
 
 import Biz.IPC.Message.Types (MessageToMain, MessageToRenderer)
 import Data.Bifunctor (lmap)
-import Data.Either (Either(..), note)
+import Data.Either (Either, note)
 import Data.Foldable (for_)
 import Data.Lens (Prism', preview)
 import Data.Map (Map)

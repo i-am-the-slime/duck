@@ -7,7 +7,7 @@ import Yoga.Tree.Zipper as Loc
 import Data.Tuple.Nested ((/\))
 import Effect (Effect)
 import Fahrtwind (heightScreen)
-import Plumage.Util.HTML as P
+import Yoga.Prelude.Style as H
 import React.Basic (JSX)
 import React.Basic.Hooks as React
 import Story.Util.Decorator (containerDecorator)

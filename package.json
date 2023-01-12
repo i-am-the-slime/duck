@@ -57,7 +57,7 @@
     "@storybook/react-webpack5": "^7.0.0-alpha.16",
     "@storybook/testing-library": "^0.0.14-next.0",
     "babel-loader": "^8.2.5",
-    "electron-nightly": "^21.0.0-nightly.20220728",
+    "electron": "^21.0.0",
     "electron-packager": "^15.5.1",
     "esbuild": "^0.14.51",
     "global-jsdom": "^8.5.0",

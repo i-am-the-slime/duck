@@ -344,7 +344,13 @@ examplePackageSet = Map.fromFoldable
             "https://github.com/purescript-contrib/purescript-aff.git"
         , version: Version "v7.0.0"
         }
-    ), ProjectName "no-deps" /\ { dependencies: [], repo: Repository "https://github.com/purescript-contrib/purescript-arraybuffer-types.git", version: Version "v3.0.2" }
+    )
+  , ProjectName "no-deps" /\
+      { dependencies: []
+      , repo: Repository
+          "https://github.com/purescript-contrib/purescript-arraybuffer-types.git"
+      , version: Version "v3.0.2"
+      }
   ]
 
 printSideBySide ∷ String → String → String

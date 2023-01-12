@@ -4,7 +4,7 @@ import Yoga.Prelude.View
 
 import Fahrtwind (background, background', borderCol, borderCol', borderLeft, height, heightFull, heightScreen, hover, ignoreClicks, opacity, overflowHidden, overflowVisible, positionAbsolute, positionFixed, width, widthFull, widthScreen)
 import Fahrtwind as F
-import Plumage.Prelude.Style (Style)
+import Yoga.Prelude.Style (Style)
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import Yoga.Block.Container.Style (col)

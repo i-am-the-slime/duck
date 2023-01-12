@@ -14,11 +14,12 @@ import Effect.Aff (launchAff_)
 import Fahrtwind (background', borderCol', borderLeft, fontFamilyOrMono, height, heightFull, mXAuto, maxWidth, overflowYScroll, textCol', textSm, width, widthAndHeight)
 import Monaco (addCommand, keyCodeEnter, keyModCtrlCmd)
 import Network.RemoteData as RD
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion (css)
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
+import Type.Prelude (Proxy(..))
+import Type.Proxy (Proxy)
 import UI.Component as UI
 import UI.Editor (useMonaco)
 import UI.Hook.UseIPC (useIPC)
@@ -34,66 +35,78 @@ import Yoga.Block.Atom.Button.Types (ButtonType(..)) as Button
 import Yoga.Block.Container.Style (col)
 import Yoga.Block.Icon.SVG.Spinner (spinner)
 import Yoga.Block.Layout.Sidebar.Style (SidebarSide(..))
+import Yoga.Prelude.Style as H
+import Yoga.Prelude.View as P
 
-foreign import newEvent :: EventType -> { bubbles :: Boolean } -> Effect Event
+foreign import newEvent ∷ EventType → { bubbles ∷ Boolean } → Effect Event
 
 mkView ∷ UI.Component Unit
 mkView = do
-  os <- getOS # liftEffect
+  os ← getOS # liftEffect
   UI.component "WorksheetView" \ctx _props → React.do
     textRef ← React.useRef ""
     editor ← useMonaco "" (React.writeRef textRef)
-    buttonRef <- React.useRef null
+    buttonRef ← React.useRef null
     useEffectOnce do
-      React.readRef editor.monacoRef >>= traverse_ \m -> m#
+      React.readRef editor.monacoRef >>= traverse_ \m → m #
         addCommand (keyCodeEnter .|. keyModCtrlCmd) do
-          getHTMLElementFromRef buttonRef >>= traverse_ \el -> do
-            event <- newEvent (EventType.click) { bubbles: true }
+          getHTMLElementFromRef buttonRef >>= traverse_ \el → do
+            event ← newEvent (EventType.click) { bubbles: true }
             dispatchEvent event (HTMLElement.toEventTarget el)
       mempty
 
-    loadFileIPC ← useIPC ctx (barlow @"%LoadTextFileResult")
-    result  /\ setResult <- React.useState (RD.NotAsked:: (RD.RemoteData _ { stdout :: String, stderr :: String, done :: Maybe Boolean }))
-    let
-     saveAndRun content = do
-      errʔ ← ctx.sendIPCMessage
-        (StoreTextFile { path: "/tmp/duck-worksheet/src/Main.purs", content })
-        <#> (preview @"%StoreTextFileResult" >>> join)
-      do
-        setResult (const RD.Loading) # liftEffect
-        for_ errʔ (notifyError ctx) # liftEffect
-        ctx.streamIPCMessage
-          ( RunCommand
-              { tool: Spago
-              , workingDir: Just "/tmp/duck-worksheet"
-              , args: [ "run" ]
-              }
+    loadFileIPC ← useIPC ctx (barlow (Proxy ∷ Proxy "%LoadTextFileResult"))
+    result /\ setResult ← React.useState
+      ( RD.NotAsked ∷
+          ( RD.RemoteData _
+              { stdout ∷ String, stderr ∷ String, done ∷ Maybe Boolean }
           )
-          \msg -> do
-            case preview @"%RunCommandUpdateResult" msg of
-              Nothing -> setResult (const $ RD.Failure ("Unexpected message"))
-              Just (StdoutData s) ->
-                setResult case _ of
-                  RD.Success d -> RD.Success (d { stdout = d.stdout <> s })
-                  _ -> RD.Success { stdout: s, stderr: "", done: Nothing}
-              Just (StderrData s) ->
-                setResult case _ of
-                  RD.Success d -> RD.Success (d { stderr = d.stderr <> s })
-                  _ -> RD.Success { stdout: "", stderr: s, done: Nothing}
-              Just (CommandFinished succeeded) ->
-                setResult case _ of
-                  RD.Success d -> RD.Success (d { done = Just succeeded })
-                  _ -> RD.Success { stdout: "", stderr: "", done: Just succeeded}
+      )
+    let
+      saveAndRun content = do
+        errʔ ←
+          ctx.sendIPCMessage
+            ( StoreTextFile
+                { path: "/tmp/duck-worksheet/src/Main.purs", content }
+            )
+            <#> (preview (Proxy ∷ Proxy "%StoreTextFileResult") >>> join)
+        do
+          setResult (const RD.Loading) # liftEffect
+          for_ errʔ (notifyError ctx) # liftEffect
+          ctx.streamIPCMessage
+            ( RunCommand
+                { tool: Spago
+                , workingDir: Just "/tmp/duck-worksheet"
+                , args: [ "run" ]
+                }
+            )
+            \msg → do
+              case preview (Proxy ∷ Proxy "%RunCommandUpdateResult") msg of
+                Nothing → setResult (const $ RD.Failure ("Unexpected message"))
+                Just (StdoutData s) →
+                  setResult case _ of
+                    RD.Success d → RD.Success (d { stdout = d.stdout <> s })
+                    _ → RD.Success { stdout: s, stderr: "", done: Nothing }
+                Just (StderrData s) →
+                  setResult case _ of
+                    RD.Success d → RD.Success (d { stderr = d.stderr <> s })
+                    _ → RD.Success { stdout: "", stderr: s, done: Nothing }
+                Just (CommandFinished succeeded) →
+                  setResult case _ of
+                    RD.Success d → RD.Success (d { done = Just succeeded })
+                    _ → RD.Success
+                      { stdout: "", stderr: "", done: Just succeeded }
 
     useEffectOnce do
       loadFileIPC.send (LoadTextFile "/tmp/duck-worksheet/src/Main.purs")
       mempty
 
-    startLS <- useIPC ctx (barlow @"%StartPureScriptLanguageServerResponse")
+    startLS ← useIPC ctx
+      (barlow (Proxy ∷ Proxy ("%StartPureScriptLanguageServerResponse")))
     useEffectOnce do
-      startLS.send (StartPureScriptLanguageServer { folder: "/tmp/duck-worksheet/" })
+      startLS.send
+        (StartPureScriptLanguageServer { folder: "/tmp/duck-worksheet/" })
       mempty
-
 
     useEffect loadFileIPC.data do
       for_ (loadFileIPC.data) (traverse_ editor.setValue)
@@ -111,48 +124,87 @@ mkView = do
         }
         [ P.div_ Style.buttonContentStyle
             [ R.div_ []
-            , R.div_ [ R.text "Run"]
+            , R.div_ [ R.text "Run" ]
             , P.div_ Style.shortcutStyle
                 [ P.div_ (Style.keyStyle)
-                  [ R.text case os of
-                      MacOS -> "⌘"
-                      _ -> "ctrl-"
-                  ]
-                , P.div_ (Style.keyStyle) [
-                    R.text "↩"
-                ]
+                    [ R.text case os of
+                        MacOS → "⌘"
+                        _ → "ctrl-"
+                    ]
+                , P.div_ (Style.keyStyle)
+                    [ R.text "↩"
+                    ]
                 ]
             ]
         ]
 
     pure $ Block.stack { css: heightFull <> background' col.backgroundBright3 }
-      [  Block.sidebar
+      [ Block.sidebar
           { space: "0"
-          , sidebar:  P.div_ ( heightFull <> borderLeft 1 <> borderCol' col.backgroundLayer2 <> width 300) [
-            Block.box_ [Block.stack_ [
-              runButton,
-              result
-                # case _ of
-                    RD.NotAsked → R.text "Go ahead run this"
-                    RD.Loading → P.div_ (widthAndHeight 24 <> mXAuto) [spinner]
-                    RD.Success {stdout, stderr, done} →
-                      P.div_ (maxWidth 300) [
-                        Block.stack_ [
-                          guard (done == Nothing)  (P.div_ (widthAndHeight 24 <> mXAuto) [spinner])
-                         , P.div_ mempty [R.text stdout]
-                          , R.details' </ { open: done /= Just true } /> [
-                            P.div_ (textSm <> overflowYScroll <> height 400 <> guard (done == Just false) (textCol' col.invalid) <>  fontFamilyOrMono "Jetbrains Mono") [
-                            P.div_ (css { whiteSpace: E.str "pre-wrap"}) [
-                            R.text (stderr
-                            # String.replaceAll (String.Pattern "\\n") (String.Replacement "\n")
-                            # String.replaceAll (String.Pattern "\\") (String.Replacement "")
-                            )]
-                            ]
-                            ]
-                        ]
+          , sidebar: P.div_
+              ( heightFull <> borderLeft 1 <> borderCol' col.backgroundLayer2 <>
+                  width 300
+              )
+              [ Block.box_
+                  [ Block.stack_
+                      [ runButton
+                      , result
+                          # case _ of
+                              RD.NotAsked → R.text "Go ahead run this"
+                              RD.Loading → P.div_ (widthAndHeight 24 <> mXAuto)
+                                [ spinner ]
+                              RD.Success { stdout, stderr, done } →
+                                P.div_ (maxWidth 300)
+                                  [ Block.stack_
+                                      [ guard (done == Nothing)
+                                          ( P.div_ (widthAndHeight 24 <> mXAuto)
+                                              [ spinner ]
+                                          )
+                                      , P.div_ mempty [ R.text stdout ]
+                                      , R.details'
+                                          </ { open: done /= Just true }
+                                          />
+                                            [ P.div_
+                                                ( textSm <> overflowYScroll
+                                                    <> height 400
+                                                    <> guard
+                                                      (done == Just false)
+                                                      (textCol' col.invalid)
+                                                    <> fontFamilyOrMono
+                                                      "Jetbrains Mono"
+                                                )
+                                                [ P.div_
+                                                    ( css
+                                                        { whiteSpace: E.str
+                                                            "pre-wrap"
+                                                        }
+                                                    )
+                                                    [ R.text
+                                                        ( stderr
+                                                            # String.replaceAll
+                                                                ( String.Pattern
+                                                                    "\\n"
+                                                                )
+                                                                ( String.Replacement
+                                                                    "\n"
+                                                                )
+                                                            # String.replaceAll
+                                                                ( String.Pattern
+                                                                    "\\"
+                                                                )
+                                                                ( String.Replacement
+                                                                    ""
+                                                                )
+                                                        )
+                                                    ]
+                                                ]
+                                            ]
+                                      ]
+                                  ]
+                              RD.Failure _ → mempty -- notifyError ctx e
                       ]
-                    RD.Failure _ → mempty -- notifyError ctx e
-               ]]]
+                  ]
+              ]
           , sideWidth: "300px"
           , side: SidebarRight
           }

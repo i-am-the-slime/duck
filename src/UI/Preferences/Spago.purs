@@ -1,19 +1,19 @@
 module UI.Tool.Spago where
 
 import Backend.Tool.Spago.Types (SpagoGlobalCacheDir(..))
-import Biz.IPC.Message.Types (MessageToMain(..), MessageToRenderer(..))
+import Biz.IPC.Message.Types (MessageToMain(..))
 import Data.Either (Either(..))
 import Data.Lens.Barlow (barlow)
 import Network.RemoteData as RD
 import React.Basic.DOM as R
 import React.Basic.Hooks as React
+import Type.Prelude (Proxy(..))
 import UI.Component as UI
 import UI.Hook.UseIPC (useIPC)
 import UI.Notification.ErrorNotification (errorNotification)
 import UI.Notification.SendNotification (sendNotification)
 import Yoga.Block.Hook.UseStateEq (useStateEq')
-import Yoga.JSON (writeJSON)
-import Yoga.Prelude.View (Maybe(..), Unit, absurd, discard, foldMap, mempty, pure, (#), ($), (/\))
+import Yoga.Prelude.View (Maybe(..), Unit, discard, foldMap, mempty, pure, (#), ($), (/\))
 
 mkView ∷ UI.Component Unit
 mkView = do
@@ -23,7 +23,8 @@ mkView = do
 
   where
   useGetSpagoGlobalCache ctx = React.do
-    { data: result, send: query } ← useIPC ctx (barlow @"%GetSpagoGlobalCacheResult")
+    { data: result, send: query } ← useIPC ctx
+      (barlow (Proxy ∷ Proxy ("%GetSpagoGlobalCacheResult")))
     pathʔ /\ setPath ← useStateEq' Nothing
     React.useEffectAlways do
       case result of

@@ -10,10 +10,10 @@ import Fahrtwind (divideY, mT, pL, pR, text2xl, textCol', widthAndHeight)
 import Fahrtwind.Icon.Heroicons as Heroicons
 import Fahrtwind.Style.Divide (divideCol')
 import Network.RemoteData as RD
-import Plumage.Util.HTML as P
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import React.Basic.Hooks as React
+import Type.Prelude (Proxy(..))
 import UI.Block.Card (clickableCard)
 import UI.Component (Component, component)
 import UI.Ctx.Types (Ctx)
@@ -22,12 +22,14 @@ import UI.Hook.UseIPC (useIPC)
 import Yoga.Block as Block
 import Yoga.Block.Atom.Button.Types as Button
 import Yoga.Block.Container.Style (col)
+import Yoga.Prelude.View as P
 
 mkView ∷ Component Unit
 mkView = do
   component "Solutions" \(ctx ∷ Ctx) _ → React.do
     { data: solutionsRD, send: getPreferences } ←
-      useIPC ctx (barlow @"%GetPureScriptSolutionDefinitionsResponse")
+      useIPC ctx
+        (barlow (Proxy ∷ Proxy ("%GetPureScriptSolutionDefinitionsResponse")))
 
     useEffectOnce do
       getPreferences GetPureScriptSolutionDefinitions

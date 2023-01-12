@@ -3,19 +3,21 @@ module UI.Tooltip where
 import Prelude
 
 import Fahrtwind (background', borderCol', pB, pX, roundedDefault, textCol', textXs)
-import Plumage.Atom.PopOver.Types (Placement(..), PrimaryPlacement(..), SecondaryPlacement(..))
-import Plumage.Atom.Tooltip.View (tooltip)
-import Plumage.Util.HTML as H
 import React.Basic (JSX)
 import React.Basic.DOM as R
 import React.Basic.Emotion as E
 import UI.Container (tooltipId)
+import Yoga.Block.Atom.PopOver.Types (Placement(..), PrimaryPlacement(..), SecondaryPlacement(..))
+import Yoga.Block.Atom.Tooltip.View (tooltip)
 import Yoga.Block.Container.Style (col)
+import Yoga.Prelude.Style as H
+import Yoga.Prelude.View as H
 
 withTooltip ∷ Array JSX → JSX → JSX
 withTooltip content = tooltip
   { containerId: tooltipId
   , placement: Placement Below Centre
+  , fallbackPlacements: [Placement Above Centre]
   , tooltip: H.div_
       ( background' col.backgroundInverted
           <> textCol' col.textInverted

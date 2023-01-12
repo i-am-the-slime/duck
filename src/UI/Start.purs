@@ -5,7 +5,6 @@ import Yoga.Prelude.View
 import Control.Monad.Reader.Class (ask)
 import Fahrtwind (height, height', heightFull, mL, mT, overflowHidden, positionFixed, width')
 import Fahrtwind as F
-import Plumage.Util.HTML as P
 import React.Basic.Emotion as E
 import UI.Component as UI
 import UI.Container (mkContainer, ourGlobalStyle)
@@ -15,6 +14,7 @@ import UI.Navigation.HeaderBar as HeaderBar
 import UI.Navigation.Router (mkRouter)
 import UI.Navigation.SideBar as SideBar
 import UI.Navigation.ThemeSwitcher (mkThemeProvider)
+import Yoga.Prelude.View as P
 
 mkView ∷ UI.Component Unit
 mkView = do
